@@ -37,7 +37,7 @@ Component({
             name: '图片压缩',
             description: '智能压缩图片大小，节省存储空间',
             icon: '🗜️',
-            iconBg: '#e8f2ff',
+            iconBg: '#e8f8e8',
             path: '/pages/compress/compress',
             isHot: true
           },

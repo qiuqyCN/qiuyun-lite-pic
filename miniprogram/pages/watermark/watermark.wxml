@@ -96,7 +96,7 @@
           max="100"
           value="{{fontSize}}"
           block-size="24"
-          activeColor="#0066ff"
+          activeColor="#41bc3f"
           backgroundColor="#e8e8ed"
           bindchange="onFontSizeChange"
         />
@@ -113,7 +113,7 @@
           max="360"
           value="{{rotation}}"
           block-size="24"
-          activeColor="#0066ff"
+          activeColor="#41bc3f"
           backgroundColor="#e8e8ed"
           bindchange="onRotationChange"
         />
@@ -155,7 +155,7 @@
           max="100"
           value="{{opacity}}"
           block-size="24"
-          activeColor="#0066ff"
+          activeColor="#41bc3f"
           backgroundColor="#e8e8ed"
           bindchange="onOpacityChange"
         />

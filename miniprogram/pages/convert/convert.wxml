@@ -96,7 +96,7 @@
           max="100"
           value="{{quality}}"
           block-size="24"
-          activeColor="#0066ff"
+          activeColor="#41bc3f"
           backgroundColor="#e8e8ed"
           bindchange="onQualityChange"
         />

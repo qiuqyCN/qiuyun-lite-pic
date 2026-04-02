@@ -23,7 +23,7 @@
 }
 
 .upload-card:active {
-  border-color: #0066ff;
+  border-color: #41bc3f;
   background: #f8f9ff;
 }
 
@@ -99,7 +99,7 @@
 .change-btn text {
   font-size: 14px;
   font-weight: 500;
-  color: #0066ff;
+  color: #41bc3f;
 }
 
 .preview-container {
@@ -158,7 +158,7 @@
 }
 
 .size-value.highlight {
-  color: #0066ff;
+  color: #41bc3f;
   font-size: 16px;
 }
 
@@ -192,8 +192,8 @@
 }
 
 .preset-btn.active {
-  background: #e8f2ff;
-  border-color: #0066ff;
+  background: #e8f8e8;
+  border-color: #41bc3f;
 }
 
 .preset-name {
@@ -205,7 +205,7 @@
 }
 
 .preset-btn.active .preset-name {
-  color: #0066ff;
+  color: #41bc3f;
 }
 
 .preset-desc {
@@ -292,7 +292,7 @@
 .scale-value {
   font-size: 16px;
   font-weight: 600;
-  color: #0066ff;
+  color: #41bc3f;
   font-family: -apple-system-font, 'SF Mono', monospace;
 }
 
@@ -331,13 +331,13 @@
 }
 
 .btn-primary {
-  background: #0066ff;
+  background: #41bc3f;
   color: white;
   box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
 }
 
 .btn-primary:active {
-  background: #0052cc;
+  background: #369c34;
 }
 
 .btn-secondary {

@@ -104,7 +104,7 @@
         <switch
           class="ratio-switch"
           checked="{{maintainAspectRatio}}"
-          color="#0066ff"
+          color="#41bc3f"
           bindchange="onAspectRatioChange"
         />
       </view>

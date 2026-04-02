@@ -74,7 +74,7 @@
         value="{{spacing}}"
         show-value="{{false}}"
         block-size="20"
-        activeColor="#0066ff"
+        activeColor="#41bc3f"
         bindchange="onSpacingChange"
       />
     </view>
@@ -92,7 +92,7 @@
         value="{{borderRadius}}"
         show-value="{{false}}"
         block-size="20"
-        activeColor="#0066ff"
+        activeColor="#41bc3f"
         bindchange="onRadiusChange"
       />
     </view>
@@ -133,7 +133,7 @@
         value="{{outputWidth}}"
         show-value="{{false}}"
         block-size="20"
-        activeColor="#0066ff"
+        activeColor="#41bc3f"
         bindchange="onWidthChange"
       />
     </view>
@@ -151,7 +151,7 @@
         value="{{outputQuality}}"
         show-value="{{false}}"
         block-size="20"
-        activeColor="#0066ff"
+        activeColor="#41bc3f"
         bindchange="onQualityChange"
       />
     </view>
