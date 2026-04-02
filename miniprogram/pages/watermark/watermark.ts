@@ -180,7 +180,7 @@ Component({
 
         // 应用水印
         if (this.data.watermarkType === 'text') {
-          await this.drawTextWatermark(ctx, canvasNode);
+          await this.drawTextWatermark(ctx);
         } else {
           await this.drawImageWatermark(ctx, canvasNode);
         }
@@ -209,7 +209,7 @@ Component({
     },
 
     // 绘制文字水印
-    async drawTextWatermark(ctx: WechatMiniprogram.CanvasContext, canvasNode: WechatMiniprogram.Canvas) {
+    async drawTextWatermark(ctx: WechatMiniprogram.CanvasContext) {
       const { watermarkText, fontSize, fontColor, opacity, rotation, position, imageWidth, imageHeight } = this.data;
 
       ctx.save();
