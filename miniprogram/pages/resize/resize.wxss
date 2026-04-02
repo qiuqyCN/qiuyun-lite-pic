@@ -481,6 +481,16 @@
   opacity: 0.8;
 }
 
+/* 按钮行布局 */
+.action-row {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-flex {
+  flex: 1;
+}
+
 /* 隐藏Canvas */
 .hidden-canvas {
   position: fixed;

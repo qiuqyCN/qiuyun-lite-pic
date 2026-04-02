@@ -40,8 +40,14 @@
 
   <!-- 布局选择 -->
   <view class="section">
-    <view class="section-title">布局模板</view>
-    <scroll-view class="layout-scroll" scroll-x>
+    <view class="section-header">
+      <view class="section-title">布局模板</view>
+      <view class="scroll-hint">
+        <text class="scroll-hint-text">左右滑动查看更多</text>
+        <text class="scroll-hint-icon">→</text>
+      </view>
+    </view>
+    <scroll-view class="layout-scroll" scroll-x show-scrollbar="{{false}}">
       <view class="layout-list">
         <view
           wx:for="{{layoutTemplates}}"

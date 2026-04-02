@@ -368,6 +368,15 @@ Component({
       }
     },
 
+    // 重新调整
+    resetResize() {
+      this.setData({
+        resultPath: '',
+        previewPath: '',
+      });
+      this.generatePreview();
+    },
+
     // 保存到历史记录
     saveToHistory() {
       const history = wx.getStorageSync('processHistory') || [];

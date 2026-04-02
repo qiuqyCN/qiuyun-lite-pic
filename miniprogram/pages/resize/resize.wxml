@@ -129,7 +129,9 @@
 
     <!-- 操作按钮 -->
     <view class="action-section">
+      <!-- 调整前：确认调整 -->
       <button
+        wx:if="{{!resultPath}}"
         class="btn btn-primary btn-lg btn-block {{isProcessing ? 'btn-loading' : ''}}"
         bindtap="confirmResize"
         disabled="{{isProcessing}}"
@@ -138,13 +140,15 @@
         <text wx:else>确认调整</text>
       </button>
 
-      <button
-        wx:if="{{resultPath}}"
-        class="btn btn-secondary btn-lg btn-block"
-        bindtap="saveToAlbum"
-      >
-        保存到相册
-      </button>
+      <!-- 调整后：重新调整 + 保存 -->
+      <view wx:if="{{resultPath}}" class="action-row">
+        <button class="btn btn-secondary btn-flex" bindtap="resetResize">
+          重新调整
+        </button>
+        <button class="btn btn-primary btn-flex" bindtap="saveToAlbum">
+          保存到相册
+        </button>
+      </view>
     </view>
   </view>
 
