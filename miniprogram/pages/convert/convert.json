@@ -1,6 +1,6 @@
 {
   "usingComponents": {},
   "navigationBarTitleText": "格式转换",
-  "navigationBarBackgroundColor": "#f5f5f7",
-  "navigationBarTextStyle": "black"
+  "navigationBarBackgroundColor": "#41bc3f",
+  "navigationBarTextStyle": "white"
 }

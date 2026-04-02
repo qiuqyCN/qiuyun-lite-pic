@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "拼图拼接",
-  "usingComponents": {}
+  "usingComponents": {},
+   "navigationBarBackgroundColor": "#41bc3f",
+  "navigationBarTextStyle": "white"
 }
