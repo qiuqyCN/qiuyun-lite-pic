@@ -326,28 +326,40 @@ Component({
           const totalHSpacing = spacing * (cols - 1);
           const totalVSpacing = spacing * (rows - 1);
 
-          const cellWidth = Math.floor((outputWidth - totalHSpacing) / cols);
-          const cellHeight = cellWidth; // 正方形单元格
+          // 限制最大高度，确保所有图片都能显示
+          const maxHeight = 2400;
+          const maxCellHeight = Math.floor((maxHeight - totalVSpacing) / rows);
+          const maxCellWidth = Math.floor((outputWidth - totalHSpacing) / cols);
+          
+          // 单元格取较小值，保持正方形
+          const cellSize = Math.min(maxCellWidth, maxCellHeight);
+          const cellWidth = cellSize;
+          const cellHeight = cellSize;
 
-          canvasWidth = outputWidth;
+          canvasWidth = cols * cellWidth + totalHSpacing;
           canvasHeight = rows * cellHeight + totalVSpacing;
 
           canvasNode.width = canvasWidth;
           canvasNode.height = canvasHeight;
 
+          console.log('Canvas尺寸:', canvasWidth, 'x', canvasHeight, '单元格:', cellWidth, 'x', cellHeight, '行列:', rows, 'x', cols);
+
           // 填充背景
           ctx.fillStyle = backgroundColor;
           ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-          // 绘制图片
+          // 绘制图片 - 顺序绘制避免 Canvas 状态冲突
           for (let i = 0; i < images.length; i++) {
             const row = Math.floor(i / cols);
             const col = i % cols;
             const x = col * (cellWidth + spacing);
             const y = row * (cellHeight + spacing);
 
+            console.log('绘制图片', i, '位置:', x, y, '尺寸:', cellWidth, 'x', cellHeight);
             await this.drawImageToCanvas(ctx, canvasNode, images[i], x, y, cellWidth, cellHeight, borderRadius);
           }
+          
+          console.log('所有图片绘制完成');
         }
 
         // 导出图片
@@ -387,53 +399,72 @@ Component({
     ) {
       // 加载图片
       const image = canvasNode.createImage();
+      
+      // 等待图片加载完成
       await new Promise<void>((resolve, reject) => {
-        image.onload = () => resolve();
-        image.onerror = reject;
+        image.onload = () => {
+          console.log('图片加载成功:', imagePath);
+          resolve();
+        };
+        image.onerror = (err) => {
+          console.error('图片加载失败:', imagePath, err);
+          reject(err);
+        };
         image.src = imagePath;
       });
 
+      // 保存当前状态
       ctx.save();
 
-      // 创建圆角裁剪路径
-      if (borderRadius > 0) {
+      try {
+        // 创建矩形裁剪路径（必须始终裁剪，防止图片超出单元格）
         ctx.beginPath();
-        ctx.moveTo(x + borderRadius, y);
-        ctx.lineTo(x + width - borderRadius, y);
-        ctx.quadraticCurveTo(x + width, y, x + width, y + borderRadius);
-        ctx.lineTo(x + width, y + height - borderRadius);
-        ctx.quadraticCurveTo(x + width, y + height, x + width - borderRadius, y + height);
-        ctx.lineTo(x + borderRadius, y + height);
-        ctx.quadraticCurveTo(x, y + height, x, y + height - borderRadius);
-        ctx.lineTo(x, y + borderRadius);
-        ctx.quadraticCurveTo(x, y, x + borderRadius, y);
+        if (borderRadius > 0) {
+          // 圆角矩形
+          ctx.moveTo(x + borderRadius, y);
+          ctx.lineTo(x + width - borderRadius, y);
+          ctx.quadraticCurveTo(x + width, y, x + width, y + borderRadius);
+          ctx.lineTo(x + width, y + height - borderRadius);
+          ctx.quadraticCurveTo(x + width, y + height, x + width - borderRadius, y + height);
+          ctx.lineTo(x + borderRadius, y + height);
+          ctx.quadraticCurveTo(x, y + height, x, y + height - borderRadius);
+          ctx.lineTo(x, y + borderRadius);
+          ctx.quadraticCurveTo(x, y, x + borderRadius, y);
+        } else {
+          // 普通矩形
+          ctx.rect(x, y, width, height);
+        }
         ctx.closePath();
         ctx.clip();
+
+        // 计算图片绘制区域（保持比例裁剪填充）
+        const imgAspect = image.width / image.height;
+        const cellAspect = width / height;
+
+        let drawWidth: number, drawHeight: number, drawX: number, drawY: number;
+
+        if (imgAspect > cellAspect) {
+          // 图片更宽，以高度为基准
+          drawHeight = height;
+          drawWidth = height * imgAspect;
+          drawX = x - (drawWidth - width) / 2;
+          drawY = y;
+        } else {
+          // 图片更高，以宽度为基准
+          drawWidth = width;
+          drawHeight = width / imgAspect;
+          drawX = x;
+          drawY = y - (drawHeight - height) / 2;
+        }
+
+        // 绘制图片
+        ctx.drawImage(image as any, drawX, drawY, drawWidth, drawHeight);
+        
+        console.log('图片绘制完成:', imagePath, '单元格:', x, y, width, height, '绘制尺寸:', drawWidth.toFixed(2), 'x', drawHeight.toFixed(2));
+      } finally {
+        // 确保恢复状态
+        ctx.restore();
       }
-
-      // 计算图片绘制区域（保持比例裁剪填充）
-      const imgAspect = image.width / image.height;
-      const cellAspect = width / height;
-
-      let drawWidth: number, drawHeight: number, drawX: number, drawY: number;
-
-      if (imgAspect > cellAspect) {
-        // 图片更宽，以高度为基准
-        drawHeight = height;
-        drawWidth = height * imgAspect;
-        drawX = x - (drawWidth - width) / 2;
-        drawY = y;
-      } else {
-        // 图片更高，以宽度为基准
-        drawWidth = width;
-        drawHeight = width / imgAspect;
-        drawX = x;
-        drawY = y - (drawHeight - height) / 2;
-      }
-
-      ctx.drawImage(image as any, drawX, drawY, drawWidth, drawHeight);
-
-      ctx.restore();
     },
 
     // 预览图片
