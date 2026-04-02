@@ -1,5 +1,5 @@
 // compress.ts
-// 图片压缩页面
+// 图片压缩页面 - 方案二简洁设计
 
 Component({
   data: {
@@ -10,16 +10,20 @@ Component({
     originalHeight: 0,
     compressedPath: '',
     compressedSize: 0,
-    
+
     // 压缩参数
-    quality: 80,
-    targetSize: 0, // KB, 0表示不限制
-    
+    quality: 60,
+
+    // 估算范围
+    estimatedMin: 0,
+    estimatedMax: 0,
+
+    // 节省百分比
+    savedPercent: 0,
+
     // 状态
     isProcessing: false,
     hasImage: false,
-    showResult: false,
-    progress: 0
   },
 
   methods: {
@@ -40,15 +44,19 @@ Component({
           src: tempFilePath
         });
 
+        const originalSize = Math.round(fileSize / 1024);
+        const quality = 60;
+
         this.setData({
           imagePath: tempFilePath,
-          originalSize: Math.round(fileSize / 1024), // KB
+          originalSize,
           originalWidth: imageInfo.width,
           originalHeight: imageInfo.height,
           hasImage: true,
-          showResult: false,
           compressedPath: '',
-          compressedSize: 0
+          compressedSize: 0,
+          quality,
+          ...this.calculateEstimateRange(originalSize, quality)
         });
 
       } catch (err) {
@@ -56,15 +64,50 @@ Component({
       }
     },
 
-    // 质量滑块变化
-    onQualityChange(e: WechatMiniprogram.SliderChange) {
-      this.setData({ quality: e.detail.value });
+    // 计算估算范围
+    calculateEstimateRange(originalSize: number, quality: number): { estimatedMin: number; estimatedMax: number } {
+      // 根据质量给出合理的估算范围
+      // 最小值：质量系数 × 0.5（理想情况）
+      // 最大值：质量系数 × 1.2（复杂图片）
+      const factor = quality / 100;
+      const estimatedMin = Math.round(originalSize * factor * 0.5);
+      const estimatedMax = Math.round(originalSize * factor * 1.2);
+      return { estimatedMin, estimatedMax };
     },
 
-    // 目标大小输入
-    onTargetSizeInput(e: WechatMiniprogram.Input) {
-      const value = parseInt(e.detail.value) || 0;
-      this.setData({ targetSize: value });
+    // 快速预设点击
+    onPresetTap(e: WechatMiniprogram.TouchEvent) {
+      const quality = parseInt(e.currentTarget.dataset.quality);
+      this.setData({
+        quality,
+        ...this.calculateEstimateRange(this.data.originalSize, quality)
+      });
+    },
+
+    // 质量滑块变化（拖动中）
+    onQualityChanging(e: WechatMiniprogram.SliderChange) {
+      const quality = e.detail.value;
+      this.setData({
+        quality,
+        ...this.calculateEstimateRange(this.data.originalSize, quality)
+      });
+    },
+
+    // 质量滑块变化（拖动结束）
+    onQualityChange(e: WechatMiniprogram.SliderChange) {
+      const quality = e.detail.value;
+      this.setData({
+        quality,
+        ...this.calculateEstimateRange(this.data.originalSize, quality)
+      });
+    },
+
+    // 预览图片
+    previewImage() {
+      wx.previewImage({
+        urls: [this.data.compressedPath || this.data.imagePath],
+        current: this.data.compressedPath || this.data.imagePath
+      });
     },
 
     // 开始压缩
@@ -74,25 +117,18 @@ Component({
         return;
       }
 
-      this.setData({ isProcessing: true, progress: 0 });
+      this.setData({ isProcessing: true });
 
       try {
-        // 创建canvas上下文
-        const query = this.createSelectorQuery();
-        const canvasCtx = await new Promise<WechatMiniprogram.CanvasContext>((resolve) => {
-          query.select('#compressCanvas').fields({ node: true, size: true }).exec((res) => {
-            const canvas = res[0].node;
-            const ctx = canvas.getContext('2d');
-            resolve(ctx as any);
-          });
-        });
-
         // 获取canvas节点
+        const query = this.createSelectorQuery();
         const canvasNode = await new Promise<WechatMiniprogram.Canvas>((resolve) => {
           query.select('#compressCanvas').fields({ node: true, size: true }).exec((res) => {
             resolve(res[0].node);
           });
         });
+
+        const ctx = canvasNode.getContext('2d');
 
         // 设置canvas尺寸
         canvasNode.width = this.data.originalWidth;
@@ -107,9 +143,7 @@ Component({
         });
 
         // 绘制图片
-        canvasCtx.drawImage(image, 0, 0, this.data.originalWidth, this.data.originalHeight);
-
-        this.setData({ progress: 50 });
+        ctx.drawImage(image, 0, 0, this.data.originalWidth, this.data.originalHeight);
 
         // 导出压缩后的图片
         const tempFilePath = await new Promise<string>((resolve) => {
@@ -126,12 +160,14 @@ Component({
           filePath: tempFilePath
         });
 
+        const compressedSize = Math.round(fileInfo.size / 1024);
+        const savedPercent = Math.round((this.data.originalSize - compressedSize) / this.data.originalSize * 100);
+
         this.setData({
           compressedPath: tempFilePath,
-          compressedSize: Math.round(fileInfo.size / 1024),
-          isProcessing: false,
-          showResult: true,
-          progress: 100
+          compressedSize,
+          savedPercent: savedPercent > 0 ? savedPercent : 0,
+          isProcessing: false
         });
 
         // 保存到历史记录
@@ -140,11 +176,29 @@ Component({
         // 更新使用统计
         this.updateUsageStats();
 
+        // 显示成功提示
+        wx.showToast({
+          title: savedPercent > 0 ? `节省 ${savedPercent}%` : '压缩完成',
+          icon: 'success'
+        });
+
       } catch (err) {
         console.error('压缩失败:', err);
         wx.showToast({ title: '压缩失败', icon: 'none' });
         this.setData({ isProcessing: false });
       }
+    },
+
+    // 重新压缩
+    resetCompress() {
+      const quality = 60;
+      this.setData({
+        compressedPath: '',
+        compressedSize: 0,
+        savedPercent: 0,
+        quality,
+        ...this.calculateEstimateRange(this.data.originalSize, quality)
+      });
     },
 
     // 保存到历史记录
@@ -184,7 +238,9 @@ Component({
 
       stats.todayCount++;
       stats.totalCount++;
-      stats.savedSpace += (this.data.originalSize - this.data.compressedSize);
+      if (this.data.originalSize > this.data.compressedSize) {
+        stats.savedSpace += (this.data.originalSize - this.data.compressedSize);
+      }
 
       wx.setStorageSync('usageStats', stats);
     },
@@ -201,21 +257,6 @@ Component({
       } catch (err) {
         wx.showToast({ title: '保存失败', icon: 'none' });
       }
-    },
-
-    // 分享图片
-    onShareAppMessage() {
-      if (this.data.compressedPath) {
-        return {
-          title: '我用秋云轻图压缩了图片',
-          path: '/pages/index/index',
-          imageUrl: this.data.compressedPath
-        };
-      }
-      return {
-        title: '秋云轻图 - 轻点之间，美图呈现',
-        path: '/pages/index/index'
-      };
     }
   }
 });

@@ -1,203 +1,282 @@
 /**compress.wxss**/
-/* 现代极简风 - 图片压缩页面 */
+/* 方案二 - 简洁压缩页面 */
 
 .compress-container {
   min-height: 100vh;
   background: #f5f5f7;
-  padding: 20px;
+  padding: 16px;
   box-sizing: border-box;
 }
 
-/* 图片选择/预览区域 */
-.image-section {
-  margin-bottom: 16px;
+/* 上传区域 */
+.upload-section {
+  padding-top: 60px;
 }
 
-/* 上传区域 */
-.upload-area {
+.upload-card {
   background: #ffffff;
-  border-radius: 20px;
+  border-radius: 24px;
   border: 2px dashed #d2d2d7;
-  padding: 48px 24px;
+  padding: 60px 32px;
+  text-align: center;
   transition: all 0.2s ease;
 }
 
-.upload-area:active {
+.upload-card:active {
   border-color: #0066ff;
   background: #f8f9ff;
 }
 
-.upload-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
 .upload-icon-box {
-  width: 72px;
-  height: 72px;
+  width: 80px;
+  height: 80px;
   background: #f5f5f7;
-  border-radius: 20px;
+  border-radius: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin: 0 auto 20px;
 }
 
 .upload-icon {
-  font-size: 32px;
+  font-size: 36px;
   color: #86868b;
   font-weight: 300;
 }
 
 .upload-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   color: #1d1d1f;
-  margin-bottom: 6px;
+  display: block;
+  margin-bottom: 8px;
 }
 
 .upload-hint {
-  font-size: 14px;
+  font-size: 15px;
   color: #86868b;
 }
 
+/* 压缩布局 */
+.compress-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 /* 预览区域 */
-.preview-area {
-  position: relative;
+.preview-section {
   background: #ffffff;
   border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.preview-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.change-btn {
+  padding: 6px 14px;
+  background: #f5f5f7;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.change-btn:active {
+  background: #e8e8ed;
+}
+
+.change-btn text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0066ff;
+}
+
+.preview-container {
+  background: #f5f5f7;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .preview-image {
   width: 100%;
-  height: 240px;
-  display: block;
+  height: 100%;
+  object-fit: contain;
 }
 
-.preview-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
-  padding: 40px 16px 16px;
-  display: flex;
-  justify-content: center;
-}
-
-.overlay-text {
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  padding: 8px 20px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  backdrop-filter: blur(10px);
-}
-
-/* 图片信息 */
-.info-section {
-  margin-bottom: 20px;
-}
-
-.info-card {
+/* 大小信息区域 */
+.size-section {
   background: #ffffff;
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-.info-item {
+/* 压缩前：当前 + 预计 */
+.size-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 10px;
 }
 
-.info-label {
-  font-size: 12px;
+.size-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.size-label {
+  font-size: 14px;
   color: #86868b;
 }
 
-.info-value {
+.size-value {
   font-size: 16px;
   font-weight: 600;
   color: #1d1d1f;
 }
 
-.info-divider {
-  width: 1px;
-  height: 32px;
-  background: #e8e8ed;
+.size-row.estimated .size-label {
+  color: #0066ff;
+}
+
+.size-value-range {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0066ff;
+}
+
+/* 压缩后：结果展示 */
+.size-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.result-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.result-original {
+  font-size: 15px;
+  color: #86868b;
+  text-decoration: line-through;
+}
+
+.result-arrow {
+  font-size: 14px;
+  color: #c7c7cc;
+}
+
+.result-actual {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0066ff;
+}
+
+.result-badge {
+  background: #34c759;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 /* 设置区域 */
 .settings-section {
-  margin-bottom: 20px;
-}
-
-.section-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: #86868b;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 12px;
-  padding-left: 4px;
-}
-
-.setting-card {
   background: #ffffff;
   border-radius: 20px;
   padding: 20px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-.setting-item {
-  margin-bottom: 24px;
-}
-
-.setting-item:last-child {
-  margin-bottom: 0;
-}
-
-.setting-header {
+/* 快速预设 */
+.presets-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-.setting-name {
+.preset-btn {
+  flex: 1;
+  background: #f5f5f7;
+  border-radius: 14px;
+  padding: 14px 8px;
+  text-align: center;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.preset-btn:active {
+  transform: scale(0.96);
+}
+
+.preset-btn.active {
+  background: #e8f2ff;
+  border-color: #0066ff;
+}
+
+.preset-name {
   font-size: 15px;
   font-weight: 600;
   color: #1d1d1f;
+  display: block;
+  margin-bottom: 2px;
 }
 
-.setting-badge {
+.preset-btn.active .preset-name {
+  color: #0066ff;
+}
+
+.preset-desc {
+  font-size: 12px;
+  color: #86868b;
+}
+
+/* 滑块控制 */
+.slider-control {
+  padding-top: 4px;
+}
+
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.slider-label {
+  font-size: 14px;
+  color: #1d1d1f;
+  font-weight: 500;
+}
+
+.slider-value {
   font-size: 14px;
   font-weight: 600;
   color: #0066ff;
   background: #e8f2ff;
-  padding: 4px 12px;
-  border-radius: 12px;
-}
-
-.setting-optional {
-  font-size: 12px;
-  color: #86868b;
-  background: #f5f5f7;
   padding: 4px 10px;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
-/* 滑块 */
 .quality-slider {
   margin: 0;
 }
@@ -205,149 +284,17 @@
 .slider-hints {
   display: flex;
   justify-content: space-between;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
-.hint-text {
+.slider-hints text {
   font-size: 12px;
   color: #86868b;
-}
-
-/* 输入框 */
-.input-group {
-  display: flex;
-  align-items: center;
-  background: #f5f5f7;
-  border-radius: 12px;
-  padding: 0 16px;
-  height: 48px;
-}
-
-.size-input {
-  flex: 1;
-  height: 100%;
-  font-size: 16px;
-  color: #1d1d1f;
-  background: transparent;
-  border: none;
-}
-
-.size-input::placeholder {
-  color: #c7c7cc;
-}
-
-.input-unit {
-  font-size: 14px;
-  color: #86868b;
-  margin-left: 8px;
-}
-
-/* 结果区域 */
-.result-section {
-  margin-bottom: 20px;
-}
-
-.result-card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-}
-
-.result-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.result-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.result-icon.success {
-  background: #e8f5e9;
-  color: #34c759;
-}
-
-.result-content {
-  flex: 1;
-}
-
-.result-label {
-  font-size: 13px;
-  color: #86868b;
-  display: block;
-  margin-bottom: 2px;
-}
-
-.result-value {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1d1d1f;
-}
-
-.result-badge {
-  padding: 6px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.result-badge.saved {
-  background: #e8f5e9;
-  color: #34c759;
-}
-
-/* 进度条 */
-.progress-bar-container {
-  padding-top: 16px;
-  border-top: 1px solid #f0f0f0;
-}
-
-.progress-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.progress-label text {
-  font-size: 13px;
-  color: #86868b;
-}
-
-.progress-percent {
-  font-weight: 600;
-  color: #0066ff !important;
-}
-
-.progress-track {
-  height: 8px;
-  background: #f0f0f0;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #0066ff, #34c759);
-  border-radius: 4px;
-  transition: width 0.3s ease;
 }
 
 /* 操作按钮 */
 .action-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  margin-top: 8px;
 }
 
 .btn {
@@ -375,6 +322,10 @@
   width: 100%;
 }
 
+.btn-flex {
+  flex: 1;
+}
+
 .btn-primary {
   background: #0066ff;
   color: white;
@@ -396,6 +347,11 @@
 
 .btn-loading {
   opacity: 0.8;
+}
+
+.action-row {
+  display: flex;
+  gap: 12px;
 }
 
 /* 加载动画 */
