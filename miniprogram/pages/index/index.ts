@@ -52,7 +52,7 @@ Component({
           {
             id: 'convert',
             name: '格式转换',
-            description: 'JPG、PNG、WEBP 格式互转',
+            description: '多格式导入，转为 JPG/PNG',
             icon: '🔄',
             iconBg: '#fff0f0',
             path: '/pages/convert/convert'
@@ -120,8 +120,10 @@ Component({
   lifetimes: {
     attached() {
       this.loadUsageStats();
-    },
-    
+    }
+  },
+
+  pageLifetimes: {
     show() {
       this.loadUsageStats();
     }

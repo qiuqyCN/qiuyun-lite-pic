@@ -1,9 +1,154 @@
 <!--convert.wxml-->
-<view class="container">
-  <view class="placeholder">
-    <text class="icon">🔄</text>
-    <text class="title">格式转换</text>
-    <text class="desc">功能开发中，敬请期待...</text>
-    <button class="back-btn" bindtap="goBack">返回首页</button>
+<view class="convert-container">
+  <!-- 未选择图片状态 -->
+  <view wx:if="{{!hasImage}}" class="upload-section">
+    <view class="upload-card" bindtap="chooseImage">
+      <view class="upload-icon-box">
+        <text class="upload-icon">+</text>
+      </view>
+      <text class="upload-title">选择图片</text>
+      <text class="upload-hint">支持多种格式导入，可转为 JPG、PNG</text>
+    </view>
   </view>
+
+  <!-- 已选择图片 -->
+  <view wx:else class="convert-layout">
+    <!-- 图片预览区域 -->
+    <view class="preview-section">
+      <view class="preview-header">
+        <text class="preview-title">{{convertedPath ? '转换完成' : '图片预览'}}</text>
+        <view class="change-btn" bindtap="chooseImage">
+          <text>更换</text>
+        </view>
+      </view>
+
+      <view class="preview-container">
+        <image
+          wx:if="{{convertedPath}}"
+          class="preview-image"
+          src="{{convertedPath}}"
+          mode="aspectFit"
+          bindtap="previewImage"
+          lazy-load="{{false}}"
+        />
+        <image
+          wx:else
+          class="preview-image"
+          src="{{imagePath}}"
+          mode="aspectFit"
+          bindtap="previewImage"
+          lazy-load="{{false}}"
+        />
+      </view>
+    </view>
+
+    <!-- 格式信息 -->
+    <view class="format-section">
+      <view class="format-info">
+        <view class="format-row">
+          <text class="format-label">原格式</text>
+          <view class="format-badge original">
+            <text class="format-text">{{originalFormat}}</text>
+          </view>
+          <text class="format-size">{{originalSize}} KB</text>
+        </view>
+        <view wx:if="{{convertedPath}}" class="format-arrow">
+          <text class="arrow-icon">↓</text>
+        </view>
+        <view wx:if="{{convertedPath}}" class="format-row">
+          <text class="format-label">转换后</text>
+          <view class="format-badge converted">
+            <text class="format-text">{{convertedFormat}}</text>
+          </view>
+          <text class="format-size">{{convertedSize}} KB</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 转换设置（转换前显示） -->
+    <view wx:if="{{!convertedPath}}" class="settings-section">
+      <!-- 目标格式选择 -->
+      <view class="format-select">
+        <text class="section-title">目标格式</text>
+        <view class="format-options">
+          <view
+            wx:for="{{formatList}}"
+            wx:key="id"
+            class="format-option {{targetFormat === item.id ? 'active' : ''}}"
+            data-format="{{item.id}}"
+            bindtap="onFormatChange"
+          >
+            <text class="format-name">{{item.name}}</text>
+            <text class="format-desc">{{item.desc}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 质量设置（仅JPG和WEBP显示） -->
+      <view wx:if="{{targetFormat !== 'png'}}" class="quality-control">
+        <view class="quality-header">
+          <text class="quality-label">输出质量</text>
+          <text class="quality-value">{{quality}}%</text>
+        </view>
+        <slider
+          class="quality-slider"
+          min="60"
+          max="100"
+          value="{{quality}}"
+          block-size="24"
+          activeColor="#0066ff"
+          backgroundColor="#e8e8ed"
+          bindchange="onQualityChange"
+        />
+        <view class="quality-hints">
+          <text>文件更小</text>
+          <text>画质更好</text>
+        </view>
+      </view>
+
+      <!-- PNG提示 -->
+      <view wx:if="{{targetFormat === 'png'}}" class="png-notice">
+        <text class="notice-icon">ℹ</text>
+        <text class="notice-text">PNG为无损格式，转换时保持最高质量</text>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-section">
+      <!-- 转换前：开始转换 -->
+      <button
+        wx:if="{{!convertedPath}}"
+        class="btn btn-primary btn-lg btn-block {{isProcessing ? 'btn-loading' : ''}}"
+        bindtap="startConvert"
+        disabled="{{isProcessing}}"
+      >
+        <text wx:if="{{!isProcessing}}">开始转换</text>
+        <view wx:else class="loading-dots">
+          <text>转换中</text>
+          <text class="dot">.</text>
+          <text class="dot">.</text>
+          <text class="dot">.</text>
+        </view>
+      </button>
+
+      <!-- 转换后：重新转换 + 保存 -->
+      <view wx:if="{{convertedPath}}" class="action-row">
+        <button class="btn btn-secondary btn-flex" bindtap="resetConvert">
+          重新转换
+        </button>
+        <button class="btn btn-primary btn-flex" bindtap="saveToAlbum">
+          保存到相册
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 隐藏Canvas -->
+  <canvas
+    type="2d"
+    id="convertCanvas"
+    class="hidden-canvas"
+  ></canvas>
+
+  <view class="safe-area-bottom"></view>
 </view>

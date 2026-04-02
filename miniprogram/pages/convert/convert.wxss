@@ -1,48 +1,417 @@
 /**convert.wxss**/
+/* 格式转换页面 - 现代极简风格 */
 
-.container {
+.convert-container {
   min-height: 100vh;
-  background: #F8F9FA;
+  background: #f5f5f7;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* 上传区域 */
+.upload-section {
+  padding-top: 60px;
+}
+
+.upload-card {
+  background: #ffffff;
+  border-radius: 24px;
+  border: 2px dashed #d2d2d7;
+  padding: 60px 32px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.upload-card:active {
+  border-color: #0066ff;
+  background: #f8f9ff;
+}
+
+.upload-icon-box {
+  width: 80px;
+  height: 80px;
+  background: #f5f5f7;
+  border-radius: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0 auto 20px;
 }
 
-.placeholder {
-  text-align: center;
-  padding: 40rpx;
+.upload-icon {
+  font-size: 36px;
+  color: #86868b;
+  font-weight: 300;
 }
 
-.icon {
-  font-size: 120rpx;
-  display: block;
-  margin-bottom: 30rpx;
-}
-
-.title {
-  font-size: 40rpx;
-  color: #333;
+.upload-title {
+  font-size: 20px;
   font-weight: 600;
+  color: #1d1d1f;
   display: block;
-  margin-bottom: 20rpx;
+  margin-bottom: 8px;
 }
 
-.desc {
-  font-size: 28rpx;
-  color: #999;
-  display: block;
-  margin-bottom: 60rpx;
+.upload-hint {
+  font-size: 15px;
+  color: #86868b;
 }
 
-.back-btn {
-  background: linear-gradient(135deg, #4A90E2, #357ABD);
+/* 转换布局 */
+.convert-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 预览区域 */
+.preview-section {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.preview-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.change-btn {
+  padding: 6px 14px;
+  background: #f5f5f7;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.change-btn:active {
+  background: #e8e8ed;
+}
+
+.change-btn text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0066ff;
+}
+
+.preview-container {
+  background: #f5f5f7;
+  border-radius: 16px;
+  overflow: hidden;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  will-change: transform;
+}
+
+/* 格式信息区域 */
+.format-section {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.format-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.format-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.format-label {
+  font-size: 14px;
+  color: #86868b;
+  width: 56px;
+}
+
+.format-badge {
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.format-badge.original {
+  background: #f5f5f7;
+  color: #86868b;
+}
+
+.format-badge.converted {
+  background: #e8f2ff;
+  color: #0066ff;
+}
+
+.format-text {
+  font-family: -apple-system-font, 'SF Mono', monospace;
+}
+
+.format-size {
+  font-size: 14px;
+  color: #1d1d1f;
+  font-weight: 500;
+  margin-left: auto;
+  font-family: -apple-system-font, 'SF Mono', monospace;
+}
+
+.format-arrow {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.arrow-icon {
+  font-size: 16px;
+  color: #c7c7cc;
+}
+
+/* 设置区域 */
+.settings-section {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d1d1f;
+  display: block;
+  margin-bottom: 16px;
+}
+
+/* 格式选择 */
+.format-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.format-option {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: #f5f5f7;
+  border-radius: 14px;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.format-option:active {
+  transform: scale(0.98);
+}
+
+.format-option.active {
+  background: #e8f2ff;
+  border-color: #0066ff;
+}
+
+.format-option.disabled {
+  opacity: 0.4;
+}
+
+.format-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1d1d1f;
+  width: 70px;
+  font-family: -apple-system-font, 'SF Mono', monospace;
+}
+
+.format-option.active .format-name {
+  color: #0066ff;
+}
+
+.format-desc {
+  font-size: 13px;
+  color: #86868b;
+  margin-left: 12px;
+}
+
+/* 质量控制 */
+.quality-control {
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.quality-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.quality-label {
+  font-size: 14px;
+  color: #1d1d1f;
+  font-weight: 500;
+}
+
+.quality-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0066ff;
+  background: #e8f2ff;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.quality-slider {
+  margin: 0;
+}
+
+.quality-hints {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+.quality-hints text {
+  font-size: 12px;
+  color: #86868b;
+}
+
+/* PNG提示 */
+.png-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #f5f5f7;
+  border-radius: 12px;
+  margin-top: 16px;
+}
+
+.notice-icon {
+  font-size: 16px;
+  color: #0066ff;
+}
+
+.notice-text {
+  font-size: 13px;
+  color: #86868b;
+}
+
+/* 操作按钮 */
+.action-section {
+  margin-top: 8px;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 16px;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-lg {
+  padding: 18px 28px;
+  font-size: 17px;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-flex {
+  flex: 1;
+}
+
+.btn-primary {
+  background: #0066ff;
   color: white;
-  border-radius: 50rpx;
-  padding: 24rpx 80rpx;
-  font-size: 32rpx;
-  border: none;
+  box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
 }
 
-.back-btn::after {
-  border: none;
+.btn-primary:active {
+  background: #0052cc;
+}
+
+.btn-secondary {
+  background: #f5f5f7;
+  color: #1d1d1f;
+}
+
+.btn-secondary:active {
+  background: #e8e8ed;
+}
+
+.btn-loading {
+  opacity: 0.8;
+}
+
+.action-row {
+  display: flex;
+  gap: 12px;
+}
+
+/* 加载动画 */
+.loading-dots {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.dot {
+  animation: dot-blink 1.4s infinite;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dot-blink {
+  0%, 60%, 100% { opacity: 0; }
+  30% { opacity: 1; }
+}
+
+/* 隐藏Canvas */
+.hidden-canvas {
+  position: fixed;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
+}
+
+/* 安全区域 */
+.safe-area-bottom {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
 }

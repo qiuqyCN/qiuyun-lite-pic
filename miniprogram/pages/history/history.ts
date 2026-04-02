@@ -10,7 +10,10 @@ Component({
   lifetimes: {
     attached() {
       this.loadHistory();
-    },
+    }
+  },
+
+  pageLifetimes: {
     show() {
       this.loadHistory();
     }
