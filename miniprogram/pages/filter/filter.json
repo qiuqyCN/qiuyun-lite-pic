@@ -1,6 +1,6 @@
 {
   "usingComponents": {},
   "navigationBarTitleText": "滤镜美化",
-  "navigationBarBackgroundColor": "#4A90E2",
-  "navigationBarTextStyle": "white"
+  "navigationBarBackgroundColor": "#f5f5f7",
+  "navigationBarTextStyle": "black"
 }
