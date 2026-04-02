@@ -4,115 +4,103 @@
   <view wx:if="{{!hasImage}}" class="upload-section">
     <view class="upload-card" bindtap="chooseImage">
       <view class="upload-icon-box">
-        <text class="upload-icon">+</text>
+        <text class="upload-icon">📐</text>
       </view>
       <text class="upload-title">选择图片</text>
-      <text class="upload-hint">点击从相册选择或拍照</text>
+      <text class="upload-hint">支持证件照、考试报名等常用尺寸</text>
     </view>
   </view>
 
   <!-- 已选择图片 -->
   <view wx:else class="resize-layout">
-    <!-- 图片预览区域 -->
+    <!-- 图片预览区域（带尺寸标注） -->
     <view class="preview-section">
       <view class="preview-header">
-        <text class="preview-title">{{resizedPath ? '调整完成' : '图片预览'}}</text>
+        <text class="preview-title">尺寸预览</text>
         <view class="change-btn" bindtap="chooseImage">
           <text>更换</text>
         </view>
       </view>
 
-      <view class="preview-container">
-        <image
-          wx:if="{{resizedPath}}"
-          class="preview-image"
-          src="{{resizedPath}}"
-          mode="aspectFit"
-          bindtap="previewImage"
-          lazy-load="{{false}}"
-        />
-        <image
-          wx:else
-          class="preview-image"
-          src="{{imagePath}}"
-          mode="aspectFit"
-          bindtap="previewImage"
-          lazy-load="{{false}}"
-        />
+      <view class="preview-with-dimensions">
+        <view class="preview-main">
+          <!-- 高度标注（在图片左侧） -->
+          <view class="dimension-height-wrapper">
+            <view class="dimension-height" style="height: {{previewDisplayHeight}}px;">
+              <view class="dimension-line-v"></view>
+              <text class="dimension-text-v">{{targetHeight}} px</text>
+              <view class="dimension-line-v"></view>
+            </view>
+          </view>
+
+          <view class="preview-content">
+            <!-- 宽度标注（在图片上方） -->
+            <view class="dimension-width" style="width: {{previewDisplayWidth}}px;">
+              <view class="dimension-line"></view>
+              <text class="dimension-text">{{targetWidth}} px</text>
+              <view class="dimension-line"></view>
+            </view>
+
+            <!-- 图片容器 -->
+            <view class="preview-container" style="width: {{previewDisplayWidth}}px; height: {{previewDisplayHeight}}px;">
+              <image
+                wx:if="{{previewPath}}"
+                class="preview-image"
+                src="{{previewPath}}"
+                mode="aspectFit"
+              />
+              <view wx:if="{{!previewPath}}" class="preview-loading">
+                <text>生成预览中...</text>
+              </view>
+            </view>
+          </view>
+        </view>
       </view>
     </view>
 
-    <!-- 尺寸信息 -->
-    <view class="size-section">
-      <view class="size-info">
-        <view class="size-row">
-          <text class="size-label">原图尺寸</text>
-          <text class="size-value">{{originalWidth}} × {{originalHeight}} px</text>
-        </view>
-        <view wx:if="{{resizedPath}}" class="size-row result">
-          <text class="size-label">调整后</text>
-          <text class="size-value highlight">{{resizedWidth}} × {{resizedHeight}} px</text>
-        </view>
-        <view wx:if="{{resizedPath}}" class="size-row">
-          <text class="size-label">文件大小</text>
-          <text class="size-value">{{originalSize}} KB → {{resizedSize}} KB</text>
+    <!-- 尺寸预设选择（横向滑动） -->
+    <view class="preset-section">
+      <view class="preset-section-header">
+        <text class="preset-section-title">常用尺寸</text>
+        <view class="scroll-hint">
+          <text class="scroll-hint-text">左右滑动查看更多</text>
+          <text class="scroll-hint-icon">→</text>
         </view>
       </view>
+      <scroll-view class="preset-scroll" scroll-x="{{true}}" show-scrollbar="{{false}}">
+        <view class="preset-list">
+          <view
+            wx:for="{{presetSizes}}"
+            wx:key="id"
+            class="preset-item {{selectedPreset === item.id ? 'active' : ''}}"
+            data-id="{{item.id}}"
+            bindtap="onPresetSelect"
+          >
+            <text class="preset-name">{{item.name}}</text>
+            <text class="preset-size">{{item.width}}×{{item.height}}</text>
+          </view>
+        </view>
+      </scroll-view>
     </view>
 
-    <!-- 调整设置（调整前显示） -->
-    <view wx:if="{{!resizedPath}}" class="settings-section">
-      <!-- 快速预设 -->
-      <view class="presets-row">
-        <view
-          class="preset-btn {{scalePercent === 25 ? 'active' : ''}}"
-          data-percent="25"
-          bindtap="onPresetTap"
-        >
-          <text class="preset-name">1/4</text>
-          <text class="preset-desc">25%</text>
-        </view>
-        <view
-          class="preset-btn {{scalePercent === 50 ? 'active' : ''}}"
-          data-percent="50"
-          bindtap="onPresetTap"
-        >
-          <text class="preset-name">1/2</text>
-          <text class="preset-desc">50%</text>
-        </view>
-        <view
-          class="preset-btn {{scalePercent === 75 ? 'active' : ''}}"
-          data-percent="75"
-          bindtap="onPresetTap"
-        >
-          <text class="preset-name">3/4</text>
-          <text class="preset-desc">75%</text>
-        </view>
-        <view
-          class="preset-btn {{scalePercent === 200 ? 'active' : ''}}"
-          data-percent="200"
-          bindtap="onPresetTap"
-        >
-          <text class="preset-name">2x</text>
-          <text class="preset-desc">200%</text>
+    <!-- 自定义尺寸 -->
+    <view class="custom-section">
+      <view class="custom-header">
+        <text class="custom-title">自定义尺寸</text>
+        <view class="aspect-ratio-toggle">
+          <text class="toggle-label">锁定比例</text>
+          <switch
+            class="toggle-switch"
+            checked="{{maintainAspectRatio}}"
+            bindchange="onAspectRatioChange"
+            color="var(--accent)"
+          />
         </view>
       </view>
 
-      <!-- 锁定比例 -->
-      <view class="aspect-ratio-control">
-        <text class="control-label">锁定宽高比</text>
-        <switch
-          class="ratio-switch"
-          checked="{{maintainAspectRatio}}"
-          color="#41bc3f"
-          bindchange="onAspectRatioChange"
-        />
-      </view>
-
-      <!-- 尺寸输入 -->
       <view class="dimension-inputs">
         <view class="input-group">
-          <text class="input-label">宽度 (px)</text>
+          <text class="input-label">宽度</text>
           <input
             class="dimension-input"
             type="number"
@@ -120,12 +108,13 @@
             bindinput="onWidthInput"
             placeholder="宽度"
           />
+          <text class="input-unit">px</text>
         </view>
-        <view class="input-divider">
-          <text class="divider-icon">×</text>
-        </view>
+
+        <view class="dimension-separator">×</view>
+
         <view class="input-group">
-          <text class="input-label">高度 (px)</text>
+          <text class="input-label">高度</text>
           <input
             class="dimension-input"
             type="number"
@@ -133,52 +122,35 @@
             bindinput="onHeightInput"
             placeholder="高度"
           />
+          <text class="input-unit">px</text>
         </view>
-      </view>
-
-      <!-- 缩放比例显示 -->
-      <view class="scale-info">
-        <text class="scale-label">缩放比例</text>
-        <text class="scale-value">{{scalePercent}}%</text>
       </view>
     </view>
 
     <!-- 操作按钮 -->
     <view class="action-section">
-      <!-- 调整前：开始调整 -->
       <button
-        wx:if="{{!resizedPath}}"
         class="btn btn-primary btn-lg btn-block {{isProcessing ? 'btn-loading' : ''}}"
-        bindtap="startResize"
+        bindtap="confirmResize"
         disabled="{{isProcessing}}"
       >
-        <text wx:if="{{!isProcessing}}">开始调整</text>
-        <view wx:else class="loading-dots">
-          <text>处理中</text>
-          <text class="dot">.</text>
-          <text class="dot">.</text>
-          <text class="dot">.</text>
-        </view>
+        <text wx:if="{{isProcessing}}">处理中...</text>
+        <text wx:else>确认调整</text>
       </button>
 
-      <!-- 调整后：重新调整 + 保存 -->
-      <view wx:if="{{resizedPath}}" class="action-row">
-        <button class="btn btn-secondary btn-flex" bindtap="resetResize">
-          重新调整
-        </button>
-        <button class="btn btn-primary btn-flex" bindtap="saveToAlbum">
-          保存到相册
-        </button>
-      </view>
+      <button
+        wx:if="{{resultPath}}"
+        class="btn btn-secondary btn-lg btn-block"
+        bindtap="saveToAlbum"
+      >
+        保存到相册
+      </button>
     </view>
   </view>
 
-  <!-- 隐藏Canvas -->
-  <canvas
-    type="2d"
-    id="resizeCanvas"
-    class="hidden-canvas"
-  ></canvas>
+  <!-- Canvas -->
+  <canvas type="2d" id="previewCanvas" class="hidden-canvas"></canvas>
+  <canvas type="2d" id="resizeCanvas" class="hidden-canvas"></canvas>
 
   <view class="safe-area-bottom"></view>
 </view>
