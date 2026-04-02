@@ -310,11 +310,13 @@
 
 /* 隐藏Canvas */
 .hidden-canvas {
-  position: fixed;
-  left: -9999px;
-  top: -9999px;
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 1px;
   height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* 安全区域 */
