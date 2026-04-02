@@ -56,13 +56,6 @@ Component({
         content: '秋云轻图 v1.0.0\n\n一款轻量级图片处理工具，所有功能均在本地完成，保护您的隐私安全。',
         showCancel: false
       });
-    },
-
-    onFeedback() {
-      wx.showToast({
-        title: '功能开发中',
-        icon: 'none'
-      });
     }
   }
 });
