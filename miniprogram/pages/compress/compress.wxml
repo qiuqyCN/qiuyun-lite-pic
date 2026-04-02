@@ -1,0 +1,120 @@
+<!--compress.wxml-->
+<view class="page-container">
+  <!-- Upload Section -->
+  <view class="upload-section">
+    <view wx:if="{{!hasImage}}" class="upload-card" bindtap="chooseImage">
+      <view class="upload-icon-wrapper">
+        <text class="upload-icon">+</text>
+      </view>
+      <text class="upload-title">选择图片</text>
+      <text class="upload-description">从相册选择或拍照</text>
+    </view>
+    
+    <view wx:else class="preview-card">
+      <image class="preview-image" src="{{imagePath}}" mode="aspectFit"/>
+      <view class="preview-info">
+        <text class="info-text">{{originalSize}} KB · {{originalWidth}}×{{originalHeight}}</text>
+        <button class="btn btn-ghost btn-sm" bindtap="chooseImage">更换</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- Settings Section -->
+  <view wx:if="{{hasImage}}" class="section">
+    <view class="section-header">
+      <text class="section-title">压缩设置</text>
+    </view>
+    
+    <view class="settings-card">
+      <view class="setting-item">
+        <view class="setting-label-row">
+          <text class="setting-label">压缩质量</text>
+          <text class="setting-value">{{quality}}%</text>
+        </view>
+        <slider 
+          class="quality-slider" 
+          min="10" 
+          max="100" 
+          value="{{quality}}"
+          block-size="20"
+          activeColor="#0f172a"
+          backgroundColor="#e2e8f0"
+          bindchange="onQualityChange"
+        />
+        <view class="slider-labels">
+          <text class="slider-label">低质量</text>
+          <text class="slider-label">高质量</text>
+        </view>
+      </view>
+
+      <view class="separator"></view>
+
+      <view class="setting-item">
+        <text class="setting-label">目标大小（可选）</text>
+        <view class="input-wrapper">
+          <input 
+            class="input" 
+            type="number" 
+            placeholder="不填则按质量压缩"
+            value="{{targetSize > 0 ? targetSize : ''}}"
+            bindinput="onTargetSizeInput"
+          />
+          <text class="input-suffix">KB</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Result Section -->
+  <view wx:if="{{showResult}}" class="section">
+    <view class="section-header">
+      <text class="section-title">压缩结果</text>
+    </view>
+    
+    <view class="result-card">
+      <view class="result-row">
+        <text class="result-label">压缩后大小</text>
+        <text class="result-value">{{compressedSize}} KB</text>
+      </view>
+      <view class="result-row">
+        <text class="result-label">压缩率</text>
+        <text class="result-value result-success">
+          {{originalSize > 0 ? Math.round((originalSize - compressedSize) / originalSize * 100) : 0}}%
+        </text>
+      </view>
+      <view class="result-row">
+        <text class="result-label">节省空间</text>
+        <text class="result-value">{{originalSize - compressedSize}} KB</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Action Buttons -->
+  <view wx:if="{{hasImage}}" class="action-section">
+    <button 
+      class="btn btn-primary btn-lg btn-block {{isProcessing ? 'btn-disabled' : ''}}" 
+      bindtap="startCompress"
+      disabled="{{isProcessing}}"
+    >
+      <text wx:if="{{!isProcessing}}">开始压缩</text>
+      <text wx:else>压缩中 {{progress}}%</text>
+    </button>
+    
+    <button 
+      wx:if="{{showResult}}" 
+      class="btn btn-outline btn-lg btn-block" 
+      bindtap="saveToAlbum"
+    >
+      保存到相册
+    </button>
+  </view>
+
+  <!-- Hidden Canvas -->
+  <canvas 
+    type="2d" 
+    id="compressCanvas" 
+    class="hidden-canvas"
+  ></canvas>
+
+  <view class="safe-area-bottom"></view>
+</view>

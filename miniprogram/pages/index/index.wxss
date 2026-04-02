@@ -1,0 +1,222 @@
+/**index.wxss**/
+/* 现代极简风首页 - 分类+列表式工具卡片 */
+
+.minimal-container {
+  min-height: 100vh;
+  background: #f5f5f7;
+  padding: 24px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.minimal-header {
+  padding: 32px 0 24px;
+}
+
+.header-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1d1d1f;
+  letter-spacing: -0.02em;
+  display: block;
+}
+
+.header-subtitle {
+  font-size: 16px;
+  color: #86868b;
+  margin-top: 6px;
+  display: block;
+}
+
+/* Categories Section */
+.categories-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.category-section {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Category Header */
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.category-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #86868b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.category-line {
+  flex: 1;
+  height: 1px;
+  background: #e8e8ed;
+}
+
+/* Tools List */
+.tools-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Tool Card - 左侧图标+右侧内容 */
+.tool-card {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.tool-card:active {
+  transform: scale(0.98);
+  background: #fafafa;
+}
+
+/* 左侧图标 */
+.tool-icon-wrapper {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 14px;
+}
+
+.tool-icon {
+  font-size: 26px;
+}
+
+/* 中间内容 */
+.tool-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tool-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tool-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.tool-badges {
+  display: flex;
+  gap: 6px;
+}
+
+.badge-hot {
+  background: #ff3b30;
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.badge-new {
+  background: #34c759;
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.tool-description {
+  font-size: 13px;
+  color: #86868b;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+/* 右侧箭头 */
+.tool-arrow {
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.arrow-icon {
+  font-size: 20px;
+  color: #c7c7cc;
+  font-weight: 300;
+}
+
+/* Footer */
+.minimal-footer {
+  padding: 24px 0;
+  text-align: center;
+}
+
+.footer-text {
+  font-size: 13px;
+  color: #86868b;
+}
+
+/* Safe Area */
+.safe-area-bottom {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 响应式 */
+@media (max-width: 375px) {
+  .minimal-container {
+    padding: 20px;
+  }
+  
+  .header-title {
+    font-size: 28px;
+  }
+  
+  .tool-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    margin-right: 12px;
+  }
+  
+  .tool-icon {
+    font-size: 24px;
+  }
+  
+  .tool-name {
+    font-size: 15px;
+  }
+  
+  .tool-description {
+    font-size: 12px;
+  }
+  
+  .tool-card {
+    padding: 12px 14px;
+  }
+}

@@ -1,0 +1,146 @@
+/**settings.wxss**/
+/* shadcn/ui 风格设置页面 */
+
+.page-container {
+  min-height: 100vh;
+  background: var(--bg-secondary);
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* Header */
+.page-header {
+  margin-bottom: 24px;
+  padding-top: 8px;
+}
+
+.header-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.025em;
+  display: block;
+}
+
+.header-description {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  display: block;
+}
+
+/* Section */
+.section {
+  margin-bottom: 24px;
+}
+
+.section-header {
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Settings List */
+.settings-list {
+  background: var(--bg-primary);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.setting-row:last-child {
+  border-bottom: none;
+}
+
+.setting-row-clickable:active {
+  background: var(--bg-muted);
+}
+
+.setting-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.setting-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  display: block;
+}
+
+.setting-description {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  display: block;
+}
+
+.setting-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 16px;
+}
+
+.quality-slider {
+  width: 120px;
+  margin: 0;
+}
+
+.setting-value {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.setting-arrow {
+  font-size: 18px;
+  color: var(--text-muted);
+}
+
+/* Footer */
+.page-footer {
+  text-align: center;
+  padding: 32px 0;
+}
+
+.footer-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+}
+
+.footer-version {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  display: block;
+}
+
+.footer-description {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  display: block;
+}
+
+/* Safe Area */
+.safe-area-bottom {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}

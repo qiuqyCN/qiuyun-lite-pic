@@ -1,0 +1,66 @@
+<!--index.wxml-->
+<view class="minimal-container">
+  <!-- Header -->
+  <view class="minimal-header">
+    <text class="header-title">秋云轻图</text>
+    <text class="header-subtitle">轻量级图片处理工具</text>
+  </view>
+
+  <!-- 工具分类列表 -->
+  <view class="categories-section">
+    <view 
+      class="category-section" 
+      wx:for="{{categories}}" 
+      wx:key="id"
+      wx:for-item="category"
+    >
+      <!-- 分类标题 -->
+      <view class="category-header">
+        <text class="category-name">{{category.name}}</text>
+        <view class="category-line"></view>
+      </view>
+      
+      <!-- 工具列表 -->
+      <view class="tools-list">
+        <view 
+          class="tool-card"
+          wx:for="{{category.tools}}"
+          wx:key="id"
+          wx:for-item="tool"
+          data-tool-id="{{tool.id}}"
+          data-path="{{tool.path}}"
+          bindtap="onToolTap"
+        >
+          <!-- 左侧图标 -->
+          <view class="tool-icon-wrapper" style="background: {{tool.iconBg}};">
+            <text class="tool-icon">{{tool.icon}}</text>
+          </view>
+          
+          <!-- 右侧内容 -->
+          <view class="tool-content">
+            <view class="tool-header">
+              <text class="tool-name">{{tool.name}}</text>
+              <view class="tool-badges">
+                <view wx:if="{{tool.isHot}}" class="badge-hot">HOT</view>
+                <view wx:if="{{tool.isNew}}" class="badge-new">NEW</view>
+              </view>
+            </view>
+            <text class="tool-description">{{tool.description}}</text>
+          </view>
+          
+          <!-- 右侧箭头 -->
+          <view class="tool-arrow">
+            <text class="arrow-icon">›</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Footer -->
+  <view class="minimal-footer">
+    <text class="footer-text">本地处理 · 隐私安全 · 完全免费</text>
+  </view>
+
+  <view class="safe-area-bottom"></view>
+</view>

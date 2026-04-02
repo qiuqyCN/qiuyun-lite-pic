@@ -1,0 +1,8 @@
+{
+  "usingComponents": {},
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "navigationBarTitleText": "秋云轻图",
+  "navigationBarBackgroundColor": "#4A90E2",
+  "navigationBarTextStyle": "white"
+}

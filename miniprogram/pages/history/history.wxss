@@ -1,0 +1,136 @@
+/**history.wxss**/
+/* shadcn/ui 风格历史页面 */
+
+.page-container {
+  min-height: 100vh;
+  background: var(--bg-secondary);
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* Header */
+.page-header {
+  margin-bottom: 24px;
+  padding-top: 8px;
+}
+
+.header-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.025em;
+  display: block;
+}
+
+.header-description {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  display: block;
+}
+
+/* History List */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  background: var(--bg-primary);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  transition: all 0.15s ease;
+}
+
+.history-item:active {
+  background: var(--bg-muted);
+}
+
+.history-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-muted);
+  flex-shrink: 0;
+}
+
+.history-content {
+  flex: 1;
+  margin-left: 12px;
+  min-width: 0;
+}
+
+.history-type {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  display: block;
+}
+
+.history-time {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  display: block;
+}
+
+.history-arrow {
+  font-size: 18px;
+  color: var(--text-muted);
+  margin-left: 8px;
+}
+
+/* Clear Section */
+.clear-section {
+  margin-top: 24px;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.empty-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  background: var(--bg-muted);
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.empty-icon {
+  font-size: 32px;
+}
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.empty-description {
+  font-size: 14px;
+  color: var(--text-muted);
+  display: block;
+}
+
+/* Safe Area */
+.safe-area-bottom {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}
