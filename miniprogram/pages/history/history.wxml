@@ -2,12 +2,21 @@
 <view class="page-container">
   <!-- Header -->
   <view class="page-header">
-    <text class="header-title">处理历史</text>
-    <text class="header-description">查看您处理过的图片</text>
+    <view class="header-content">
+      <text class="header-title">处理历史</text>
+      <text class="header-count" wx:if="{{historyList.length > 0}}">{{historyList.length}} 条记录</text>
+    </view>
+    <view 
+      class="clear-btn" 
+      bindtap="onClearHistory"
+      wx:if="{{historyList.length > 0}}"
+    >
+      <text class="clear-text">清空</text>
+    </view>
   </view>
 
   <!-- History List -->
-  <view wx:if="{{historyList.length > 0}}">
+  <view wx:if="{{historyList.length > 0}}" class="history-container">
     <view class="history-list">
       <view 
         class="history-item" 
@@ -16,29 +25,42 @@
         data-item="{{item}}"
         bindtap="onHistoryTap"
       >
-        <image class="history-thumb" src="{{item.resultPath}}" mode="aspectFill"/>
-        <view class="history-content">
-          <text class="history-type">{{item.typeName}}</text>
-          <text class="history-time">{{item.timeStr}}</text>
+        <view class="image-wrapper">
+          <image class="history-thumb" src="{{item.resultPath}}" mode="aspectFill"/>
+          <view class="type-tag">{{item.typeName}}</view>
         </view>
-        <text class="history-arrow">›</text>
+        <view class="history-info">
+          <text class="history-time">{{item.timeStr}}</text>
+          <view class="history-meta" wx:if="{{item.params}}">
+            <text class="meta-item" wx:if="{{item.params.imageCount}}">{{item.params.imageCount}}张图片</text>
+            <text class="meta-item" wx:if="{{item.params.layout}}">{{item.params.layout}}</text>
+            <text class="meta-item" wx:if="{{item.params.watermarkText}}">文字水印</text>
+          </view>
+        </view>
+        <view class="arrow">
+          <text class="arrow-icon">›</text>
+        </view>
       </view>
     </view>
     
-    <view class="clear-section">
-      <button class="btn btn-outline btn-block" bindtap="onClearHistory">
-        清除历史记录
-      </button>
+    <view class="list-footer">
+      <text class="footer-text">仅保留最近 20 条记录</text>
     </view>
   </view>
   
   <!-- Empty State -->
   <view wx:else class="empty-state">
-    <view class="empty-icon-wrapper">
-      <text class="empty-icon">📷</text>
+    <view class="empty-illustration">
+      <view class="empty-circle">
+        <text class="empty-icon">📝</text>
+      </view>
     </view>
     <text class="empty-title">暂无处理记录</text>
-    <text class="empty-description">快去处理图片吧</text>
+    <text class="empty-desc">您处理的图片将显示在这里</text>
+    <view class="empty-action" bindtap="goToHome">
+      <text class="action-text">开始处理图片</text>
+      <text class="action-arrow">→</text>
+    </view>
   </view>
 
   <view class="safe-area-bottom"></view>

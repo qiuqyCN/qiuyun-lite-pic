@@ -37,11 +37,23 @@ Component({
     },
 
     onClearHistory() {
+      if (this.data.historyList.length === 0) {
+        console.log('历史记录为空，不执行清除');
+        return;
+      }
+
+      console.log('点击清空按钮，显示确认对话框');
+
       wx.showModal({
         title: '确认清除',
-        content: '确定要清除所有历史记录吗？',
+        content: '确定要清除所有历史记录吗？此操作不可恢复',
+        showCancel: true,
+        cancelText: '取消',
+        confirmText: '清除',
         success: (res) => {
+          console.log('对话框结果:', res);
           if (res.confirm) {
+            console.log('用户确认清除');
             wx.removeStorageSync('processHistory');
             this.setData({ historyList: [] });
             wx.showToast({
@@ -49,7 +61,17 @@ Component({
               icon: 'success'
             });
           }
+        },
+        fail: (err) => {
+          console.error('showModal 失败:', err);
         }
+      });
+    },
+
+    // 返回首页
+    goToHome() {
+      wx.switchTab({
+        url: '/pages/index/index'
       });
     }
   }
