@@ -142,15 +142,10 @@
   margin-bottom: 24rpx;
 }
 
-.logo {
+.logo-img {
   width: 80rpx;
   height: 80rpx;
-  background: linear-gradient(135deg, #0066ff 0%, #0055d4 100%);
   border-radius: 20rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 44rpx;
 }
 
 .app-name {

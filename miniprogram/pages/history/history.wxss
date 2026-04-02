@@ -186,6 +186,10 @@
 
 .empty-icon {
   font-size: 80rpx;
+  line-height: 200rpx;
+  background: transparent;
+  text-align: center;
+  display: block;
 }
 
 .empty-title {
