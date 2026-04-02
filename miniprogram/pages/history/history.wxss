@@ -210,7 +210,7 @@
   align-items: center;
   gap: 12rpx;
   padding: 24rpx 48rpx;
-  background: #41bc3f;
+  background: var(--accent);
   border-radius: 48rpx;
 }
 
