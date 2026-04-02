@@ -218,7 +218,6 @@
 
 /* 图片容器 */
 .preview-container {
-  border-radius: 16px;
   overflow: hidden;
   display: flex;
   align-items: center;
