@@ -1,0 +1,13 @@
+<!--components/image-upload/image-upload.wxml-->
+<view class="upload-section">
+  <view 
+    class="upload-card {{disabled ? 'disabled' : ''}}" 
+    bindtap="onTap"
+  >
+    <view class="upload-icon-box">
+      <text class="upload-icon">+</text>
+    </view>
+    <text class="upload-title">{{title}}</text>
+    <text class="upload-hint">{{hint}}</text>
+  </view>
+</view>

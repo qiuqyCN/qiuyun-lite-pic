@@ -1,6 +1,54 @@
 // watermark.ts
 // 添加水印页面
 
+import { chooseImage } from '../../utils/image';
+import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
+import { saveImageToAlbum } from '../../utils/file';
+import { handleError, showSuccess, showLoading } from '../../utils/error';
+import type { CanvasContext, HistoryItem } from '../../types/index';
+
+/** 水印位置类型 */
+type WatermarkPosition = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight' | 'center' | 'tile';
+
+/** 水印类型 */
+type WatermarkType = 'text' | 'image';
+
+/** 页面数据接口 */
+interface WatermarkData {
+  /** 原图路径 */
+  imagePath: string;
+  /** 带水印图片路径 */
+  watermarkedPath: string;
+  /** 图片宽度 */
+  imageWidth: number;
+  /** 图片高度 */
+  imageHeight: number;
+  /** 水印类型 */
+  watermarkType: WatermarkType;
+  /** 水印文字 */
+  watermarkText: string;
+  /** 水印图片路径 */
+  watermarkImage: string;
+  /** 字体大小 */
+  fontSize: number;
+  /** 字体颜色 */
+  fontColor: string;
+  /** 透明度 0-100 */
+  opacity: number;
+  /** 旋转角度 */
+  rotation: number;
+  /** 水印位置 */
+  position: WatermarkPosition;
+  /** 预设颜色列表 */
+  colorList: string[];
+  /** 输出格式 */
+  fileType: 'jpg' | 'png';
+  /** 是否处理中 */
+  isProcessing: boolean;
+  /** 是否已选择图片 */
+  hasImage: boolean;
+}
+
 Component({
   data: {
     // 图片信息
@@ -10,7 +58,7 @@ Component({
     imageHeight: 0,
 
     // 水印设置
-    watermarkType: 'text' as 'text' | 'image',
+    watermarkType: 'text' as WatermarkType,
     watermarkText: '秋云轻图',
     watermarkImage: '',
 
@@ -21,109 +69,128 @@ Component({
     rotation: 0,
 
     // 位置
-    position: 'bottomRight' as 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight' | 'center' | 'tile',
+    position: 'bottomRight' as WatermarkPosition,
 
     // 预设颜色
     colorList: ['#ffffff', '#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'],
 
+    // 输出格式
+    fileType: 'jpg',
+
     // 状态
     isProcessing: false,
     hasImage: false
-  },
+  } as WatermarkData,
 
   methods: {
-    // 选择图片
-    chooseImage() {
-      wx.chooseMedia({
-        count: 1,
-        mediaType: ['image'],
-        sourceType: ['album', 'camera'],
-        success: (res) => {
-          const tempFilePath = res.tempFiles[0].tempFilePath;
+    /**
+     * 选择图片
+     * 从相册或相机选择图片并获取图片信息
+     */
+    async chooseImage() {
+      try {
+        const imageInfo = await chooseImage();
 
-          // 获取图片尺寸
-          wx.getImageInfo({
-            src: tempFilePath,
-            success: (imageInfo) => {
-              this.setData({
-                imagePath: tempFilePath,
-                imageWidth: imageInfo.width,
-                imageHeight: imageInfo.height,
-                hasImage: true,
-                watermarkedPath: tempFilePath
-              }, () => {
-                // 如果有水印设置，重新应用
-                if (this.data.watermarkText || this.data.watermarkImage) {
-                  this.applyWatermark();
-                }
-              });
-            }
-          });
-        }
-      });
-    },
-
-    // 选择水印图片
-    chooseWatermarkImage() {
-      wx.chooseMedia({
-        count: 1,
-        mediaType: ['image'],
-        sourceType: ['album'],
-        success: (res) => {
-          this.setData({
-            watermarkImage: res.tempFiles[0].tempFilePath
-          }, () => {
+        this.setData({
+          imagePath: imageInfo.path,
+          imageWidth: imageInfo.width,
+          imageHeight: imageInfo.height,
+          hasImage: true,
+          watermarkedPath: imageInfo.path
+        }, () => {
+          // 如果有水印设置，重新应用
+          if (this.data.watermarkText || this.data.watermarkImage) {
             this.applyWatermark();
-          });
-        }
-      });
+          }
+        });
+      } catch (error) {
+        handleError(error, '选择图片失败');
+      }
     },
 
-    // 切换水印类型
+    /**
+     * 选择水印图片
+     * 从相册选择图片作为水印
+     */
+    async chooseWatermarkImage() {
+      try {
+        const imageInfo = await chooseImage();
+        this.setData({
+          watermarkImage: imageInfo.path
+        }, () => {
+          this.applyWatermark();
+        });
+      } catch (error) {
+        handleError(error, '选择水印图片失败');
+      }
+    },
+
+    /**
+     * 切换水印类型
+     * @param e - 触摸事件对象
+     */
     onTypeChange(e: WechatMiniprogram.TouchEvent) {
-      const type = e.currentTarget.dataset.type as 'text' | 'image';
+      const type = e.currentTarget.dataset.type as WatermarkType;
       this.setData({ watermarkType: type }, () => {
         this.applyWatermark();
       });
     },
 
-    // 文字输入
+    /**
+     * 文字输入事件处理
+     * @param e - 输入事件对象
+     */
     onTextInput(e: WechatMiniprogram.Input) {
       this.setData({ watermarkText: e.detail.value }, () => {
         this.applyWatermark();
       });
     },
 
-    // 字体大小变化
-    onFontSizeChange(e: WechatMiniprogram.SliderChange) {
+    /**
+     * 字体大小变化事件处理
+     * @param e - 自定义事件对象
+     */
+    onFontSizeChange(e: WechatMiniprogram.CustomEvent) {
       this.setData({ fontSize: e.detail.value }, () => {
         this.applyWatermark();
       });
     },
 
-    // 透明度变化
-    onOpacityChange(e: WechatMiniprogram.SliderChange) {
+    /**
+     * 透明度变化事件处理
+     * @param e - 自定义事件对象
+     */
+    onOpacityChange(e: WechatMiniprogram.CustomEvent) {
       this.setData({ opacity: e.detail.value }, () => {
         this.applyWatermark();
       });
     },
 
-    // 旋转角度变化
-    onRotationChange(e: WechatMiniprogram.SliderChange) {
+    /**
+     * 旋转角度变化事件处理
+     * @param e - 自定义事件对象
+     */
+    onRotationChange(e: WechatMiniprogram.CustomEvent) {
       this.setData({ rotation: e.detail.value }, () => {
         this.applyWatermark();
       });
     },
 
-    // 选择颜色
-    onColorSelect(e: WechatMiniprogram.TouchEvent) {
-      const color = e.currentTarget.dataset.color;
+    /**
+     * 选择颜色事件处理
+     * @param e - 自定义事件对象
+     */
+    onColorSelect(e: WechatMiniprogram.CustomEvent) {
+      const color = e.detail.color;
       this.setData({ fontColor: color }, () => {
         this.applyWatermark();
       });
     },
 
-    // 选择位置
+    /**
+     * 选择位置事件处理
+     * @param e - 触摸事件对象
+     */
     onPositionSelect(e: WechatMiniprogram.TouchEvent) {
       const position = e.currentTarget.dataset.position;
       this.setData({ position }, () => {
@@ -131,7 +198,20 @@ Component({
       });
     },
 
-    // 应用水印
+    /**
+     * 格式选择变化
+     */
+    onFormatChange(e: WechatMiniprogram.CustomEvent) {
+      const format = e.detail.format as 'jpg' | 'png';
+      this.setData({ fileType: format }, () => {
+        this.applyWatermark();
+      });
+    },
+
+    /**
+     * 应用水印
+     * 在 Canvas 上绘制原图并添加水印效果
+     */
     async applyWatermark() {
       if (!this.data.hasImage) return;
 
@@ -155,22 +235,15 @@ Component({
       this.setData({ isProcessing: true });
 
       try {
-        // 获取canvas节点
-        const query = this.createSelectorQuery();
-        const canvasNode = await new Promise<WechatMiniprogram.Canvas>((resolve) => {
-          query.select('#watermarkCanvas').fields({ node: true, size: true }).exec((res) => {
-            resolve(res[0].node);
-          });
-        });
+        // 创建 Canvas 上下文
+        const { canvas, ctx } = await createCanvasContext('watermarkCanvas', this);
 
-        const ctx = canvasNode.getContext('2d');
-
-        // 设置canvas尺寸
-        canvasNode.width = this.data.imageWidth;
-        canvasNode.height = this.data.imageHeight;
+        // 设置 canvas 尺寸
+        canvas.width = this.data.imageWidth;
+        canvas.height = this.data.imageHeight;
 
         // 绘制原图
-        const image = canvasNode.createImage();
+        const image = canvas.createImage();
         await new Promise<void>((resolve, reject) => {
           image.onload = () => resolve();
           image.onerror = reject;
@@ -182,18 +255,13 @@ Component({
         if (this.data.watermarkType === 'text') {
           await this.drawTextWatermark(ctx);
         } else {
-          await this.drawImageWatermark(ctx, canvasNode);
+          await this.drawImageWatermark(ctx, canvas);
         }
 
         // 导出图片
-        const tempFilePath = await new Promise<string>((resolve, reject) => {
-          wx.canvasToTempFilePath({
-            canvas: canvasNode,
-            fileType: 'jpg',
-            quality: 0.92,
-            success: (res) => resolve(res.tempFilePath),
-            fail: (err) => reject(err)
-          });
+        const tempFilePath = await canvasToTempFile(canvas, {
+          fileType: this.data.fileType,
+          quality: 0.92
         });
 
         this.setData({
@@ -201,15 +269,17 @@ Component({
           isProcessing: false
         });
 
-      } catch (err) {
-        console.error('水印应用失败:', err);
-        wx.showToast({ title: '水印应用失败', icon: 'none' });
+      } catch (error) {
+        handleError(error, '水印应用失败');
         this.setData({ isProcessing: false });
       }
     },
 
-    // 绘制文字水印
-    async drawTextWatermark(ctx: WechatMiniprogram.CanvasContext) {
+    /**
+     * 绘制文字水印
+     * @param ctx - Canvas 2D 上下文
+     */
+    async drawTextWatermark(ctx: CanvasRenderingContext2D) {
       const { watermarkText, fontSize, fontColor, opacity, rotation, position, imageWidth, imageHeight } = this.data;
 
       ctx.save();
@@ -274,12 +344,16 @@ Component({
       ctx.restore();
     },
 
-    // 绘制图片水印
-    async drawImageWatermark(ctx: WechatMiniprogram.CanvasContext, canvasNode: WechatMiniprogram.Canvas) {
+    /**
+     * 绘制图片水印
+     * @param ctx - Canvas 2D 上下文
+     * @param canvas - Canvas 节点
+     */
+    async drawImageWatermark(ctx: CanvasRenderingContext2D, canvas: any) {
       const { watermarkImage, opacity, position, imageWidth, imageHeight } = this.data;
 
       // 加载水印图片
-      const watermarkImg = canvasNode.createImage();
+      const watermarkImg = canvas.createImage();
       await new Promise<void>((resolve, reject) => {
         watermarkImg.onload = () => resolve();
         watermarkImg.onerror = reject;
@@ -349,7 +423,10 @@ Component({
       ctx.restore();
     },
 
-    // 预览图片
+    /**
+     * 预览图片
+     * 在微信中预览带水印的图片
+     */
     previewImage() {
       wx.previewImage({
         urls: [this.data.watermarkedPath],
@@ -357,39 +434,43 @@ Component({
       });
     },
 
-    // 保存到相册
+    /**
+     * 保存到相册
+     * 将带水印的图片保存到系统相册
+     */
     async saveToAlbum() {
       if (!this.data.watermarkedPath) return;
 
+      const hideLoading = showLoading('保存中...');
+
       try {
-        await wx.saveImageToPhotosAlbum({
-          filePath: this.data.watermarkedPath
-        });
-        wx.showToast({ title: '已保存到相册', icon: 'success' });
+        await saveImageToAlbum(this.data.watermarkedPath);
+        hideLoading();
+        showSuccess('已保存到相册');
         this.saveToHistory();
-      } catch (err) {
-        wx.showToast({ title: '保存失败', icon: 'none' });
+      } catch (error) {
+        hideLoading();
+        handleError(error, '保存失败');
       }
     },
 
-    // 保存到历史记录
+    /**
+     * 保存到历史记录
+     * 将处理记录保存到本地存储
+     */
     saveToHistory() {
       const history = wx.getStorageSync('processHistory') || [];
-      history.unshift({
+      const historyItem: HistoryItem = {
         id: Date.now().toString(),
         type: 'watermark',
         typeName: '添加水印',
         originalPath: this.data.imagePath,
         resultPath: this.data.watermarkedPath,
-        createTime: Date.now(),
-        timeStr: new Date().toLocaleString(),
-        params: {
-          watermarkType: this.data.watermarkType,
-          watermarkText: this.data.watermarkText,
-          position: this.data.position,
-          opacity: this.data.opacity
-        }
-      });
+        timestamp: Date.now(),
+        fileSize: 0
+      };
+
+      history.unshift(historyItem);
       wx.setStorageSync('processHistory', history.slice(0, 20));
     }
   }

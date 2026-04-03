@@ -1,0 +1,32 @@
+<!--components/scroll-selector/scroll-selector.wxml-->
+<view class="scroll-selector">
+  <!-- 标题栏 -->
+  <view class="selector-header">
+    <text class="selector-title">{{title}}</text>
+    <view wx:if="{{showHint}}" class="scroll-hint">
+      <text class="scroll-hint-text">{{hintText}}</text>
+      <text class="scroll-hint-icon">→</text>
+    </view>
+  </view>
+
+  <!-- 滚动列表 -->
+  <scroll-view class="selector-scroll" scroll-x show-scrollbar="{{false}}">
+    <view class="selector-list">
+      <view
+        wx:for="{{list}}"
+        wx:key="id"
+        class="selector-item {{selectedId === item.id ? 'active' : ''}}"
+        data-item="{{item}}"
+        bindtap="onItemTap"
+      >
+        <slot name="item" item="{{item}}">
+          <!-- 默认内容 -->
+          <view class="item-default">
+            <text wx:if="{{item.icon}}" class="item-icon">{{item.icon}}</text>
+            <text class="item-name">{{item.name}}</text>
+          </view>
+        </slot>
+      </view>
+    </view>
+  </scroll-view>
+</view>

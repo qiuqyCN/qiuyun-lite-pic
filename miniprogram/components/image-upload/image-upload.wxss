@@ -1,0 +1,55 @@
+/* components/image-upload/image-upload.wxss */
+
+.upload-section {
+  padding: 20rpx 30rpx;
+}
+
+.upload-card {
+  background: #ffffff;
+  border-radius: 20rpx;
+  border: 2rpx dashed #d2d2d7;
+  padding: 100rpx 60rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20rpx;
+  transition: all 0.2s ease;
+}
+
+.upload-card:active {
+  border-color: #41bc3f;
+  background: #f8f9ff;
+}
+
+.upload-card.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.upload-icon-box {
+  width: 100rpx;
+  height: 100rpx;
+  background: #f5f5f7;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-icon {
+  font-size: 48rpx;
+  color: #86868b;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.upload-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.upload-hint {
+  font-size: 26rpx;
+  color: #86868b;
+}

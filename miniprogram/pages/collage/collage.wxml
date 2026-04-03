@@ -1,19 +1,19 @@
-<!-- collage.wxml -->
-<!-- 拼图拼接页面 -->
-
+<!--collage.wxml-->
 <view class="container">
   <!-- 图片选择区域 -->
   <view class="section">
     <view class="section-title">选择图片</view>
 
-    <!-- 空状态 -->
-    <view wx:if="{{!hasImages}}" class="empty-state" bindtap="chooseImages">
-      <view class="empty-icon">🖼️</view>
-      <view class="empty-text">点击选择图片</view>
-      <view class="empty-subtext">最多支持 {{currentLayout.maxImages}} 张图片</view>
-    </view>
+    <!-- 未选择图片状态 -->
+    <image-upload
+      wx:if="{{!hasImages}}"
+      icon="🖼️"
+      title="点击选择图片"
+      hint="最多支持 {{currentLayout.maxImages}} 张图片"
+      bind:upload="chooseImages"
+    />
 
-    <!-- 图片列表 -->
+    <!-- 已选择图片列表 -->
     <view wx:else class="image-list">
       <view
         wx:for="{{images}}"
@@ -40,27 +40,14 @@
 
   <!-- 布局选择 -->
   <view class="section">
-    <view class="section-header">
-      <view class="section-title">布局模板</view>
-      <view class="scroll-hint">
-        <text class="scroll-hint-text">左右滑动查看更多</text>
-        <text class="scroll-hint-icon">→</text>
-      </view>
-    </view>
-    <scroll-view class="layout-scroll" scroll-x show-scrollbar="{{false}}">
-      <view class="layout-list">
-        <view
-          wx:for="{{layoutTemplates}}"
-          wx:key="id"
-          class="layout-item {{currentLayout.id === item.id ? 'active' : ''}}"
-          data-id="{{item.id}}"
-          bindtap="onLayoutSelect"
-        >
-          <view class="layout-icon">{{item.icon}}</view>
-          <view class="layout-name">{{item.name}}</view>
-        </view>
-      </view>
-    </scroll-view>
+    <scroll-selector
+      title="布局模板"
+      list="{{layoutTemplates}}"
+      selectedId="{{currentLayout.id}}"
+      showHint="{{true}}"
+      hintText="左右滑动查看更多"
+      bind:select="onLayoutSelect"
+    />
   </view>
 
   <!-- 样式设置 -->
@@ -68,57 +55,35 @@
     <view class="section-title">样式设置</view>
 
     <!-- 间距 -->
-    <view class="setting-item">
-      <view class="setting-label">
-        <text>图片间距</text>
-        <text class="setting-value">{{spacing}}px</text>
-      </view>
-      <slider
-        class="setting-slider"
-        min="0"
-        max="50"
-        value="{{spacing}}"
-        show-value="{{false}}"
-        block-size="20"
-        activeColor="#41bc3f"
-        bindchange="onSpacingChange"
-      />
-    </view>
+    <slider-control
+      label="图片间距"
+      value="{{spacing}}"
+      min="0"
+      max="50"
+      unit="px"
+      activeColor="#41bc3f"
+      bind:change="onSpacingChange"
+    />
 
     <!-- 圆角 -->
-    <view class="setting-item">
-      <view class="setting-label">
-        <text>圆角大小</text>
-        <text class="setting-value">{{borderRadius}}px</text>
-      </view>
-      <slider
-        class="setting-slider"
-        min="0"
-        max="50"
-        value="{{borderRadius}}"
-        show-value="{{false}}"
-        block-size="20"
-        activeColor="#41bc3f"
-        bindchange="onRadiusChange"
-      />
-    </view>
+    <slider-control
+      label="圆角大小"
+      value="{{borderRadius}}"
+      min="0"
+      max="50"
+      unit="px"
+      activeColor="#41bc3f"
+      bind:change="onRadiusChange"
+    />
 
     <!-- 背景色 -->
-    <view class="setting-item">
-      <view class="setting-label">背景颜色</view>
-      <view class="color-list">
-        <view
-          wx:for="{{colorList}}"
-          wx:key="*this"
-          class="color-item {{backgroundColor === item ? 'active' : ''}}"
-          style="background-color: {{item}};"
-          data-color="{{item}}"
-          bindtap="onColorSelect"
-        >
-          <view wx:if="{{backgroundColor === item}}" class="color-check">✓</view>
-        </view>
-      </view>
-    </view>
+    <color-picker
+      title="背景颜色"
+      colors="{{colorList}}"
+      selectedColor="{{backgroundColor}}"
+      showTitle="{{true}}"
+      bind:select="onColorSelect"
+    />
   </view>
 
   <!-- 输出设置 -->
@@ -126,50 +91,47 @@
     <view class="section-title">输出设置</view>
 
     <!-- 输出宽度 -->
-    <view class="setting-item">
-      <view class="setting-label">
-        <text>输出宽度</text>
-        <text class="setting-value">{{outputWidth}}px</text>
-      </view>
-      <slider
-        class="setting-slider"
-        min="600"
-        max="2400"
-        step="100"
-        value="{{outputWidth}}"
-        show-value="{{false}}"
-        block-size="20"
-        activeColor="#41bc3f"
-        bindchange="onWidthChange"
-      />
-    </view>
+    <slider-control
+      label="输出宽度"
+      value="{{outputWidth}}"
+      min="600"
+      max="2400"
+      step="100"
+      unit="px"
+      activeColor="#41bc3f"
+      bind:change="onWidthChange"
+    />
 
     <!-- 画质 -->
-    <view class="setting-item">
-      <view class="setting-label">
-        <text>输出画质</text>
-        <text class="setting-value">{{outputQuality}}%</text>
-      </view>
-      <slider
-        class="setting-slider"
-        min="60"
-        max="100"
-        value="{{outputQuality}}"
-        show-value="{{false}}"
-        block-size="20"
-        activeColor="#41bc3f"
-        bindchange="onQualityChange"
-      />
-    </view>
+    <slider-control
+      label="输出画质"
+      value="{{outputQuality}}"
+      min="60"
+      max="100"
+      unit="%"
+      activeColor="#41bc3f"
+      bind:change="onQualityChange"
+    />
   </view>
+
+  <!-- 输出格式 -->
+  <format-selector
+    value="{{fileType}}"
+    mode="horizontal"
+    showDesc="{{false}}"
+    bind:change="onFormatChange"
+  />
 
   <!-- 预览区域 -->
   <view wx:if="{{showPreview && resultPath}}" class="section">
-    <view class="section-title">预览效果</view>
-    <view class="preview-area" bindtap="previewImage">
-      <image class="result-image" src="{{resultPath}}" mode="widthFix" />
-      <view class="preview-hint">点击查看大图</view>
-    </view>
+    <image-preview
+      imagePath="{{resultPath}}"
+      title="预览效果"
+      showChange="{{false}}"
+      isProcessing="{{isProcessing}}"
+      processingText="生成中..."
+      bind:preview="previewImage"
+    />
   </view>
 
   <!-- 底部占位 -->
@@ -177,24 +139,17 @@
 </view>
 
 <!-- 操作按钮 -->
-<view class="action-bar">
-  <button
-    class="action-btn primary {{!hasImages || isProcessing ? 'disabled' : ''}}"
-    bindtap="generateCollage"
-    disabled="{{!hasImages || isProcessing}}"
-  >
-    <text wx:if="{{isProcessing}}">生成中...</text>
-    <text wx:else>{{resultPath ? '重新生成' : '生成拼图'}}</text>
-  </button>
-
-  <button
-    wx:if="{{resultPath}}"
-    class="action-btn secondary"
-    bindtap="saveToAlbum"
-  >
-    保存到相册
-  </button>
-</view>
+<action-buttons
+  hasResult="{{!!resultPath}}"
+  isLoading="{{isProcessing}}"
+  primaryText="生成拼图"
+  secondaryText="重新生成"
+  saveText="保存到相册"
+  loadingText="生成中..."
+  bind:primary="generateCollage"
+  bind:secondary="generateCollage"
+  bind:save="saveToAlbum"
+/>
 
 <!-- 隐藏的 Canvas -->
 <canvas type="2d" id="collageCanvas" class="hidden-canvas"></canvas>

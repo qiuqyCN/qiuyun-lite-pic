@@ -8,53 +8,6 @@
   box-sizing: border-box;
 }
 
-/* 上传区域 */
-.upload-section {
-  padding-top: 60px;
-}
-
-.upload-card {
-  background: #ffffff;
-  border-radius: 24px;
-  border: 2px dashed #d2d2d7;
-  padding: 60px 32px;
-  text-align: center;
-  transition: all 0.2s ease;
-}
-
-.upload-card:active {
-  border-color: var(--accent);
-  background: var(--accent-light);
-}
-
-.upload-icon-box {
-  width: 80px;
-  height: 80px;
-  background: #f5f5f7;
-  border-radius: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-}
-
-.upload-icon {
-  font-size: 36px;
-}
-
-.upload-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #1d1d1f;
-  display: block;
-  margin-bottom: 8px;
-}
-
-.upload-hint {
-  font-size: 15px;
-  color: #86868b;
-}
-
 /* 布局 */
 .resize-layout {
   display: flex;
@@ -243,94 +196,62 @@
   color: #86868b;
 }
 
-/* 预设尺寸区域 */
-.preset-section {
+/* scroll-selector 组件自定义样式 */
+scroll-selector {
+  display: block;
   background: #ffffff;
   border-radius: 20px;
   padding: 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-.preset-section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.preset-section-title {
+scroll-selector .selector-title {
   font-size: 15px;
   font-weight: 600;
   color: #1d1d1f;
 }
 
-.scroll-hint {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.scroll-hint-text {
+scroll-selector .scroll-hint-text {
   font-size: 12px;
   color: #86868b;
 }
 
-.scroll-hint-icon {
+scroll-selector .scroll-hint-icon {
   font-size: 12px;
   color: var(--accent);
-  animation: scrollHint 1.5s ease-in-out infinite;
 }
 
-@keyframes scrollHint {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(4px); }
-}
-
-.preset-scroll {
-  white-space: nowrap;
-}
-
-.preset-list {
-  display: flex;
-  gap: 12px;
-  padding: 4px;
-}
-
-.preset-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 12px 16px;
+scroll-selector .selector-item {
   background: #f5f5f7;
-  border-radius: 16px;
-  min-width: 80px;
-  transition: all 0.2s ease;
   border: 2px solid transparent;
 }
 
-.preset-item:active {
-  transform: scale(0.96);
-}
-
-.preset-item.active {
+scroll-selector .selector-item.active {
   background: var(--accent-light);
   border-color: var(--accent);
+}
+
+/* 预设项自定义内容 */
+.preset-item-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
 .preset-name {
   font-size: 14px;
   font-weight: 600;
   color: #1d1d1f;
-  margin-bottom: 4px;
-}
-
-.preset-item.active .preset-name {
-  color: var(--accent);
 }
 
 .preset-size {
   font-size: 11px;
   color: #86868b;
+}
+
+scroll-selector .selector-item.active .preset-name {
+  color: var(--accent);
 }
 
 /* 自定义尺寸区域 */
@@ -417,77 +338,6 @@
   color: #c7c7cc;
   font-weight: 300;
   padding-bottom: 24px;
-}
-
-/* 操作按钮 */
-.action-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px 24px;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 16px;
-  border: none;
-  transition: all 0.2s ease;
-  margin: 0;
-}
-
-.btn::after {
-  display: none;
-}
-
-.btn:active {
-  transform: scale(0.98);
-}
-
-.btn-lg {
-  padding: 18px 28px;
-  font-size: 17px;
-}
-
-.btn-block {
-  width: 100%;
-}
-
-.btn-primary {
-  background: var(--accent);
-  color: white;
-  box-shadow: 0 4px 12px rgba(65, 188, 63, 0.3);
-}
-
-.btn-primary:active {
-  background: var(--accent-dark);
-}
-
-.btn-secondary {
-  background: #f5f5f7;
-  color: #1d1d1f;
-}
-
-.btn-secondary:active {
-  background: #e8e8ed;
-}
-
-.btn-loading {
-  opacity: 0.8;
-}
-
-/* 按钮行布局 */
-.action-row {
-  display: flex;
-  gap: 12px;
-}
-
-.btn-flex {
-  flex: 1;
 }
 
 /* 隐藏Canvas */

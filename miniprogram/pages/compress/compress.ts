@@ -1,81 +1,118 @@
 // compress.ts
-// 图片压缩页面 - 方案二简洁设计
+// 图片压缩页面 - 优化重构版
+
+import { chooseImage, estimateCompressedSize, calculateSavedPercent } from '../../utils/image';
+import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
+import { saveImageToAlbum } from '../../utils/file';
+import { handleError, showSuccess, showLoading } from '../../utils/error';
+
+interface CompressData {
+  // 图片信息
+  imagePath: string;
+  originalSize: number;
+  originalWidth: number;
+  originalHeight: number;
+  compressedPath: string;
+  compressedSize: number;
+
+  // 压缩参数
+  quality: number;
+  fileType: 'jpg' | 'png';
+
+  // 估算范围
+  estimatedMin: number;
+  estimatedMax: number;
+
+  // 节省百分比
+  savedPercent: number;
+
+  // 状态
+  isProcessing: boolean;
+  hasImage: boolean;
+}
 
 Component({
   data: {
-    // 图片信息
     imagePath: '',
     originalSize: 0,
     originalWidth: 0,
     originalHeight: 0,
     compressedPath: '',
     compressedSize: 0,
-
-    // 压缩参数
     quality: 60,
-
-    // 估算范围
+    fileType: 'jpg',
     estimatedMin: 0,
     estimatedMax: 0,
-
-    // 节省百分比
     savedPercent: 0,
-
-    // 状态
     isProcessing: false,
     hasImage: false,
-  },
+  } as CompressData,
 
   methods: {
-    // 选择图片
+    /**
+     * 根据原图大小推荐质量
+     */
+    recommendQuality(originalSizeKB: number): number {
+      // 原图小于100KB，已经是小图，建议较低质量避免变大
+      if (originalSizeKB < 100) return 50;
+      // 原图100-500KB，建议使用中等质量
+      if (originalSizeKB < 500) return 60;
+      // 原图500KB-2MB，建议使用较高质量
+      if (originalSizeKB < 2048) return 70;
+      // 原图大于2MB，建议使用高质量压缩
+      return 80;
+    },
+
+    /**
+     * 选择图片
+     */
     async chooseImage() {
       try {
-        const res = await wx.chooseMedia({
-          count: 1,
-          mediaType: ['image'],
-          sourceType: ['album', 'camera']
-        });
-
-        const tempFilePath = res.tempFiles[0].tempFilePath;
-        const fileSize = res.tempFiles[0].size;
-
-        // 获取图片信息
-        const imageInfo = await wx.getImageInfo({
-          src: tempFilePath
-        });
-
-        const originalSize = Math.round(fileSize / 1024);
-        const quality = 60;
+        const imageInfo = await chooseImage();
+        const originalSizeKB = Math.round(imageInfo.size / 1024);
+        // 智能推荐质量
+        const quality = this.recommendQuality(originalSizeKB);
 
         this.setData({
-          imagePath: tempFilePath,
-          originalSize,
+          imagePath: imageInfo.path,
+          originalSize: originalSizeKB,
           originalWidth: imageInfo.width,
           originalHeight: imageInfo.height,
           hasImage: true,
           compressedPath: '',
           compressedSize: 0,
           quality,
-          ...this.calculateEstimateRange(originalSize, quality)
+          ...this.calculateEstimateRange(originalSizeKB, quality)
         });
 
+        // 如果原图很小，提示用户
+        if (originalSizeKB < 100) {
+          wx.showToast({
+            title: '原图已较小，建议降低质量',
+            icon: 'none',
+            duration: 2000
+          });
+        }
       } catch (err) {
+        // 用户取消选择，不显示错误
         console.log('用户取消选择');
       }
     },
 
-    // 计算估算范围
+    /**
+     * 计算估算范围
+     */
     calculateEstimateRange(originalSize: number, quality: number): { estimatedMin: number; estimatedMax: number } {
-      // 根据质量给出合理的估算范围
-      // 最小值：质量系数 × 0.5（理想情况）
-      // 最大值：质量系数 × 1.2（复杂图片）
-      const factor = quality / 100;
-      const estimatedMin = Math.round(originalSize * factor * 0.5);
-      const estimatedMax = Math.round(originalSize * factor * 1.2);
-      return { estimatedMin, estimatedMax };
+      const { min, max } = estimateCompressedSize(originalSize * 1024, quality);
+      return {
+        estimatedMin: Math.round(min / 1024),
+        estimatedMax: Math.round(max / 1024)
+      };
     },
 
-    // 快速预设点击
+    /**
+     * 快速预设点击
+     */
     onPresetTap(e: WechatMiniprogram.TouchEvent) {
       const quality = parseInt(e.currentTarget.dataset.quality);
       this.setData({
@@ -84,7 +121,9 @@ Component({
       });
     },
 
-    // 质量滑块变化（拖动中）
+    /**
+     * 质量滑块变化
+     */
     onQualityChanging(e: WechatMiniprogram.SliderChange) {
       const quality = e.detail.value;
       this.setData({
@@ -93,7 +132,9 @@ Component({
       });
     },
 
-    // 质量滑块变化（拖动结束）
+    /**
+     * 质量滑块变化（拖动结束）
+     */
     onQualityChange(e: WechatMiniprogram.SliderChange) {
       const quality = e.detail.value;
       this.setData({
@@ -102,40 +143,55 @@ Component({
       });
     },
 
-    // 预览图片
+    /**
+     * 格式选择变化（压缩页面只支持JPG）
+     */
+    onFormatChange(e: WechatMiniprogram.CustomEvent) {
+      const format = e.detail.format as 'jpg' | 'png';
+      // 压缩功能只支持JPG，如果用户选择PNG，提示用户
+      if (format === 'png') {
+        wx.showToast({
+          title: 'PNG为无损格式，无需压缩',
+          icon: 'none',
+          duration: 2000
+        });
+        return;
+      }
+      this.setData({ fileType: format });
+    },
+
+    /**
+     * 预览图片
+     */
     previewImage() {
+      const url = this.data.compressedPath || this.data.imagePath;
       wx.previewImage({
-        urls: [this.data.compressedPath || this.data.imagePath],
-        current: this.data.compressedPath || this.data.imagePath
+        urls: [url],
+        current: url
       });
     },
 
-    // 开始压缩
+    /**
+     * 开始压缩
+     */
     async startCompress() {
       if (!this.data.hasImage) {
-        wx.showToast({ title: '请先选择图片', icon: 'none' });
+        handleError(null, '请先选择图片');
         return;
       }
 
+      const hideLoading = showLoading('压缩中...');
       this.setData({ isProcessing: true });
 
       try {
-        // 获取canvas节点
-        const query = this.createSelectorQuery();
-        const canvasNode = await new Promise<WechatMiniprogram.Canvas>((resolve) => {
-          query.select('#compressCanvas').fields({ node: true, size: true }).exec((res) => {
-            resolve(res[0].node);
-          });
-        });
-
-        const ctx = canvasNode.getContext('2d');
+        const { canvas, ctx } = await createCanvasContext('compressCanvas', this);
 
         // 设置canvas尺寸
-        canvasNode.width = this.data.originalWidth;
-        canvasNode.height = this.data.originalHeight;
+        canvas.width = this.data.originalWidth;
+        canvas.height = this.data.originalHeight;
 
         // 创建图片对象
-        const image = canvasNode.createImage();
+        const image = canvas.createImage();
         await new Promise((resolve, reject) => {
           image.onload = resolve;
           image.onerror = reject;
@@ -145,23 +201,16 @@ Component({
         // 绘制图片
         ctx.drawImage(image, 0, 0, this.data.originalWidth, this.data.originalHeight);
 
-        // 导出压缩后的图片
-        const tempFilePath = await new Promise<string>((resolve) => {
-          wx.canvasToTempFilePath({
-            canvas: canvasNode,
-            quality: this.data.quality / 100,
-            fileType: 'jpg',
-            success: (res) => resolve(res.tempFilePath)
-          });
+        // 导出压缩后的图片（压缩只支持JPG格式）
+        const tempFilePath = await canvasToTempFile(canvas, {
+          quality: this.data.quality / 100,
+          fileType: this.data.fileType === 'jpg' ? 'jpg' : 'jpg'
         });
 
         // 获取压缩后文件大小
-        const fileInfo = await wx.getFileInfo({
-          filePath: tempFilePath
-        });
-
+        const fileInfo = await wx.getFileInfo({ filePath: tempFilePath });
         const compressedSize = Math.round(fileInfo.size / 1024);
-        const savedPercent = Math.round((this.data.originalSize - compressedSize) / this.data.originalSize * 100);
+        const savedPercent = calculateSavedPercent(this.data.originalSize, compressedSize);
 
         this.setData({
           compressedPath: tempFilePath,
@@ -170,6 +219,18 @@ Component({
           isProcessing: false
         });
 
+        hideLoading();
+
+        // 如果压缩后比原图大，提示用户
+        if (compressedSize >= this.data.originalSize) {
+          wx.showModal({
+            title: '压缩提示',
+            content: `压缩后(${compressedSize}KB)比原图(${this.data.originalSize}KB)更大，建议降低质量或直接使用原图`,
+            showCancel: false,
+            confirmText: '知道了'
+          });
+        }
+
         // 保存到历史记录
         this.saveToHistory();
 
@@ -177,21 +238,25 @@ Component({
         this.updateUsageStats();
 
         // 显示成功提示
-        wx.showToast({
-          title: savedPercent > 0 ? `节省 ${savedPercent}%` : '压缩完成',
-          icon: 'success'
-        });
+        if (compressedSize < this.data.originalSize) {
+          showSuccess(`节省 ${savedPercent}%`);
+        } else {
+          showSuccess('压缩完成');
+        }
 
       } catch (err) {
-        console.error('压缩失败:', err);
-        wx.showToast({ title: '压缩失败', icon: 'none' });
+        hideLoading();
+        handleError(err, '压缩失败');
         this.setData({ isProcessing: false });
       }
     },
 
-    // 重新压缩
+    /**
+     * 重新压缩
+     */
     resetCompress() {
-      const quality = 60;
+      // 使用智能推荐质量
+      const quality = this.recommendQuality(this.data.originalSize);
       this.setData({
         compressedPath: '',
         compressedSize: 0,
@@ -201,7 +266,9 @@ Component({
       });
     },
 
-    // 保存到历史记录
+    /**
+     * 保存到历史记录
+     */
     saveToHistory() {
       const history = wx.getStorageSync('processHistory') || [];
       history.unshift({
@@ -221,7 +288,9 @@ Component({
       wx.setStorageSync('processHistory', history.slice(0, 20));
     },
 
-    // 更新使用统计
+    /**
+     * 更新使用统计
+     */
     updateUsageStats() {
       const stats = wx.getStorageSync('usageStats') || {
         todayCount: 0,
@@ -245,17 +314,17 @@ Component({
       wx.setStorageSync('usageStats', stats);
     },
 
-    // 保存到相册
+    /**
+     * 保存到相册
+     */
     async saveToAlbum() {
       if (!this.data.compressedPath) return;
 
       try {
-        await wx.saveImageToPhotosAlbum({
-          filePath: this.data.compressedPath
-        });
-        wx.showToast({ title: '已保存到相册', icon: 'success' });
+        await saveImageToAlbum(this.data.compressedPath);
+        showSuccess('已保存到相册');
       } catch (err) {
-        wx.showToast({ title: '保存失败', icon: 'none' });
+        handleError(err, '保存失败');
       }
     }
   }

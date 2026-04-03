@@ -1,0 +1,29 @@
+<!--components/color-picker/color-picker.wxml-->
+<view class="color-picker">
+  <!-- 标题 -->
+  <text wx:if="{{showTitle}}" class="picker-title">{{title}}</text>
+
+  <!-- 颜色网格 -->
+  <view class="color-grid">
+    <view
+      wx:for="{{colors}}"
+      wx:key="*this"
+      class="color-item {{selectedColor === item ? 'active' : ''}}"
+      style="background-color: {{item}};"
+      data-color="{{item}}"
+      bindtap="onColorTap"
+    >
+      <!-- 选中标记 -->
+      <view wx:if="{{selectedColor === item}}" class="check-mark">
+        <text class="check-icon">✓</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 当前颜色显示 -->
+  <view class="current-color">
+    <text class="color-label">当前颜色</text>
+    <view class="color-preview" style="background-color: {{selectedColor}};"></view>
+    <text class="color-value">{{selectedColor}}</text>
+  </view>
+</view>

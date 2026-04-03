@@ -1,6 +1,12 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "image-upload": "/components/image-upload/image-upload",
+    "image-preview": "/components/image-preview/image-preview",
+    "slider-control": "/components/slider-control/slider-control",
+    "format-selector": "/components/format-selector/format-selector",
+    "action-buttons": "/components/action-buttons/action-buttons"
+  },
   "navigationBarTitleText": "图片压缩",
- "navigationBarBackgroundColor": "#41bc3f",
+  "navigationBarBackgroundColor": "#41bc3f",
   "navigationBarTextStyle": "white"
 }

@@ -1,15 +1,13 @@
 <!--resize.wxml-->
 <view class="resize-container">
   <!-- 未选择图片状态 -->
-  <view wx:if="{{!hasImage}}" class="upload-section">
-    <view class="upload-card" bindtap="chooseImage">
-      <view class="upload-icon-box">
-        <text class="upload-icon">📐</text>
-      </view>
-      <text class="upload-title">选择图片</text>
-      <text class="upload-hint">支持证件照、考试报名等常用尺寸</text>
-    </view>
-  </view>
+  <image-upload
+    wx:if="{{!hasImage}}"
+    icon="📐"
+    title="选择图片"
+    hint="支持证件照、考试报名等常用尺寸"
+    bind:upload="chooseImage"
+  />
 
   <!-- 已选择图片 -->
   <view wx:else class="resize-layout">
@@ -59,29 +57,21 @@
     </view>
 
     <!-- 尺寸预设选择（横向滑动） -->
-    <view class="preset-section">
-      <view class="preset-section-header">
-        <text class="preset-section-title">常用尺寸</text>
-        <view class="scroll-hint">
-          <text class="scroll-hint-text">左右滑动查看更多</text>
-          <text class="scroll-hint-icon">→</text>
+    <scroll-selector
+      title="常用尺寸"
+      list="{{presetSizes}}"
+      selectedId="{{selectedPreset}}"
+      showHint="{{true}}"
+      hintText="左右滑动查看更多"
+      bind:select="onPresetSelect"
+    >
+      <view slot="item" slot-scope="item">
+        <view class="preset-item-content">
+          <text class="preset-name">{{item.name}}</text>
+          <text class="preset-size">{{item.width}}×{{item.height}}</text>
         </view>
       </view>
-      <scroll-view class="preset-scroll" scroll-x="{{true}}" show-scrollbar="{{false}}">
-        <view class="preset-list">
-          <view
-            wx:for="{{presetSizes}}"
-            wx:key="id"
-            class="preset-item {{selectedPreset === item.id ? 'active' : ''}}"
-            data-id="{{item.id}}"
-            bindtap="onPresetSelect"
-          >
-            <text class="preset-name">{{item.name}}</text>
-            <text class="preset-size">{{item.width}}×{{item.height}}</text>
-          </view>
-        </view>
-      </scroll-view>
-    </view>
+    </scroll-selector>
 
     <!-- 自定义尺寸 -->
     <view class="custom-section">
@@ -127,29 +117,26 @@
       </view>
     </view>
 
-    <!-- 操作按钮 -->
-    <view class="action-section">
-      <!-- 调整前：确认调整 -->
-      <button
-        wx:if="{{!resultPath}}"
-        class="btn btn-primary btn-lg btn-block {{isProcessing ? 'btn-loading' : ''}}"
-        bindtap="confirmResize"
-        disabled="{{isProcessing}}"
-      >
-        <text wx:if="{{isProcessing}}">处理中...</text>
-        <text wx:else>确认调整</text>
-      </button>
+    <!-- 输出格式 -->
+    <format-selector
+      value="{{fileType}}"
+      mode="horizontal"
+      showDesc="{{false}}"
+      bind:change="onFormatChange"
+    />
 
-      <!-- 调整后：重新调整 + 保存 -->
-      <view wx:if="{{resultPath}}" class="action-row">
-        <button class="btn btn-secondary btn-flex" bindtap="resetResize">
-          重新调整
-        </button>
-        <button class="btn btn-primary btn-flex" bindtap="saveToAlbum">
-          保存到相册
-        </button>
-      </view>
-    </view>
+    <!-- 操作按钮 -->
+    <action-buttons
+      hasResult="{{!!resultPath}}"
+      isLoading="{{isProcessing}}"
+      primaryText="确认调整"
+      secondaryText="重新调整"
+      saveText="保存到相册"
+      loadingText="处理中..."
+      bind:primary="confirmResize"
+      bind:secondary="resetResize"
+      bind:save="saveToAlbum"
+    />
   </view>
 
   <!-- Canvas -->

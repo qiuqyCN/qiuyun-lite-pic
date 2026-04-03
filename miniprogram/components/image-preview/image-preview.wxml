@@ -1,0 +1,35 @@
+<!-- d:\Codes\WeChatProjects\qiuyun-lite-pic\miniprogram\components\image-preview\image-preview.wxml -->
+<view class="image-preview-container">
+  <!-- 标题栏 -->
+  <view class="header">
+    <text class="title">{{title}}</text>
+    <view 
+      wx:if="{{showChange && !isProcessing}}" 
+      class="change-btn"
+      bindtap="onChangeTap"
+    >
+      更换
+    </view>
+  </view>
+
+  <!-- 图片区域 -->
+  <view class="image-wrapper" bindtap="onImageTap">
+    <image 
+      wx:if="{{imagePath}}"
+      class="preview-image"
+      src="{{imagePath}}"
+      mode="aspectFit"
+    />
+    <view wx:else class="placeholder">
+      <text class="placeholder-text">暂无图片</text>
+    </view>
+
+    <!-- 处理中遮罩 -->
+    <view wx:if="{{isProcessing}}" class="processing-overlay">
+      <view class="processing-content">
+        <view class="loading-icon"></view>
+        <text class="processing-text">{{processingText}}</text>
+      </view>
+    </view>
+  </view>
+</view>

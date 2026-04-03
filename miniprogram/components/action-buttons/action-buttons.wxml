@@ -1,0 +1,31 @@
+<!--components/action-buttons/action-buttons.wxml-->
+<view class="action-buttons">
+  <!-- 处理前：单个大按钮 -->
+  <button
+    wx:if="{{!hasResult}}"
+    class="btn btn-primary btn-lg btn-block {{isLoading ? 'btn-loading' : ''}}"
+    bindtap="onPrimaryTap"
+    disabled="{{isLoading}}"
+  >
+    <text wx:if="{{isLoading}}">{{loadingText}}</text>
+    <text wx:else>{{primaryText}}</text>
+  </button>
+
+  <!-- 处理后：两个按钮 -->
+  <view wx:if="{{hasResult}}" class="action-row">
+    <button 
+      class="btn btn-secondary btn-flex" 
+      bindtap="onSecondaryTap"
+      disabled="{{isLoading}}"
+    >
+      {{secondaryText}}
+    </button>
+    <button 
+      class="btn btn-primary btn-flex" 
+      bindtap="onSaveTap"
+      disabled="{{isLoading}}"
+    >
+      {{saveText}}
+    </button>
+  </view>
+</view>

@@ -1,5 +1,10 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "image-upload": "/components/image-upload/image-upload",
+    "scroll-selector": "/components/scroll-selector/scroll-selector",
+    "format-selector": "/components/format-selector/format-selector",
+    "action-buttons": "/components/action-buttons/action-buttons"
+  },
   "navigationBarTitleText": "尺寸调整",
   "navigationBarBackgroundColor": "#41bc3f",
   "navigationBarTextStyle": "white"

@@ -1,0 +1,73 @@
+/* 滑块控制组件样式 */
+.slider-control {
+  padding: 20rpx 0;
+  background-color: #fff;
+}
+
+/* 头部：标签和值 */
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10rpx;
+  padding: 0 10rpx;
+}
+
+.slider-label {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.slider-value {
+  font-size: 28rpx;
+  color: #41bc3f;
+  font-weight: 600;
+}
+
+/* 滑块包装器 */
+.slider-wrapper {
+  padding: 0 10rpx;
+}
+
+.slider {
+  margin: 0;
+}
+
+/* 滑块自定义样式 */
+.slider .wx-slider-wrapper {
+  height: 4rpx;
+}
+
+.slider .wx-slider-track {
+  height: 4rpx;
+  border-radius: 2rpx;
+}
+
+.slider .wx-slider-thumb {
+  width: 40rpx;
+  height: 40rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+}
+
+/* 提示文字 */
+.slider-hints {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20rpx;
+  margin-top: 4rpx;
+}
+
+.hint {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.hint-min {
+  text-align: left;
+}
+
+.hint-max {
+  text-align: right;
+}

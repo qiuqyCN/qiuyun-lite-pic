@@ -1,46 +1,26 @@
 <!--convert.wxml-->
 <view class="convert-container">
   <!-- 未选择图片状态 -->
-  <view wx:if="{{!hasImage}}" class="upload-section">
-    <view class="upload-card" bindtap="chooseImage">
-      <view class="upload-icon-box">
-        <text class="upload-icon">+</text>
-      </view>
-      <text class="upload-title">选择图片</text>
-      <text class="upload-hint">支持多种格式导入，可转为 JPG、PNG</text>
-    </view>
-  </view>
+  <image-upload
+    wx:if="{{!hasImage}}"
+    icon="+"
+    title="选择图片"
+    hint="支持多种格式导入，可转为 JPG、PNG"
+    bind:upload="chooseImage"
+  />
 
   <!-- 已选择图片 -->
   <view wx:else class="convert-layout">
     <!-- 图片预览区域 -->
-    <view class="preview-section">
-      <view class="preview-header">
-        <text class="preview-title">{{convertedPath ? '转换完成' : '图片预览'}}</text>
-        <view class="change-btn" bindtap="chooseImage">
-          <text>更换</text>
-        </view>
-      </view>
-
-      <view class="preview-container">
-        <image
-          wx:if="{{convertedPath}}"
-          class="preview-image"
-          src="{{convertedPath}}"
-          mode="aspectFit"
-          bindtap="previewImage"
-          lazy-load="{{false}}"
-        />
-        <image
-          wx:else
-          class="preview-image"
-          src="{{imagePath}}"
-          mode="aspectFit"
-          bindtap="previewImage"
-          lazy-load="{{false}}"
-        />
-      </view>
-    </view>
+    <image-preview
+      imagePath="{{convertedPath || imagePath}}"
+      title="{{convertedPath ? '转换完成' : '图片预览'}}"
+      showChange="{{true}}"
+      isProcessing="{{isProcessing}}"
+      processingText="转换中..."
+      bind:change="chooseImage"
+      bind:preview="previewImage"
+    />
 
     <!-- 格式信息 -->
     <view class="format-section">
@@ -68,23 +48,16 @@
     <!-- 转换设置（转换前显示） -->
     <view wx:if="{{!convertedPath}}" class="settings-section">
       <!-- 目标格式选择 -->
-      <view class="format-select">
-        <text class="section-title">目标格式</text>
-        <view class="format-options">
-          <view
-            wx:for="{{formatList}}"
-            wx:key="id"
-            class="format-option {{targetFormat === item.id ? 'active' : ''}}"
-            data-format="{{item.id}}"
-            bindtap="onFormatChange"
-          >
-            <text class="format-name">{{item.name}}</text>
-            <text class="format-desc">{{item.desc}}</text>
-          </view>
-        </view>
-      </view>
+      <format-selector
+        value="{{targetFormat}}"
+        mode="vertical"
+        title="目标格式"
+        showTip="{{true}}"
+        tipText="PNG支持透明背景，JPG文件更小"
+        bind:change="onFormatChange"
+      />
 
-      <!-- 质量设置（仅JPG和WEBP显示） -->
+      <!-- 质量设置（仅JPG显示） -->
       <view wx:if="{{targetFormat !== 'png'}}" class="quality-control">
         <view class="quality-header">
           <text class="quality-label">输出质量</text>
@@ -105,42 +78,20 @@
           <text>画质更好</text>
         </view>
       </view>
-
-      <!-- PNG提示 -->
-      <view wx:if="{{targetFormat === 'png'}}" class="png-notice">
-        <text class="notice-icon">ℹ</text>
-        <text class="notice-text">PNG为无损格式，转换时保持最高质量</text>
-      </view>
     </view>
 
     <!-- 操作按钮 -->
-    <view class="action-section">
-      <!-- 转换前：开始转换 -->
-      <button
-        wx:if="{{!convertedPath}}"
-        class="btn btn-primary btn-lg btn-block {{isProcessing ? 'btn-loading' : ''}}"
-        bindtap="startConvert"
-        disabled="{{isProcessing}}"
-      >
-        <text wx:if="{{!isProcessing}}">开始转换</text>
-        <view wx:else class="loading-dots">
-          <text>转换中</text>
-          <text class="dot">.</text>
-          <text class="dot">.</text>
-          <text class="dot">.</text>
-        </view>
-      </button>
-
-      <!-- 转换后：重新转换 + 保存 -->
-      <view wx:if="{{convertedPath}}" class="action-row">
-        <button class="btn btn-secondary btn-flex" bindtap="resetConvert">
-          重新转换
-        </button>
-        <button class="btn btn-primary btn-flex" bindtap="saveToAlbum">
-          保存到相册
-        </button>
-      </view>
-    </view>
+    <action-buttons
+      hasResult="{{!!convertedPath}}"
+      isLoading="{{isProcessing}}"
+      primaryText="开始转换"
+      secondaryText="重新转换"
+      saveText="保存到相册"
+      loadingText="转换中..."
+      bind:primary="startConvert"
+      bind:secondary="resetConvert"
+      bind:save="saveToAlbum"
+    />
   </view>
 
   <!-- 隐藏Canvas -->

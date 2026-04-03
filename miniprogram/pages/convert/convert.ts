@@ -1,6 +1,42 @@
 // convert.ts
 // 格式转换页面
 
+import { chooseImage, getImageInfo } from '../../utils/image';
+import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
+import { saveImageToAlbum } from '../../utils/file';
+import { formatFileSizeSimple } from '../../utils/format';
+import { handleError, showSuccess, showLoading } from '../../utils/error';
+import type { ImageInfo } from '../../types/index';
+
+/** 格式选项 */
+interface FormatOption {
+  id: 'jpg' | 'png';
+  name: string;
+  desc: string;
+}
+
+/** 页面数据 */
+interface ConvertData {
+  // 图片信息
+  imagePath: string;
+  originalSize: number;
+  originalFormat: string;
+  convertedPath: string;
+  convertedSize: number;
+  convertedFormat: string;
+
+  // 格式设置
+  targetFormat: 'jpg' | 'png';
+  quality: number;
+
+  // 状态
+  isProcessing: boolean;
+  hasImage: boolean;
+
+  // 支持的输出格式（Canvas只支持导出jpg/png）
+  formatList: FormatOption[];
+}
+
 Component({
   data: {
     // 图片信息
@@ -12,7 +48,7 @@ Component({
     convertedFormat: '',
 
     // 格式设置
-    targetFormat: 'jpg' as 'jpg' | 'png',
+    targetFormat: 'jpg',
     quality: 92,
 
     // 状态
@@ -24,63 +60,62 @@ Component({
       { id: 'jpg', name: 'JPG', desc: '有损压缩，广泛兼容' },
       { id: 'png', name: 'PNG', desc: '无损压缩，支持透明' }
     ]
-  },
+  } as ConvertData,
 
   methods: {
-    // 选择图片
-    chooseImage() {
-      wx.chooseMedia({
-        count: 1,
-        mediaType: ['image'],
-        sourceType: ['album', 'camera'],
-        success: (res) => {
-          const tempFilePath = res.tempFiles[0].tempFilePath;
-          const fileSize = res.tempFiles[0].size;
+    /**
+     * 选择图片
+     */
+    async chooseImage() {
+      try {
+        const imageInfo = await chooseImage();
 
-          console.log('Selected file path:', tempFilePath);
+        console.log('Selected file path:', imageInfo.path);
 
-          // 检测原图格式
-          const detectedFormat = (this as any).detectFormat(tempFilePath);
-          console.log('Detected format:', detectedFormat);
+        // 检测原图格式
+        const detectedFormat = this.detectFormat(imageInfo.path);
+        console.log('Detected format:', detectedFormat);
 
-          // 设置原格式显示（大写）
-          const originalFormat = detectedFormat.toUpperCase();
+        // 设置原格式显示（大写）
+        const originalFormat = detectedFormat.toUpperCase();
 
-          // 默认目标格式
-          let targetFormat: 'jpg' | 'png' = 'jpg';
-          if (detectedFormat === 'jpg' || detectedFormat === 'jpeg') {
-            targetFormat = 'png';
-          } else if (detectedFormat === 'png') {
-            targetFormat = 'jpg';
-          } else {
-            // gif/bmp/heic 等其他格式默认转为 jpg
-            targetFormat = 'jpg';
-          }
-
-          this.setData({
-            imagePath: tempFilePath,
-            originalSize: Math.round(fileSize / 1024),
-            originalFormat: originalFormat,
-            hasImage: true,
-            convertedPath: '',
-            convertedSize: 0,
-            convertedFormat: '',
-            targetFormat: targetFormat,
-            quality: 92
-          }, () => {
-            console.log('Set data complete - originalFormat:', this.data.originalFormat);
-          });
-        },
-        fail: (err) => {
-          console.log('选择图片失败或取消', err);
+        // 默认目标格式
+        let targetFormat: 'jpg' | 'png' = 'jpg';
+        if (detectedFormat === 'jpg' || detectedFormat === 'jpeg') {
+          targetFormat = 'png';
+        } else if (detectedFormat === 'png') {
+          targetFormat = 'jpg';
+        } else {
+          // gif/bmp/heic 等其他格式默认转为 jpg
+          targetFormat = 'jpg';
         }
-      });
+
+        this.setData({
+          imagePath: imageInfo.path,
+          originalSize: Math.round(imageInfo.size / 1024),
+          originalFormat: originalFormat,
+          hasImage: true,
+          convertedPath: '',
+          convertedSize: 0,
+          convertedFormat: '',
+          targetFormat: targetFormat,
+          quality: 92
+        }, () => {
+          console.log('Set data complete - originalFormat:', this.data.originalFormat);
+        });
+      } catch (err) {
+        console.log('选择图片失败或取消', err);
+      }
     },
 
-    // 检测图片格式
+    /**
+     * 检测图片格式
+     * @param filePath 文件路径
+     * @returns 检测到的格式
+     */
     detectFormat(filePath: string): string {
       const path = filePath.toLowerCase();
-      
+
       // 检查是否包含格式标识
       if (path.includes('.png')) return 'png';
       if (path.includes('.webp')) return 'webp';
@@ -89,34 +124,45 @@ Component({
       if (path.includes('.heic')) return 'heic';
       if (path.includes('.tiff') || path.includes('.tif')) return 'tiff';
       if (path.includes('.jpg') || path.includes('.jpeg')) return 'jpg';
-      
+
       // 默认返回 jpg
       return 'jpg';
     },
 
-    // 格式选择
-    onFormatChange(e: WechatMiniprogram.TouchEvent) {
-      const format = e.currentTarget.dataset.format;
+    /**
+     * 格式选择
+     * @param e 组件事件
+     */
+    onFormatChange(e: WechatMiniprogram.CustomEvent) {
+      const format = e.detail.format as 'jpg' | 'png';
       this.setData({ targetFormat: format });
     },
 
-    // 质量滑块变化
+    /**
+     * 质量滑块变化
+     * @param e 滑块变化事件
+     */
     onQualityChange(e: WechatMiniprogram.SliderChange) {
       this.setData({ quality: e.detail.value });
     },
 
-    // 预览图片
+    /**
+     * 预览图片
+     */
     previewImage() {
+      const currentPath = this.data.convertedPath || this.data.imagePath;
       wx.previewImage({
-        urls: [this.data.convertedPath || this.data.imagePath],
-        current: this.data.convertedPath || this.data.imagePath
+        urls: [currentPath],
+        current: currentPath
       });
     },
 
-    // 开始转换
+    /**
+     * 开始转换
+     */
     async startConvert() {
       if (!this.data.hasImage) {
-        wx.showToast({ title: '请先选择图片', icon: 'none' });
+        handleError(null, '请先选择图片');
         return;
       }
 
@@ -125,38 +171,30 @@ Component({
       // 检查是否是相同格式
       const originalLower = originalFormat.toLowerCase();
       console.log('Converting from', originalLower, 'to', targetFormat);
-      
+
       // 如果原格式不是jpg/png，允许转换为jpg
       const isSupportedOriginal = ['jpg', 'jpeg', 'png'].includes(originalLower);
       if (targetFormat === originalLower && isSupportedOriginal) {
-        wx.showToast({ title: '目标格式与原格式相同', icon: 'none' });
+        handleError(null, '目标格式与原格式相同');
         return;
       }
 
+      const hideLoading = showLoading('转换中...');
       this.setData({ isProcessing: true });
 
       try {
-        // 获取canvas节点
-        const query = this.createSelectorQuery();
-        const canvasNode = await new Promise<WechatMiniprogram.Canvas>((resolve) => {
-          query.select('#convertCanvas').fields({ node: true, size: true }).exec((res) => {
-            resolve(res[0].node);
-          });
-        });
+        // 创建 Canvas 上下文
+        const { canvas, ctx } = await createCanvasContext('convertCanvas', this);
 
-        const ctx = canvasNode.getContext('2d');
-
-        // 获取原图尺寸
-        const imageInfo = await wx.getImageInfo({
-          src: this.data.imagePath
-        });
+        // 获取原图信息
+        const imageInfo = await getImageInfo(this.data.imagePath);
 
         // 设置canvas尺寸
-        canvasNode.width = imageInfo.width;
-        canvasNode.height = imageInfo.height;
+        canvas.width = imageInfo.width;
+        canvas.height = imageInfo.height;
 
         // 创建图片对象
-        const image = canvasNode.createImage();
+        const image = canvas.createImage();
         await new Promise((resolve, reject) => {
           image.onload = resolve;
           image.onerror = reject;
@@ -169,36 +207,25 @@ Component({
         // 导出转换后的图片
         // Canvas只支持导出jpg/png
         const exportQuality = targetFormat === 'png' ? 1 : quality / 100;
-        
+
         console.log('Exporting with format:', targetFormat, 'quality:', exportQuality);
-        
-        const tempFilePath = await new Promise<string>((resolve, reject) => {
-          wx.canvasToTempFilePath({
-            canvas: canvasNode,
-            fileType: targetFormat as 'jpg' | 'png',
-            quality: exportQuality,
-            success: (res) => {
-              console.log('Export success:', res.tempFilePath);
-              resolve(res.tempFilePath);
-            },
-            fail: (err) => {
-              console.error('Export failed:', err);
-              reject(err);
-            }
-          });
+
+        const tempFilePath = await canvasToTempFile(canvas, {
+          fileType: targetFormat,
+          quality: exportQuality
         });
 
+        console.log('Export success:', tempFilePath);
+
         // 获取转换后文件大小
-        const fileInfo = await wx.getFileInfo({
-          filePath: tempFilePath
-        });
+        const convertedFileInfo = await getImageInfo(tempFilePath);
 
         const newConvertedFormat = targetFormat.toUpperCase();
         console.log('Setting convertedFormat to:', newConvertedFormat);
-        
+
         this.setData({
           convertedPath: tempFilePath,
-          convertedSize: Math.round(fileInfo.size / 1024),
+          convertedSize: Math.round(convertedFileInfo.size / 1024),
           convertedFormat: newConvertedFormat,
           isProcessing: false
         }, () => {
@@ -211,19 +238,19 @@ Component({
         // 更新使用统计
         this.updateUsageStats();
 
-        wx.showToast({
-          title: '转换完成',
-          icon: 'success'
-        });
-
+        showSuccess('转换完成');
       } catch (err) {
         console.error('转换失败:', err);
-        wx.showToast({ title: '转换失败', icon: 'none' });
+        handleError(err, '转换失败');
         this.setData({ isProcessing: false });
+      } finally {
+        hideLoading();
       }
     },
 
-    // 重新转换
+    /**
+     * 重新转换
+     */
     resetConvert() {
       this.setData({
         convertedPath: '',
@@ -232,7 +259,9 @@ Component({
       });
     },
 
-    // 保存到历史记录
+    /**
+     * 保存到历史记录
+     */
     saveToHistory() {
       const history = wx.getStorageSync('processHistory') || [];
       history.unshift({
@@ -254,7 +283,9 @@ Component({
       wx.setStorageSync('processHistory', history.slice(0, 20));
     },
 
-    // 更新使用统计
+    /**
+     * 更新使用统计
+     */
     updateUsageStats() {
       const stats = wx.getStorageSync('usageStats') || {
         todayCount: 0,
@@ -275,7 +306,9 @@ Component({
       wx.setStorageSync('usageStats', stats);
     },
 
-    // 保存到相册
+    /**
+     * 保存到相册
+     */
     async saveToAlbum() {
       if (!this.data.convertedPath) return;
 
@@ -283,13 +316,11 @@ Component({
       console.log('Expected format:', this.data.convertedFormat);
 
       try {
-        await wx.saveImageToPhotosAlbum({
-          filePath: this.data.convertedPath
-        });
-        wx.showToast({ title: '已保存到相册', icon: 'success' });
+        await saveImageToAlbum(this.data.convertedPath);
+        showSuccess('已保存到相册');
       } catch (err) {
         console.error('Save to album failed:', err);
-        wx.showToast({ title: '保存失败', icon: 'none' });
+        handleError(err, '保存失败');
       }
     }
   }

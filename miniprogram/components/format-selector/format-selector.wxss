@@ -1,0 +1,202 @@
+/* components/format-selector/format-selector.wxss */
+
+/* ========== 基础样式 ========== */
+.format-selector {
+  padding: 20rpx 0;
+  background: #ffffff;
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.selector-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 20rpx;
+  padding: 0 24rpx;
+}
+
+/* ========== 横向模式 ========== */
+.horizontal-mode .horizontal-options {
+  display: flex;
+  gap: 20rpx;
+  padding: 0 24rpx;
+}
+
+.horizontal-mode .format-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 24rpx;
+  background: #ffffff;
+  border-radius: 16rpx;
+  border: 2rpx solid #e5e5e5;
+  transition: all 0.2s ease;
+}
+
+.horizontal-mode .format-option:active {
+  transform: scale(0.98);
+}
+
+.horizontal-mode .format-option.active {
+  border-color: #41bc3f;
+  background: rgba(65, 188, 63, 0.05);
+}
+
+.horizontal-mode .radio-circle {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  border: 4rpx solid #d2d2d7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.horizontal-mode .format-option.active .radio-circle {
+  border-color: #41bc3f;
+}
+
+.horizontal-mode .radio-dot {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+  background: #41bc3f;
+}
+
+.horizontal-mode .format-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.horizontal-mode .format-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.horizontal-mode .format-option.active .format-name {
+  color: #41bc3f;
+}
+
+.horizontal-mode .format-desc {
+  font-size: 24rpx;
+  color: #86868b;
+}
+
+/* 禁用状态 */
+.horizontal-mode .format-option.disabled {
+  opacity: 0.5;
+  background: #f5f5f7;
+}
+
+.horizontal-mode .format-option.disabled .radio-circle.disabled {
+  border-color: #d2d2d7;
+  background: #e5e5e5;
+}
+
+.horizontal-mode .format-option.disabled .format-name {
+  color: #86868b;
+}
+
+/* ========== 纵向卡片模式 ========== */
+.vertical-mode .vertical-options {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  padding: 0 24rpx;
+}
+
+.vertical-mode .format-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx;
+  background: #f5f5f7;
+  border-radius: 16rpx;
+  border: 4rpx solid transparent;
+  transition: all 0.2s ease;
+}
+
+.vertical-mode .format-card:active {
+  transform: scale(0.99);
+}
+
+.vertical-mode .format-card.active {
+  background: rgba(65, 188, 63, 0.1);
+  border-color: #41bc3f;
+}
+
+.vertical-mode .card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.vertical-mode .card-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.vertical-mode .format-card.active .card-name {
+  color: #41bc3f;
+}
+
+.vertical-mode .card-desc {
+  font-size: 26rpx;
+  color: #86868b;
+}
+
+.vertical-mode .check-icon {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: #41bc3f;
+  color: #ffffff;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* 禁用状态 */
+.vertical-mode .format-card.disabled {
+  opacity: 0.5;
+  background: #e5e5e5;
+}
+
+.vertical-mode .format-card.disabled .card-name {
+  color: #86868b;
+}
+
+/* ========== 提示信息 ========== */
+.tip-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+  margin-top: 24rpx;
+  padding: 20rpx 24rpx;
+  background: #f5f5f7;
+  border-radius: 12rpx;
+  margin-left: 24rpx;
+  margin-right: 24rpx;
+}
+
+.tip-icon {
+  font-size: 28rpx;
+  color: #41bc3f;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.tip-text {
+  font-size: 26rpx;
+  color: #86868b;
+  line-height: 1.5;
+}

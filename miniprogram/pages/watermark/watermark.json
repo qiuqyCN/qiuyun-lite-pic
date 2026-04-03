@@ -1,5 +1,12 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "image-upload": "/components/image-upload/image-upload",
+    "image-preview": "/components/image-preview/image-preview",
+    "slider-control": "/components/slider-control/slider-control",
+    "color-picker": "/components/color-picker/color-picker",
+    "format-selector": "/components/format-selector/format-selector",
+    "action-buttons": "/components/action-buttons/action-buttons"
+  },
   "navigationBarTitleText": "添加水印",
   "navigationBarBackgroundColor": "#41bc3f",
   "navigationBarTextStyle": "white"

@@ -1,0 +1,47 @@
+<!--components/format-selector/format-selector.wxml-->
+<view wx:if="{{!hidden}}" class="format-selector {{mode}}-mode">
+  <!-- 标题 -->
+  <text wx:if="{{title}}" class="selector-title">{{title}}</text>
+
+  <!-- 横向模式 -->
+  <view wx:if="{{mode === 'horizontal'}}" class="horizontal-options">
+    <view
+      wx:for="{{formatList}}"
+      wx:key="id"
+      class="format-option {{value === item.id ? 'active' : ''}} {{item.disabled ? 'disabled' : ''}}"
+      data-format="{{item.id}}"
+      bindtap="onFormatTap"
+    >
+      <view class="radio-circle {{item.disabled ? 'disabled' : ''}}">
+        <view wx:if="{{value === item.id}}" class="radio-dot"></view>
+      </view>
+      <view class="format-info">
+        <text class="format-name">{{item.name}}</text>
+        <text wx:if="{{showDesc}}" class="format-desc">{{item.desc}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 纵向卡片模式 -->
+  <view wx:if="{{mode === 'vertical'}}" class="vertical-options">
+    <view
+      wx:for="{{formatList}}"
+      wx:key="id"
+      class="format-card {{value === item.id ? 'active' : ''}} {{item.disabled ? 'disabled' : ''}}"
+      data-format="{{item.id}}"
+      bindtap="onFormatTap"
+    >
+      <view class="card-main">
+        <text class="card-name">{{item.name}}</text>
+        <text wx:if="{{showDesc}}" class="card-desc">{{item.desc}}</text>
+      </view>
+      <view wx:if="{{value === item.id}}" class="check-icon">✓</view>
+    </view>
+  </view>
+
+  <!-- 提示信息 -->
+  <view wx:if="{{showTip && tipText}}" class="tip-box">
+    <text class="tip-icon">ℹ</text>
+    <text class="tip-text">{{tipText}}</text>
+  </view>
+</view>

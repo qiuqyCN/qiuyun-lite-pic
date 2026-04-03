@@ -1,11 +1,67 @@
 // collage.ts
 // 拼图拼接页面
 
+import { chooseImage, chooseMultipleImages, getImageInfo } from '../../utils/image';
+import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
+import { saveImageToAlbum } from '../../utils/file';
+import { handleError, showSuccess } from '../../utils/error';
+
+/** 布局模板 */
+interface LayoutTemplate {
+  id: string;
+  name: string;
+  icon: string;
+  cols: number;
+  rows: number;
+  maxImages: number;
+  mode?: 'grid' | 'horizontal' | 'vertical';
+}
+
+/** 图片尺寸信息 */
+interface ImageSizeInfo {
+  width: number;
+  height: number;
+}
+
+/** 组件数据 */
+interface CollageData {
+  /** 图片列表 */
+  images: string[];
+  /** 图片尺寸信息列表 */
+  imageInfos: ImageSizeInfo[];
+  /** 布局模板列表 */
+  layoutTemplates: LayoutTemplate[];
+  /** 当前布局 */
+  currentLayout: LayoutTemplate;
+  /** 间距设置 */
+  spacing: number;
+  /** 圆角设置 */
+  borderRadius: number;
+  /** 背景颜色 */
+  backgroundColor: string;
+  /** 预设颜色列表 */
+  colorList: string[];
+  /** 输出宽度 */
+  outputWidth: number;
+  /** 输出质量 */
+  outputQuality: number;
+  /** 输出格式 */
+  fileType: 'jpg' | 'png';
+  /** 是否处理中 */
+  isProcessing: boolean;
+  /** 是否有图片 */
+  hasImages: boolean;
+  /** 结果图片路径 */
+  resultPath: string;
+  /** 是否显示预览 */
+  showPreview: boolean;
+}
+
 Component({
   data: {
     // 图片列表
     images: [] as string[],
-    imageInfos: [] as { width: number; height: number }[],
+    imageInfos: [] as ImageSizeInfo[],
 
     // 布局模板
     layoutTemplates: [
@@ -33,30 +89,38 @@ Component({
     outputWidth: 1200,
     outputQuality: 90,
 
+    // 输出格式
+    fileType: 'jpg',
+
     // 状态
     isProcessing: false,
     hasImages: false,
     resultPath: '',
     showPreview: false
-  },
+  } as CollageData,
 
   methods: {
-    // 选择图片
-    chooseImages() {
+    /**
+     * 选择图片
+     * 根据当前布局的最大图片数量选择图片
+     */
+    async chooseImages() {
       const maxCount = this.data.currentLayout.maxImages;
-      wx.chooseMedia({
-        count: maxCount,
-        mediaType: ['image'],
-        sourceType: ['album', 'camera'],
-        success: (res) => {
-          const newImages = res.tempFiles.map(file => file.tempFilePath);
-          this.loadImageInfos(newImages);
-        }
-      });
+
+      try {
+        const imageInfos = await chooseMultipleImages(maxCount);
+        const imagePaths = imageInfos.map(img => img.path);
+        await this.loadImageInfos(imagePaths);
+      } catch (error) {
+        handleError(error, '选择图片失败');
+      }
     },
 
-    // 添加图片
-    addImages() {
+    /**
+     * 添加图片
+     * 在当前图片基础上继续添加图片
+     */
+    async addImages() {
       const currentCount = this.data.images.length;
       const maxCount = this.data.currentLayout.maxImages;
       const remaining = maxCount - currentCount;
@@ -66,32 +130,28 @@ Component({
         return;
       }
 
-      wx.chooseMedia({
-        count: remaining,
-        mediaType: ['image'],
-        sourceType: ['album', 'camera'],
-        success: (res) => {
-          const newImages = res.tempFiles.map(file => file.tempFilePath);
-          this.loadImageInfos([...this.data.images, ...newImages]);
-        }
-      });
+      try {
+        const images = await chooseMultipleImages(remaining);
+        const newPaths = images.map(img => img.path);
+        await this.loadImageInfos([...this.data.images, ...newPaths]);
+      } catch (error) {
+        handleError(error, '添加图片失败');
+      }
     },
 
-    // 加载图片信息
+    /**
+     * 加载图片信息
+     * @param imagePaths 图片路径数组
+     */
     async loadImageInfos(imagePaths: string[]) {
-      const infos: { width: number; height: number }[] = [];
+      const infos: ImageSizeInfo[] = [];
 
       for (const path of imagePaths) {
         try {
-          const info = await new Promise<{ width: number; height: number }>((resolve, reject) => {
-            wx.getImageInfo({
-              src: path,
-              success: (res) => resolve({ width: res.width, height: res.height }),
-              fail: reject
-            });
-          });
-          infos.push(info);
+          const info = await getImageInfo(path);
+          infos.push({ width: info.width, height: info.height });
         } catch (err) {
+          console.error('获取图片信息失败:', path, err);
           infos.push({ width: 100, height: 100 });
         }
       }
@@ -109,9 +169,12 @@ Component({
       });
     },
 
-    // 删除图片
+    /**
+     * 删除图片
+     * @param e 触摸事件
+     */
     removeImage(e: WechatMiniprogram.TouchEvent) {
-      const index = e.currentTarget.dataset.index;
+      const index = e.currentTarget.dataset.index as number;
       const images = [...this.data.images];
       const imageInfos = [...this.data.imageInfos];
       images.splice(index, 1);
@@ -130,41 +193,40 @@ Component({
       });
     },
 
-    // 更换图片
-    replaceImage(e: WechatMiniprogram.TouchEvent) {
-      const index = e.currentTarget.dataset.index;
-      wx.chooseMedia({
-        count: 1,
-        mediaType: ['image'],
-        sourceType: ['album', 'camera'],
-        success: (res) => {
-          const newPath = res.tempFiles[0].tempFilePath;
-          wx.getImageInfo({
-            src: newPath,
-            success: (imageInfo) => {
-              const images = [...this.data.images];
-              const imageInfos = [...this.data.imageInfos];
-              images[index] = newPath;
-              imageInfos[index] = { width: imageInfo.width, height: imageInfo.height };
+    /**
+     * 更换图片
+     * @param e 触摸事件
+     */
+    async replaceImage(e: WechatMiniprogram.TouchEvent) {
+      const index = e.currentTarget.dataset.index as number;
 
-              this.setData({ images, imageInfos }, () => {
-                this.generateCollage();
-              });
-            }
-          });
-        }
-      });
+      try {
+        const imageInfo = await chooseImage();
+        const images = [...this.data.images];
+        const imageInfos = [...this.data.imageInfos];
+        images[index] = imageInfo.path;
+        imageInfos[index] = { width: imageInfo.width, height: imageInfo.height };
+
+        this.setData({ images, imageInfos }, () => {
+          this.generateCollage();
+        });
+      } catch (error) {
+        handleError(error, '更换图片失败');
+      }
     },
 
-    // 选择布局
-    onLayoutSelect(e: WechatMiniprogram.TouchEvent) {
-      const layoutId = e.currentTarget.dataset.id;
-      const template = this.data.layoutTemplates.find(t => t.id === layoutId);
+    /**
+     * 选择布局
+     * @param e 组件事件
+     */
+    onLayoutSelect(e: WechatMiniprogram.CustomEvent) {
+      const template = e.detail.item;
       if (!template) return;
 
       const layout: LayoutTemplate = {
         id: template.id,
         name: template.name,
+        icon: template.icon || '📐',
         cols: template.cols,
         rows: template.rows,
         maxImages: template.maxImages,
@@ -192,8 +254,11 @@ Component({
       });
     },
 
-    // 间距变化
-    onSpacingChange(e: WechatMiniprogram.SliderChange) {
+    /**
+     * 间距变化
+     * @param e 组件事件
+     */
+    onSpacingChange(e: WechatMiniprogram.CustomEvent) {
       this.setData({ spacing: e.detail.value }, () => {
         if (this.data.hasImages) {
           this.generateCollage();
@@ -201,8 +266,11 @@ Component({
       });
     },
 
-    // 圆角变化
-    onRadiusChange(e: WechatMiniprogram.SliderChange) {
+    /**
+     * 圆角变化
+     * @param e 组件事件
+     */
+    onRadiusChange(e: WechatMiniprogram.CustomEvent) {
       this.setData({ borderRadius: e.detail.value }, () => {
         if (this.data.hasImages) {
           this.generateCollage();
@@ -210,9 +278,12 @@ Component({
       });
     },
 
-    // 选择背景色
-    onColorSelect(e: WechatMiniprogram.TouchEvent) {
-      const color = e.currentTarget.dataset.color;
+    /**
+     * 选择背景色
+     * @param e 组件事件
+     */
+    onColorSelect(e: WechatMiniprogram.CustomEvent) {
+      const color = e.detail.color;
       this.setData({ backgroundColor: color }, () => {
         if (this.data.hasImages) {
           this.generateCollage();
@@ -220,34 +291,43 @@ Component({
       });
     },
 
-    // 输出宽度变化
-    onWidthChange(e: WechatMiniprogram.SliderChange) {
+    /**
+     * 输出宽度变化
+     * @param e 组件事件
+     */
+    onWidthChange(e: WechatMiniprogram.CustomEvent) {
       this.setData({ outputWidth: e.detail.value });
     },
 
-    // 画质变化
-    onQualityChange(e: WechatMiniprogram.SliderChange) {
+    /**
+     * 画质变化
+     * @param e 组件事件
+     */
+    onQualityChange(e: WechatMiniprogram.CustomEvent) {
       this.setData({ outputQuality: e.detail.value });
     },
 
-    // 生成拼图
+    /**
+     * 格式选择变化
+     */
+    onFormatChange(e: WechatMiniprogram.CustomEvent) {
+      const format = e.detail.format as 'jpg' | 'png';
+      this.setData({ fileType: format });
+    },
+
+    /**
+     * 生成拼图
+     */
     async generateCollage() {
       if (this.data.images.length === 0) return;
 
       this.setData({ isProcessing: true });
 
       try {
-        const { images, imageInfos, currentLayout, spacing, borderRadius, backgroundColor, outputWidth } = this.data;
+        const { images, imageInfos, currentLayout, spacing, borderRadius, backgroundColor, outputWidth, outputQuality } = this.data;
 
-        // 获取canvas节点
-        const query = this.createSelectorQuery();
-        const canvasNode = await new Promise<WechatMiniprogram.Canvas>((resolve) => {
-          query.select('#collageCanvas').fields({ node: true, size: true }).exec((res) => {
-            resolve(res[0].node);
-          });
-        });
-
-        const ctx = canvasNode.getContext('2d');
+        // 获取canvas上下文
+        const { canvas: canvasNode, ctx } = await createCanvasContext('collageCanvas', this);
 
         // 计算输出尺寸
         let canvasWidth: number, canvasHeight: number;
@@ -330,7 +410,7 @@ Component({
           const maxHeight = 2400;
           const maxCellHeight = Math.floor((maxHeight - totalVSpacing) / rows);
           const maxCellWidth = Math.floor((outputWidth - totalHSpacing) / cols);
-          
+
           // 单元格取较小值，保持正方形
           const cellSize = Math.min(maxCellWidth, maxCellHeight);
           const cellWidth = cellSize;
@@ -358,19 +438,14 @@ Component({
             console.log('绘制图片', i, '位置:', x, y, '尺寸:', cellWidth, 'x', cellHeight);
             await this.drawImageToCanvas(ctx, canvasNode, images[i], x, y, cellWidth, cellHeight, borderRadius);
           }
-          
+
           console.log('所有图片绘制完成');
         }
 
         // 导出图片
-        const tempFilePath = await new Promise<string>((resolve, reject) => {
-          wx.canvasToTempFilePath({
-            canvas: canvasNode,
-            fileType: 'jpg',
-            quality: this.data.outputQuality / 100,
-            success: (res) => resolve(res.tempFilePath),
-            fail: (err) => reject(err)
-          });
+        const tempFilePath = await canvasToTempFile(canvasNode, {
+          fileType: this.data.fileType,
+          quality: outputQuality / 100
         });
 
         this.setData({
@@ -381,15 +456,25 @@ Component({
 
       } catch (err) {
         console.error('拼图生成失败:', err);
-        wx.showToast({ title: '拼图生成失败', icon: 'none' });
+        handleError(err, '拼图生成失败');
         this.setData({ isProcessing: false });
       }
     },
 
-    // 绘制图片到canvas（支持圆角）
+    /**
+     * 绘制图片到canvas（支持圆角）
+     * @param ctx Canvas上下文
+     * @param canvasNode Canvas节点
+     * @param imagePath 图片路径
+     * @param x X坐标
+     * @param y Y坐标
+     * @param width 宽度
+     * @param height 高度
+     * @param borderRadius 圆角半径
+     */
     async drawImageToCanvas(
-      ctx: WechatMiniprogram.CanvasContext,
-      canvasNode: WechatMiniprogram.Canvas,
+      ctx: any,
+      canvasNode: any,
       imagePath: string,
       x: number,
       y: number,
@@ -399,14 +484,14 @@ Component({
     ) {
       // 加载图片
       const image = canvasNode.createImage();
-      
+
       // 等待图片加载完成
       await new Promise<void>((resolve, reject) => {
         image.onload = () => {
           console.log('图片加载成功:', imagePath);
           resolve();
         };
-        image.onerror = (err) => {
+        image.onerror = (err: any) => {
           console.error('图片加载失败:', imagePath, err);
           reject(err);
         };
@@ -428,7 +513,7 @@ Component({
           ctx.quadraticCurveTo(x + width, y + height, x + width - borderRadius, y + height);
           ctx.lineTo(x + borderRadius, y + height);
           ctx.quadraticCurveTo(x, y + height, x, y + height - borderRadius);
-          ctx.lineTo(x, y + borderRadius);
+        ctx.lineTo(x, y + borderRadius);
           ctx.quadraticCurveTo(x, y, x + borderRadius, y);
         } else {
           // 普通矩形
@@ -458,8 +543,8 @@ Component({
         }
 
         // 绘制图片
-        ctx.drawImage(image as any, drawX, drawY, drawWidth, drawHeight);
-        
+        ctx.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+
         console.log('图片绘制完成:', imagePath, '单元格:', x, y, width, height, '绘制尺寸:', drawWidth.toFixed(2), 'x', drawHeight.toFixed(2));
       } finally {
         // 确保恢复状态
@@ -467,7 +552,9 @@ Component({
       }
     },
 
-    // 预览图片
+    /**
+     * 预览图片
+     */
     previewImage() {
       if (!this.data.resultPath) return;
       wx.previewImage({
@@ -476,22 +563,24 @@ Component({
       });
     },
 
-    // 保存到相册
+    /**
+     * 保存到相册
+     */
     async saveToAlbum() {
       if (!this.data.resultPath) return;
 
       try {
-        await wx.saveImageToPhotosAlbum({
-          filePath: this.data.resultPath
-        });
-        wx.showToast({ title: '已保存到相册', icon: 'success' });
+        await saveImageToAlbum(this.data.resultPath);
+        showSuccess('已保存到相册');
         this.saveToHistory();
-      } catch (err) {
-        wx.showToast({ title: '保存失败', icon: 'none' });
+      } catch (error) {
+        handleError(error, '保存失败');
       }
     },
 
-    // 保存到历史记录
+    /**
+     * 保存到历史记录
+     */
     saveToHistory() {
       const history = wx.getStorageSync('processHistory') || [];
       history.unshift({
@@ -512,13 +601,3 @@ Component({
     }
   }
 });
-
-// 布局模板类型
-interface LayoutTemplate {
-  id: string;
-  name: string;
-  cols: number;
-  rows: number;
-  maxImages: number;
-  mode: 'grid' | 'horizontal' | 'vertical';
-}

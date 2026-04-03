@@ -1,0 +1,27 @@
+<view class="slider-control">
+  <!-- 标签和值 -->
+  <view class="slider-header">
+    <text class="slider-label">{{label}}</text>
+    <text class="slider-value">{{currentValue}}{{unit}}</text>
+  </view>
+
+  <!-- 滑块 -->
+  <view class="slider-wrapper">
+    <slider
+      class="slider"
+      value="{{currentValue}}"
+      min="{{min}}"
+      max="{{max}}"
+      activeColor="{{activeColor}}"
+      block-size="20"
+      bindchanging="onChanging"
+      bindchange="onChange"
+    />
+  </view>
+
+  <!-- 提示文字 -->
+  <view class="slider-hints" wx:if="{{showHints}}">
+    <text class="hint hint-min">{{minHint || min}}</text>
+    <text class="hint hint-max">{{maxHint || max}}</text>
+  </view>
+</view>

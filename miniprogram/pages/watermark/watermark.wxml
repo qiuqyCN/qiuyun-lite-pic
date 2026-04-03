@@ -1,40 +1,26 @@
 <!--watermark.wxml-->
 <view class="watermark-container">
   <!-- 未选择图片状态 -->
-  <view wx:if="{{!hasImage}}" class="upload-section">
-    <view class="upload-card" bindtap="chooseImage">
-      <view class="upload-icon-box">
-        <text class="upload-icon">💧</text>
-      </view>
-      <text class="upload-title">选择图片</text>
-      <text class="upload-hint">点击从相册选择或拍照</text>
-    </view>
-  </view>
+  <image-upload
+    wx:if="{{!hasImage}}"
+    icon="💧"
+    title="选择图片"
+    hint="点击从相册选择或拍照"
+    bind:upload="chooseImage"
+  />
 
   <!-- 已选择图片 -->
   <view wx:else class="watermark-layout">
     <!-- 图片预览区域 -->
-    <view class="preview-section">
-      <view class="preview-header">
-        <text class="preview-title">水印预览</text>
-        <view class="change-btn" bindtap="chooseImage">
-          <text>更换</text>
-        </view>
-      </view>
-
-      <view class="preview-container">
-        <image
-          class="preview-image"
-          src="{{watermarkedPath}}"
-          mode="aspectFit"
-          bindtap="previewImage"
-          lazy-load="{{false}}"
-        />
-        <view wx:if="{{isProcessing}}" class="processing-mask">
-          <text class="processing-text">处理中...</text>
-        </view>
-      </view>
-    </view>
+    <image-preview
+      imagePath="{{watermarkedPath}}"
+      title="水印预览"
+      showChange="{{true}}"
+      isProcessing="{{isProcessing}}"
+      processingText="处理中..."
+      bind:change="chooseImage"
+      bind:preview="previewImage"
+    />
 
     <!-- 水印类型切换 -->
     <view class="type-section">
@@ -71,53 +57,34 @@
       </view>
 
       <!-- 颜色选择 -->
-      <view class="color-group">
-        <text class="input-label">文字颜色</text>
-        <view class="color-list">
-          <view
-            wx:for="{{colorList}}"
-            wx:key="*this"
-            class="color-item {{fontColor === item ? 'active' : ''}}"
-            style="background-color: {{item}};"
-            data-color="{{item}}"
-            bindtap="onColorSelect"
-          />
-        </view>
-      </view>
+      <color-picker
+        title="文字颜色"
+        colors="{{colorList}}"
+        selectedColor="{{fontColor}}"
+        bind:select="onColorSelect"
+      />
 
       <!-- 字体大小 -->
-      <view class="slider-group">
-        <view class="slider-header">
-          <text class="slider-label">字体大小</text>
-          <text class="slider-value">{{fontSize}}px</text>
-        </view>
-        <slider
-          min="20"
-          max="100"
-          value="{{fontSize}}"
-          block-size="24"
-          activeColor="#41bc3f"
-          backgroundColor="#e8e8ed"
-          bindchange="onFontSizeChange"
-        />
-      </view>
+      <slider-control
+        label="字体大小"
+        value="{{fontSize}}"
+        min="20"
+        max="100"
+        unit="px"
+        activeColor="#41bc3f"
+        bind:change="onFontSizeChange"
+      />
 
       <!-- 旋转角度 -->
-      <view class="slider-group">
-        <view class="slider-header">
-          <text class="slider-label">旋转角度</text>
-          <text class="slider-value">{{rotation}}°</text>
-        </view>
-        <slider
-          min="0"
-          max="360"
-          value="{{rotation}}"
-          block-size="24"
-          activeColor="#41bc3f"
-          backgroundColor="#e8e8ed"
-          bindchange="onRotationChange"
-        />
-      </view>
+      <slider-control
+        label="旋转角度"
+        value="{{rotation}}"
+        min="0"
+        max="360"
+        unit="°"
+        activeColor="#41bc3f"
+        bind:change="onRotationChange"
+      />
     </view>
 
     <!-- 图片水印设置 -->
@@ -145,21 +112,15 @@
 
     <!-- 透明度设置（共用） -->
     <view class="settings-section">
-      <view class="slider-group">
-        <view class="slider-header">
-          <text class="slider-label">透明度</text>
-          <text class="slider-value">{{opacity}}%</text>
-        </view>
-        <slider
-          min="10"
-          max="100"
-          value="{{opacity}}"
-          block-size="24"
-          activeColor="#41bc3f"
-          backgroundColor="#e8e8ed"
-          bindchange="onOpacityChange"
-        />
-      </view>
+      <slider-control
+        label="透明度"
+        value="{{opacity}}"
+        min="10"
+        max="100"
+        unit="%"
+        activeColor="#41bc3f"
+        bind:change="onOpacityChange"
+      />
 
       <!-- 位置选择 -->
       <view class="position-group">
@@ -211,12 +172,24 @@
       </view>
     </view>
 
+    <!-- 输出格式 -->
+    <format-selector
+      value="{{fileType}}"
+      mode="horizontal"
+      showDesc="{{false}}"
+      bind:change="onFormatChange"
+    />
+
     <!-- 操作按钮 -->
-    <view class="action-section">
-      <button class="btn btn-primary btn-lg btn-block" bindtap="saveToAlbum">
-        保存到相册
-      </button>
-    </view>
+    <action-buttons
+      hasResult="{{hasImage}}"
+      isLoading="{{isProcessing}}"
+      primaryText="保存到相册"
+      saveText="保存到相册"
+      loadingText="处理中..."
+      bind:primary="saveToAlbum"
+      bind:save="saveToAlbum"
+    />
   </view>
 
   <!-- 隐藏Canvas -->

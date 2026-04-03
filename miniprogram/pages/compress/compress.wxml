@@ -1,36 +1,26 @@
 <!--compress.wxml-->
 <view class="compress-container">
   <!-- 未选择图片状态 -->
-  <view wx:if="{{!hasImage}}" class="upload-section">
-    <view class="upload-card" bindtap="chooseImage">
-      <view class="upload-icon-box">
-        <text class="upload-icon">+</text>
-      </view>
-      <text class="upload-title">选择图片</text>
-      <text class="upload-hint">点击从相册选择或拍照</text>
-    </view>
-  </view>
+  <image-upload
+    wx:if="{{!hasImage}}"
+    icon="✨"
+    title="选择图片"
+    hint="点击从相册选择或拍照"
+    bind:upload="chooseImage"
+  />
 
   <!-- 已选择图片 -->
   <view wx:else class="compress-layout">
     <!-- 图片预览区域 -->
-    <view class="preview-section">
-      <view class="preview-header">
-        <text class="preview-title">{{compressedPath ? '压缩完成' : '图片预览'}}</text>
-        <view class="change-btn" bindtap="chooseImage">
-          <text>更换</text>
-        </view>
-      </view>
-
-      <view class="preview-container">
-        <image
-          class="preview-image"
-          src="{{compressedPath || imagePath}}"
-          mode="aspectFit"
-          bindtap="previewImage"
-        />
-      </view>
-    </view>
+    <image-preview
+      imagePath="{{compressedPath || imagePath}}"
+      title="{{compressedPath ? '压缩完成' : '图片预览'}}"
+      showChange="{{true}}"
+      isProcessing="{{isProcessing}}"
+      processingText="压缩中..."
+      bind:change="chooseImage"
+      bind:preview="previewImage"
+    />
 
     <!-- 大小信息 -->
     <view class="size-section">
@@ -88,57 +78,45 @@
       </view>
 
       <!-- 质量滑块 -->
-      <view class="slider-control">
-        <view class="slider-header">
-          <text class="slider-label">压缩质量</text>
-          <text class="slider-value">{{quality}}%</text>
-        </view>
-        <slider
-          class="quality-slider"
-          min="10"
-          max="100"
-          value="{{quality}}"
-          block-size="24"
-          activeColor="#41bc3f"
-          backgroundColor="#e8e8ed"
-          bindchange="onQualityChange"
-          bindchanging="onQualityChanging"
-        />
-        <view class="slider-hints">
-          <text>体积小</text>
-          <text>画质好</text>
-        </view>
-      </view>
+      <slider-control
+        label="压缩质量"
+        value="{{quality}}"
+        min="10"
+        max="100"
+        unit="%"
+        activeColor="#41bc3f"
+        showHints="{{true}}"
+        minHint="体积小"
+        maxHint="画质好"
+        bind:changing="onQualityChanging"
+        bind:change="onQualityChange"
+      />
     </view>
+
+    <!-- 输出格式 -->
+    <format-selector
+      hidden="{{compressedPath}}"
+      value="{{fileType}}"
+      mode="horizontal"
+      showDesc="{{false}}"
+      disabledFormats="{{['png']}}"
+      showTip="{{true}}"
+      tipText="提示：压缩功能仅支持输出JPG格式。PNG为无损格式，无法通过调整质量来减小体积"
+      bind:change="onFormatChange"
+    />
 
     <!-- 操作按钮 -->
-    <view class="action-section">
-      <!-- 压缩前：开始压缩 -->
-      <button
-        wx:if="{{!compressedPath}}"
-        class="btn btn-primary btn-lg btn-block {{isProcessing ? 'btn-loading' : ''}}"
-        bindtap="startCompress"
-        disabled="{{isProcessing}}"
-      >
-        <text wx:if="{{!isProcessing}}">开始压缩</text>
-        <view wx:else class="loading-dots">
-          <text>压缩中</text>
-          <text class="dot">.</text>
-          <text class="dot">.</text>
-          <text class="dot">.</text>
-        </view>
-      </button>
-
-      <!-- 压缩后：重新压缩 + 保存 -->
-      <view wx:if="{{compressedPath}}" class="action-row">
-        <button class="btn btn-secondary btn-flex" bindtap="resetCompress">
-          重新压缩
-        </button>
-        <button class="btn btn-primary btn-flex" bindtap="saveToAlbum">
-          保存到相册
-        </button>
-      </view>
-    </view>
+    <action-buttons
+      hasResult="{{!!compressedPath}}"
+      isLoading="{{isProcessing}}"
+      primaryText="开始压缩"
+      secondaryText="重新压缩"
+      saveText="保存到相册"
+      loadingText="压缩中..."
+      bind:primary="startCompress"
+      bind:secondary="resetCompress"
+      bind:save="saveToAlbum"
+    />
   </view>
 
   <!-- 隐藏Canvas -->

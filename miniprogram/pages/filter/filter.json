@@ -1,5 +1,12 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "image-upload": "/components/image-upload/image-upload",
+    "image-preview": "/components/image-preview/image-preview",
+    "scroll-selector": "/components/scroll-selector/scroll-selector",
+    "slider-control": "/components/slider-control/slider-control",
+    "format-selector": "/components/format-selector/format-selector",
+    "action-buttons": "/components/action-buttons/action-buttons"
+  },
   "navigationBarTitleText": "滤镜美化",
   "navigationBarBackgroundColor": "#41bc3f",
   "navigationBarTextStyle": "white"
