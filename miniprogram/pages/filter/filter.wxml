@@ -55,9 +55,9 @@
       bind:change="onFormatChange"
     />
 
-    <!-- 操作按钮 -->
+    <!-- 操作按钮：始终显示重置+保存 -->
     <action-buttons
-      hasResult="{{currentFilter !== 'original'}}"
+      hasResult="{{true}}"
       isLoading="{{isProcessing}}"
       primaryText="保存到相册"
       secondaryText="重置"

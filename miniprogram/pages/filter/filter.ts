@@ -78,7 +78,6 @@ Component({
           filterIntensity: 100
         });
 
-        showSuccess('图片加载成功');
       } catch (error) {
         handleError(error, '图片选择失败');
       } finally {
@@ -159,8 +158,6 @@ Component({
           }
         }
 
-        console.log('Canvas尺寸:', canvasWidth, 'x', canvasHeight);
-
         // 设置canvas尺寸
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
@@ -168,14 +165,8 @@ Component({
         // 创建图片对象
         const image = canvas.createImage();
         await new Promise<void>((resolve, reject) => {
-          image.onload = () => {
-            console.log('图片加载成功');
-            resolve();
-          };
-          image.onerror = (err: any) => {
-            console.error('图片加载失败:', err);
-            reject(new Error('图片加载失败'));
-          };
+          image.onload = () => resolve();
+          image.onerror = () => reject(new Error('图片加载失败'));
           image.src = imagePath;
         });
 
@@ -185,25 +176,18 @@ Component({
         // 直接使用像素级处理（兼容性更好）
         const intensityRatio = intensity / 100;
 
-        console.log('开始绘制图片');
         ctx.drawImage(image, 0, 0, canvasWidth, canvasHeight);
-        console.log('图片绘制完成');
 
         // 应用像素级滤镜
         if (filterType !== 'original' && filterType !== 'blur') {
-          console.log('开始应用像素滤镜:', filterType);
           await this.applyPixelFilter(ctx, canvasWidth, canvasHeight, filterType, intensityRatio);
-          console.log('像素滤镜应用完成');
         }
 
         // 使用 canvasToTempFile 工具函数导出处理后的图片
-        console.log('开始导出图片');
         const tempFilePath = await canvasToTempFile(canvas, {
           fileType: this.data.fileType,
           quality: 0.92
         });
-
-        console.log('图片导出成功:', tempFilePath);
 
         this.setData({
           filteredPath: tempFilePath,
@@ -211,7 +195,6 @@ Component({
         });
 
       } catch (err) {
-        console.error('滤镜应用失败:', err);
         handleError(err, '滤镜应用失败');
         this.setData({ isProcessing: false });
       }
@@ -325,7 +308,7 @@ Component({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (ctx as any).putImageData(imageData, 0, 0);
       } catch (err) {
-        console.error('像素处理失败:', err);
+        // 像素处理失败，静默处理
       }
     },
 
@@ -347,6 +330,11 @@ Component({
      */
     async saveToAlbum() {
       if (!this.data.filteredPath) return;
+
+      // 如果当前是原图滤镜，需要重新应用当前滤镜设置
+      if (this.data.currentFilter === 'original') {
+        await this.applyFilter(this.data.currentFilter, this.data.filterIntensity);
+      }
 
       const hideLoading = showLoading('保存中...');
 
