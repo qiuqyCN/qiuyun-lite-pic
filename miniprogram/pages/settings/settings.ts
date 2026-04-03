@@ -3,12 +3,15 @@
 
 Component({
   data: {
-    cacheSize: '0MB'
+    cacheSize: '0MB',
+    version: '1.0.0',
+    envVersion: ''
   },
 
   lifetimes: {
     attached() {
       this.calculateCacheSize();
+      this.getVersionInfo();
     }
   },
 
@@ -51,11 +54,37 @@ Component({
     },
 
     onAbout() {
+      const { version, envVersion } = this.data;
+      const envText = envVersion && envVersion !== 'release' ? ` (${this.getEnvText(envVersion)})` : '';
       wx.showModal({
         title: '关于秋云轻图',
-        content: '秋云轻图 v1.0.0\n\n一款轻量级图片处理工具，所有功能均在本地完成，保护您的隐私安全。',
+        content: `秋云轻图 v${version}${envText}\n\n一款轻量级图片处理工具，所有功能均在本地完成，保护您的隐私安全。`,
         showCancel: false
       });
+    },
+
+    // 获取版本信息
+    getVersionInfo() {
+      try {
+        const accountInfo = wx.getAccountInfoSync();
+        const { version, envVersion } = accountInfo.miniProgram;
+        this.setData({
+          version: version || '1.0.0',
+          envVersion: envVersion || 'release'
+        });
+      } catch (err) {
+        console.log('获取版本信息失败', err);
+      }
+    },
+
+    // 获取环境版本文本
+    getEnvText(envVersion: string): string {
+      const envMap: Record<string, string> = {
+        'develop': '开发版',
+        'trial': '体验版',
+        'release': '正式版'
+      };
+      return envMap[envVersion] || envVersion;
     }
   }
 });

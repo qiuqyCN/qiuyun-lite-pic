@@ -71,7 +71,7 @@
       <image class="logo-img" src="/images/logo.png" mode="aspectFit"/>
       <text class="app-name">秋云轻图</text>
     </view>
-    <text class="version">Version 1.0.0</text>
+    <text class="version">Version {{version}}</text>
     <text class="slogan">轻点之间，美图呈现</text>
   </view>
 
