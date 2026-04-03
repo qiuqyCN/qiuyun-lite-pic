@@ -28,6 +28,28 @@ Component({
     }
   },
 
+  data: {
+    imageLoading: false,
+    imageLoaded: false
+  },
+
+  observers: {
+    'imagePath': function(newPath: string) {
+      if (newPath) {
+        // 路径变化时，重置加载状态
+        this.setData({
+          imageLoading: true,
+          imageLoaded: false
+        });
+      } else {
+        this.setData({
+          imageLoading: false,
+          imageLoaded: false
+        });
+      }
+    }
+  },
+
   methods: {
     // 点击更换按钮
     onChangeTap() {
@@ -37,7 +59,7 @@ Component({
     // 点击图片预览
     onImageTap() {
       if (this.data.isProcessing) return;
-      
+
       if (this.data.imagePath) {
         wx.previewImage({
           current: this.data.imagePath,
@@ -47,6 +69,22 @@ Component({
           imagePath: this.data.imagePath
         });
       }
+    },
+
+    // 图片加载完成
+    onImageLoad() {
+      this.setData({
+        imageLoading: false,
+        imageLoaded: true
+      });
+    },
+
+    // 图片加载失败
+    onImageError() {
+      this.setData({
+        imageLoading: false,
+        imageLoaded: false
+      });
     }
   }
 });

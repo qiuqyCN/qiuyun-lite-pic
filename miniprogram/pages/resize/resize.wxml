@@ -88,7 +88,7 @@
             class="dimension-input"
             type="number"
             value="{{targetWidth}}"
-            bindinput="onWidthInput"
+            bindchange="onWidthChange"
             placeholder="宽度"
           />
           <text class="input-unit">px</text>
@@ -102,7 +102,7 @@
             class="dimension-input"
             type="number"
             value="{{targetHeight}}"
-            bindinput="onHeightInput"
+            bindchange="onHeightChange"
             placeholder="高度"
           />
           <text class="input-unit">px</text>
@@ -118,15 +118,15 @@
       bind:change="onFormatChange"
     />
 
-    <!-- 操作按钮 -->
+    <!-- 操作按钮：始终显示重置+保存 -->
     <action-buttons
-      hasResult="{{!!resultPath}}"
+      hasResult="{{true}}"
       isLoading="{{isProcessing}}"
-      primaryText="确认调整"
-      secondaryText="重新调整"
+      primaryText="保存到相册"
+      secondaryText="重置"
       saveText="保存到相册"
       loadingText="处理中..."
-      bind:primary="confirmResize"
+      bind:primary="saveToAlbum"
       bind:secondary="resetResize"
       bind:save="saveToAlbum"
     />

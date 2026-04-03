@@ -5,6 +5,7 @@ import { chooseImage, chooseMultipleImages, getImageInfo } from '../../utils/ima
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
 import { saveImageToAlbum } from '../../utils/file';
 import { handleError, showSuccess } from '../../utils/error';
+import { debounce } from '../../utils/debounce';
 
 /** 布局模板 */
 interface LayoutTemplate {
@@ -188,7 +189,7 @@ Component({
         showPreview: false
       }, () => {
         if (images.length > 0) {
-          this.generateCollage();
+          this.debouncedGenerate();
         }
       });
     },
@@ -208,7 +209,7 @@ Component({
         imageInfos[index] = { width: imageInfo.width, height: imageInfo.height };
 
         this.setData({ images, imageInfos }, () => {
-          this.generateCollage();
+          this.debouncedGenerate();
         });
       } catch (error) {
         handleError(error, '更换图片失败');
@@ -249,7 +250,7 @@ Component({
         showPreview: false
       }, () => {
         if (images.length > 0) {
-          this.generateCollage();
+          this.debouncedGenerate();
         }
       });
     },
@@ -261,7 +262,7 @@ Component({
     onSpacingChange(e: WechatMiniprogram.CustomEvent) {
       this.setData({ spacing: e.detail.value }, () => {
         if (this.data.hasImages) {
-          this.generateCollage();
+          this.debouncedGenerate();
         }
       });
     },
@@ -273,7 +274,7 @@ Component({
     onRadiusChange(e: WechatMiniprogram.CustomEvent) {
       this.setData({ borderRadius: e.detail.value }, () => {
         if (this.data.hasImages) {
-          this.generateCollage();
+          this.debouncedGenerate();
         }
       });
     },
@@ -286,7 +287,7 @@ Component({
       const color = e.detail.color;
       this.setData({ backgroundColor: color }, () => {
         if (this.data.hasImages) {
-          this.generateCollage();
+          this.debouncedGenerate();
         }
       });
     },
@@ -315,8 +316,33 @@ Component({
       this.setData({ fileType: format }, () => {
         // 如果已经生成了拼图，重新生成以使用新格式
         if (this.data.resultPath && this.data.images.length > 0) {
-          this.generateCollage();
+          this.debouncedGenerate();
         }
+      });
+    },
+
+    /**
+     * 防抖生成（实时预览）
+     */
+    debouncedGenerate: debounce(function(this: any) {
+      if (this.data.hasImages && !this.data.isProcessing) {
+        this.generateCollage();
+      }
+    }, 500),
+
+    /**
+     * 重置拼图
+     */
+    resetCollage() {
+      this.setData({
+        images: [],
+        imageInfos: [],
+        hasImages: false,
+        resultPath: '',
+        showPreview: false,
+        spacing: 10,
+        borderRadius: 0,
+        backgroundColor: '#ffffff'
       });
     },
 

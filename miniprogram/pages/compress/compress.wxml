@@ -24,31 +24,23 @@
 
     <!-- 大小信息 -->
     <view class="size-section">
-      <view wx:if="{{!compressedPath}}" class="size-info">
+      <view class="size-info">
         <view class="size-row">
-          <text class="size-label">当前</text>
+          <text class="size-label">原图</text>
           <text class="size-value">{{originalSize}} KB</text>
         </view>
-        <view class="size-row estimated">
-          <text class="size-label">预计</text>
-          <text class="size-value-range">{{estimatedMin}} ~ {{estimatedMax}} KB</text>
+        <view wx:if="{{compressedPath}}" class="size-row">
+          <text class="size-label">压缩后</text>
+          <text class="size-value" style="color: #41bc3f;">{{compressedSize}} KB</text>
         </view>
-      </view>
-
-      <view wx:else class="size-result">
-        <view class="result-main">
-          <text class="result-original">{{originalSize}} KB</text>
-          <text class="result-arrow">→</text>
-          <text class="result-actual">{{compressedSize}} KB</text>
-        </view>
-        <view class="result-badge">
+        <view wx:if="{{compressedPath && savedPercent > 0}}" class="result-badge">
           <text>节省 {{savedPercent}}%</text>
         </view>
       </view>
     </view>
 
-    <!-- 压缩设置（压缩前显示） -->
-    <view wx:if="{{!compressedPath}}" class="settings-section">
+    <!-- 压缩设置 -->
+    <view class="settings-section">
       <!-- 快速预设 -->
       <view class="presets-row">
         <view
@@ -95,7 +87,6 @@
 
     <!-- 输出格式 -->
     <format-selector
-      hidden="{{compressedPath}}"
       value="{{fileType}}"
       mode="horizontal"
       showDesc="{{false}}"
@@ -105,15 +96,15 @@
       bind:change="onFormatChange"
     />
 
-    <!-- 操作按钮 -->
+    <!-- 操作按钮：始终显示重置+保存 -->
     <action-buttons
-      hasResult="{{!!compressedPath}}"
+      hasResult="{{true}}"
       isLoading="{{isProcessing}}"
-      primaryText="开始压缩"
-      secondaryText="重新压缩"
+      primaryText="保存到相册"
+      secondaryText="重置"
       saveText="保存到相册"
-      loadingText="压缩中..."
-      bind:primary="startCompress"
+      loadingText="处理中..."
+      bind:primary="saveToAlbum"
       bind:secondary="resetCompress"
       bind:save="saveToAlbum"
     />

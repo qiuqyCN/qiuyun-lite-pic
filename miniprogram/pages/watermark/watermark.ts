@@ -5,7 +5,7 @@ import { chooseImage } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
 import { saveImageToAlbum } from '../../utils/file';
 import { handleError, showSuccess, showLoading } from '../../utils/error';
-import type { CanvasContext, HistoryItem } from '../../types/index';
+import type { HistoryItem } from '../../types/index';
 
 /** 水印位置类型 */
 type WatermarkPosition = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight' | 'center' | 'tile';
@@ -279,7 +279,7 @@ Component({
      * 绘制文字水印
      * @param ctx - Canvas 2D 上下文
      */
-    async drawTextWatermark(ctx: CanvasRenderingContext2D) {
+    async drawTextWatermark(ctx: any) {
       const { watermarkText, fontSize, fontColor, opacity, rotation, position, imageWidth, imageHeight } = this.data;
 
       ctx.save();
@@ -349,7 +349,7 @@ Component({
      * @param ctx - Canvas 2D 上下文
      * @param canvas - Canvas 节点
      */
-    async drawImageWatermark(ctx: CanvasRenderingContext2D, canvas: any) {
+    async drawImageWatermark(ctx: any, canvas: any) {
       const { watermarkImage, opacity, position, imageWidth, imageHeight } = this.data;
 
       // 加载水印图片
@@ -472,6 +472,27 @@ Component({
 
       history.unshift(historyItem);
       wx.setStorageSync('processHistory', history.slice(0, 20));
+    },
+
+    /**
+     * 重置水印设置
+     * 将所有水印设置恢复到默认值
+     */
+    resetWatermark() {
+      this.setData({
+        watermarkType: 'text',
+        watermarkText: '秋云轻图',
+        watermarkImage: '',
+        fontSize: 40,
+        fontColor: '#ffffff',
+        opacity: 50,
+        rotation: 0,
+        position: 'bottomRight',
+        fileType: 'jpg',
+        watermarkedPath: this.data.imagePath
+      }, () => {
+        this.applyWatermark();
+      });
     }
   }
 });

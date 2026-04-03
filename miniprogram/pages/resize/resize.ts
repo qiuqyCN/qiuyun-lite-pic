@@ -13,6 +13,7 @@ import {
 } from '../../utils/canvas';
 import { saveImageToAlbum } from '../../utils/file';
 import { handleError, showSuccess, showLoading } from '../../utils/error';
+import { debounce } from '../../utils/debounce';
 import { ALL_PRESETS } from '../../constants/presets';
 import type { PresetSize } from '../../types/index';
 
@@ -99,8 +100,10 @@ Component({
           targetHeight: originalHeight,
         });
 
-        // 生成预览
-        this.generatePreview();
+        // 自动生成预览
+        setTimeout(() => {
+          this.generatePreview();
+        }, 100);
       } catch (err) {
         // 用户取消选择，不显示错误
         console.log('用户取消选择');
@@ -122,7 +125,7 @@ Component({
         maintainAspectRatio: false,
       });
 
-      this.generatePreview();
+      this.debouncedResize();
     },
 
     /**
@@ -130,7 +133,7 @@ Component({
      * 根据是否保持宽高比自动计算高度
      * @param e - 输入事件对象
      */
-    onWidthInput(e: WechatMiniprogram.Input) {
+    onWidthChange(e: WechatMiniprogram.Input) {
       const value = parseInt(e.detail.value) || 0;
       const { originalWidth, originalHeight, maintainAspectRatio } = this.data;
 
@@ -154,7 +157,7 @@ Component({
         });
       }
 
-      this.generatePreview();
+      this.debouncedResize();
     },
 
     /**
@@ -162,7 +165,7 @@ Component({
      * 根据是否保持宽高比自动计算宽度
      * @param e - 输入事件对象
      */
-    onHeightInput(e: WechatMiniprogram.Input) {
+    onHeightChange(e: WechatMiniprogram.Input) {
       const value = parseInt(e.detail.value) || 0;
       const { originalWidth, originalHeight, maintainAspectRatio } = this.data;
 
@@ -186,7 +189,7 @@ Component({
         });
       }
 
-      this.generatePreview();
+      this.debouncedResize();
     },
 
     /**
@@ -195,8 +198,8 @@ Component({
     onFormatChange(e: WechatMiniprogram.CustomEvent) {
       const format = e.detail.format as 'jpg' | 'png';
       this.setData({ fileType: format }, () => {
-        // 如果已经生成了结果图，重新生成以使用新格式
-        if (this.data.resultPath && this.data.hasImage) {
+        // 重新生成预览以使用新格式
+        if (this.data.hasImage) {
           this.generatePreview();
         }
       });
@@ -233,11 +236,23 @@ Component({
     },
 
     /**
+     * 防抖调整尺寸（实时预览）
+     */
+    debouncedResize: debounce(function(this: any) {
+      if (this.data.hasImage) {
+        this.generatePreview();
+      }
+    }, 500),
+
+    /**
      * 生成预览图
      * 在预览画布上显示调整后的图片效果
      */
     async generatePreview() {
       if (!this.data.hasImage) return;
+
+      // 清空结果路径，强制保存时重新生成
+      this.setData({ resultPath: '' });
 
       const { imagePath, originalWidth, originalHeight, targetWidth, targetHeight } = this.data;
 
@@ -305,49 +320,6 @@ Component({
     },
 
     /**
-     * 确认调整尺寸
-     * 验证参数并生成最终图片
-     */
-    async confirmResize() {
-      if (!this.data.hasImage) {
-        handleError(null, '请先选择图片');
-        return;
-      }
-
-      const { targetWidth, targetHeight } = this.data;
-      if (targetWidth <= 0 || targetHeight <= 0) {
-        handleError(null, '尺寸必须大于0');
-        return;
-      }
-
-      if (targetWidth > 8192 || targetHeight > 8192) {
-        handleError(null, '尺寸不能超过8192px');
-        return;
-      }
-
-      const hideLoading = showLoading('处理中...');
-      this.setData({ isProcessing: true });
-
-      try {
-        const resultPath = await this.generateResultImage();
-
-        this.setData({
-          resultPath,
-          isProcessing: false,
-        });
-
-        this.saveToHistory();
-        showSuccess('调整完成');
-      } catch (err) {
-        console.error('调整失败:', err);
-        handleError(err, '调整失败');
-        this.setData({ isProcessing: false });
-      } finally {
-        hideLoading();
-      }
-    },
-
-    /**
      * 生成结果图片
      * 在画布上绘制调整尺寸后的图片
      * @returns 临时文件路径
@@ -411,12 +383,26 @@ Component({
      * 将处理后的图片保存到系统相册
      */
     async saveToAlbum() {
-      if (!this.data.resultPath) return;
+      let resultPath = this.data.resultPath;
+
+      // 如果没有结果路径，先生成
+      if (!resultPath) {
+        const hideLoading = showLoading('生成中...');
+        try {
+          resultPath = await this.generateResultImage();
+          this.setData({ resultPath });
+          hideLoading();
+        } catch (err) {
+          hideLoading();
+          handleError(err, '生成失败');
+          return;
+        }
+      }
 
       const hideLoading = showLoading('保存中...');
 
       try {
-        await saveImageToAlbum(this.data.resultPath);
+        await saveImageToAlbum(resultPath);
         showSuccess('已保存到相册');
       } catch (err) {
         handleError(err, '保存失败');
@@ -426,13 +412,17 @@ Component({
     },
 
     /**
-     * 重新调整
-     * 清除结果，重新生成预览
+     * 重置
+     * 清除结果，恢复到原始尺寸
      */
     resetResize() {
+      const { originalWidth, originalHeight } = this.data;
       this.setData({
         resultPath: '',
         previewPath: '',
+        selectedPreset: '',
+        targetWidth: originalWidth,
+        targetHeight: originalHeight,
       });
       this.generatePreview();
     },

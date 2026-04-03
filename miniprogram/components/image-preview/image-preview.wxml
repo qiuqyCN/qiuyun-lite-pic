@@ -14,18 +14,27 @@
 
   <!-- 图片区域 -->
   <view class="image-wrapper" bindtap="onImageTap">
+    <!-- 图片加载中占位 -->
+    <view wx:if="{{imageLoading}}" class="image-loading-placeholder">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+
     <image 
       wx:if="{{imagePath}}"
-      class="preview-image"
+      class="preview-image {{imageLoaded ? 'loaded' : ''}}"
       src="{{imagePath}}"
       mode="aspectFit"
+      bindload="onImageLoad"
+      binderror="onImageError"
+      lazy-load="{{true}}"
     />
     <view wx:else class="placeholder">
       <text class="placeholder-text">暂无图片</text>
     </view>
 
     <!-- 处理中遮罩 -->
-    <view wx:if="{{isProcessing}}" class="processing-overlay">
+    <view class="processing-overlay {{isProcessing ? 'show' : ''}}">
       <view class="processing-content">
         <view class="loading-icon"></view>
         <text class="processing-text">{{processingText}}</text>

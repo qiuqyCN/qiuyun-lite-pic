@@ -1,10 +1,11 @@
 // compress.ts
 // 图片压缩页面 - 优化重构版
 
-import { chooseImage, estimateCompressedSize, calculateSavedPercent } from '../../utils/image';
+import { chooseImage, calculateSavedPercent } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
 import { saveImageToAlbum } from '../../utils/file';
 import { handleError, showSuccess, showLoading } from '../../utils/error';
+import { debounce } from '../../utils/debounce';
 
 interface CompressData {
   // 图片信息
@@ -18,10 +19,6 @@ interface CompressData {
   // 压缩参数
   quality: number;
   fileType: 'jpg' | 'png';
-
-  // 估算范围
-  estimatedMin: number;
-  estimatedMax: number;
 
   // 节省百分比
   savedPercent: number;
@@ -41,8 +38,6 @@ Component({
     compressedSize: 0,
     quality: 60,
     fileType: 'jpg',
-    estimatedMin: 0,
-    estimatedMax: 0,
     savedPercent: 0,
     isProcessing: false,
     hasImage: false,
@@ -81,8 +76,7 @@ Component({
           hasImage: true,
           compressedPath: '',
           compressedSize: 0,
-          quality,
-          ...this.calculateEstimateRange(originalSizeKB, quality)
+          quality
         });
 
         // 如果原图很小，提示用户
@@ -93,6 +87,11 @@ Component({
             duration: 2000
           });
         }
+
+        // 自动开始压缩预览
+        setTimeout(() => {
+          this.startCompress();
+        }, 100);
       } catch (err) {
         // 用户取消选择，不显示错误
         console.log('用户取消选择');
@@ -100,24 +99,13 @@ Component({
     },
 
     /**
-     * 计算估算范围
-     */
-    calculateEstimateRange(originalSize: number, quality: number): { estimatedMin: number; estimatedMax: number } {
-      const { min, max } = estimateCompressedSize(originalSize * 1024, quality);
-      return {
-        estimatedMin: Math.round(min / 1024),
-        estimatedMax: Math.round(max / 1024)
-      };
-    },
-
-    /**
      * 快速预设点击
      */
     onPresetTap(e: WechatMiniprogram.TouchEvent) {
       const quality = parseInt(e.currentTarget.dataset.quality);
-      this.setData({
-        quality,
-        ...this.calculateEstimateRange(this.data.originalSize, quality)
+      this.setData({ quality }, () => {
+        // 触发实时压缩
+        this.debouncedCompress();
       });
     },
 
@@ -126,39 +114,30 @@ Component({
      */
     onQualityChanging(e: WechatMiniprogram.SliderChange) {
       const quality = e.detail.value;
-      this.setData({
-        quality,
-        ...this.calculateEstimateRange(this.data.originalSize, quality)
-      });
+      this.setData({ quality });
     },
 
     /**
-     * 质量滑块变化（拖动结束）
+     * 质量滑块变化（拖动结束）- 触发实时压缩
      */
     onQualityChange(e: WechatMiniprogram.SliderChange) {
       const quality = e.detail.value;
-      this.setData({
-        quality,
-        ...this.calculateEstimateRange(this.data.originalSize, quality)
+      this.setData({ quality }, () => {
+        // 实时压缩预览
+        this.debouncedCompress();
       });
     },
 
     /**
-     * 格式选择变化（压缩页面只支持JPG）
+     * 防抖压缩（实时预览）
      */
-    onFormatChange(e: WechatMiniprogram.CustomEvent) {
-      const format = e.detail.format as 'jpg' | 'png';
-      // 压缩功能只支持JPG，如果用户选择PNG，提示用户
-      if (format === 'png') {
-        wx.showToast({
-          title: 'PNG为无损格式，无需压缩',
-          icon: 'none',
-          duration: 2000
-        });
-        return;
+    debouncedCompress: debounce(function(this: any) {
+      if (this.data.hasImage && !this.data.isProcessing) {
+        this.startCompress();
       }
-      this.setData({ fileType: format });
-    },
+    }, 500),
+
+
 
     /**
      * 预览图片
@@ -237,12 +216,7 @@ Component({
         // 更新使用统计
         this.updateUsageStats();
 
-        // 显示成功提示
-        if (compressedSize < this.data.originalSize) {
-          showSuccess(`节省 ${savedPercent}%`);
-        } else {
-          showSuccess('压缩完成');
-        }
+        // 不显示弹窗提示，节省信息已在页面上展示
 
       } catch (err) {
         hideLoading();
@@ -261,8 +235,10 @@ Component({
         compressedPath: '',
         compressedSize: 0,
         savedPercent: 0,
-        quality,
-        ...this.calculateEstimateRange(this.data.originalSize, quality)
+        quality
+      }, () => {
+        // 重置后自动触发压缩
+        this.startCompress();
       });
     },
 

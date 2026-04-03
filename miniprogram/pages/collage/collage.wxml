@@ -142,13 +142,11 @@
 <action-buttons
   hasResult="{{!!resultPath}}"
   isLoading="{{isProcessing}}"
-  primaryText="生成拼图"
-  secondaryText="重新生成"
-  saveText="保存到相册"
-  loadingText="生成中..."
-  bind:primary="generateCollage"
-  bind:secondary="generateCollage"
-  bind:save="saveToAlbum"
+  primaryText="保存到相册"
+  secondaryText="重置"
+  loadingText="保存中..."
+  bind:primary="saveToAlbum"
+  bind:secondary="resetCollage"
 />
 
 <!-- 隐藏的 Canvas -->

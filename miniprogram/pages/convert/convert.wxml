@@ -45,15 +45,16 @@
       </view>
     </view>
 
-    <!-- 转换设置（转换前显示） -->
-    <view wx:if="{{!convertedPath}}" class="settings-section">
+    <!-- 转换设置 -->
+    <view class="settings-section">
       <!-- 目标格式选择 -->
       <format-selector
         value="{{targetFormat}}"
         mode="vertical"
         title="目标格式"
         showTip="{{true}}"
-        tipText="PNG支持透明背景，JPG文件更小"
+        tipText="PNG支持透明背景，JPG文件更小。灰色选项为原图格式，不可选择"
+        disabledFormats="{{disabledFormats}}"
         bind:change="onFormatChange"
       />
 
@@ -80,15 +81,15 @@
       </view>
     </view>
 
-    <!-- 操作按钮 -->
+    <!-- 操作按钮：始终显示重置+保存 -->
     <action-buttons
-      hasResult="{{!!convertedPath}}"
+      hasResult="{{true}}"
       isLoading="{{isProcessing}}"
-      primaryText="开始转换"
-      secondaryText="重新转换"
+      primaryText="保存到相册"
+      secondaryText="重置"
       saveText="保存到相册"
-      loadingText="转换中..."
-      bind:primary="startConvert"
+      loadingText="处理中..."
+      bind:primary="saveToAlbum"
       bind:secondary="resetConvert"
       bind:save="saveToAlbum"
     />

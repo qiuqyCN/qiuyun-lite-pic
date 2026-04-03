@@ -4,16 +4,8 @@
 import { chooseImage, getImageInfo } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
 import { saveImageToAlbum } from '../../utils/file';
-import { formatFileSizeSimple } from '../../utils/format';
 import { handleError, showSuccess, showLoading } from '../../utils/error';
-import type { ImageInfo } from '../../types/index';
-
-/** 格式选项 */
-interface FormatOption {
-  id: 'jpg' | 'png';
-  name: string;
-  desc: string;
-}
+import { debounce } from '../../utils/debounce';
 
 /** 页面数据 */
 interface ConvertData {
@@ -33,8 +25,8 @@ interface ConvertData {
   isProcessing: boolean;
   hasImage: boolean;
 
-  // 支持的输出格式（Canvas只支持导出jpg/png）
-  formatList: FormatOption[];
+  // 禁用的格式（与原格式相同）
+  disabledFormats: string[];
 }
 
 Component({
@@ -55,11 +47,8 @@ Component({
     isProcessing: false,
     hasImage: false,
 
-    // 支持的输出格式（Canvas只支持导出jpg/png）
-    formatList: [
-      { id: 'jpg', name: 'JPG', desc: '有损压缩，广泛兼容' },
-      { id: 'png', name: 'PNG', desc: '无损压缩，支持透明' }
-    ]
+    // 禁用的格式
+    disabledFormats: [],
   } as ConvertData,
 
   methods: {
@@ -70,11 +59,8 @@ Component({
       try {
         const imageInfo = await chooseImage();
 
-        console.log('Selected file path:', imageInfo.path);
-
         // 检测原图格式
         const detectedFormat = this.detectFormat(imageInfo.path);
-        console.log('Detected format:', detectedFormat);
 
         // 设置原格式显示（大写）
         const originalFormat = detectedFormat.toUpperCase();
@@ -90,6 +76,13 @@ Component({
           targetFormat = 'jpg';
         }
 
+        // 计算禁用的格式（与原格式相同的格式）
+        const disabledFormats = ['jpg', 'jpeg'].includes(detectedFormat)
+          ? ['jpg']
+          : detectedFormat === 'png'
+            ? ['png']
+            : [];
+
         this.setData({
           imagePath: imageInfo.path,
           originalSize: Math.round(imageInfo.size / 1024),
@@ -99,10 +92,14 @@ Component({
           convertedSize: 0,
           convertedFormat: '',
           targetFormat: targetFormat,
-          quality: 92
-        }, () => {
-          console.log('Set data complete - originalFormat:', this.data.originalFormat);
+          quality: 92,
+          disabledFormats
         });
+
+        // 自动开始转换
+        setTimeout(() => {
+          this.startConvert();
+        }, 100);
       } catch (err) {
         console.log('选择图片失败或取消', err);
       }
@@ -135,15 +132,30 @@ Component({
      */
     onFormatChange(e: WechatMiniprogram.CustomEvent) {
       const format = e.detail.format as 'jpg' | 'png';
-      this.setData({ targetFormat: format });
+      this.setData({ targetFormat: format }, () => {
+        // 实时转换预览
+        this.debouncedConvert();
+      });
     },
+
+    /**
+     * 防抖转换（实时预览）
+     */
+    debouncedConvert: debounce(function(this: any) {
+      if (this.data.hasImage && !this.data.isProcessing) {
+        this.startConvert();
+      }
+    }, 500),
 
     /**
      * 质量滑块变化
      * @param e 滑块变化事件
      */
     onQualityChange(e: WechatMiniprogram.SliderChange) {
-      this.setData({ quality: e.detail.value });
+      this.setData({ quality: e.detail.value }, () => {
+        // 实时转换预览
+        this.debouncedConvert();
+      });
     },
 
     /**
@@ -170,7 +182,6 @@ Component({
 
       // 检查是否是相同格式
       const originalLower = originalFormat.toLowerCase();
-      console.log('Converting from', originalLower, 'to', targetFormat);
 
       // 如果原格式不是jpg/png，允许转换为jpg
       const isSupportedOriginal = ['jpg', 'jpeg', 'png'].includes(originalLower);
@@ -208,28 +219,19 @@ Component({
         // Canvas只支持导出jpg/png
         const exportQuality = targetFormat === 'png' ? 1 : quality / 100;
 
-        console.log('Exporting with format:', targetFormat, 'quality:', exportQuality);
-
         const tempFilePath = await canvasToTempFile(canvas, {
           fileType: targetFormat,
           quality: exportQuality
         });
 
-        console.log('Export success:', tempFilePath);
-
         // 获取转换后文件大小
         const convertedFileInfo = await getImageInfo(tempFilePath);
-
-        const newConvertedFormat = targetFormat.toUpperCase();
-        console.log('Setting convertedFormat to:', newConvertedFormat);
 
         this.setData({
           convertedPath: tempFilePath,
           convertedSize: Math.round(convertedFileInfo.size / 1024),
-          convertedFormat: newConvertedFormat,
+          convertedFormat: targetFormat.toUpperCase(),
           isProcessing: false
-        }, () => {
-          console.log('Convert complete - convertedFormat:', this.data.convertedFormat);
         });
 
         // 保存到历史记录
@@ -237,10 +239,7 @@ Component({
 
         // 更新使用统计
         this.updateUsageStats();
-
-        showSuccess('转换完成');
       } catch (err) {
-        console.error('转换失败:', err);
         handleError(err, '转换失败');
         this.setData({ isProcessing: false });
       } finally {
@@ -256,6 +255,9 @@ Component({
         convertedPath: '',
         convertedSize: 0,
         convertedFormat: ''
+      }, () => {
+        // 重置后自动触发转换
+        this.startConvert();
       });
     },
 
@@ -312,14 +314,10 @@ Component({
     async saveToAlbum() {
       if (!this.data.convertedPath) return;
 
-      console.log('Saving to album:', this.data.convertedPath);
-      console.log('Expected format:', this.data.convertedFormat);
-
       try {
         await saveImageToAlbum(this.data.convertedPath);
         showSuccess('已保存到相册');
       } catch (err) {
-        console.error('Save to album failed:', err);
         handleError(err, '保存失败');
       }
     }

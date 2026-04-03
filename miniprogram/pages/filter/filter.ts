@@ -5,7 +5,7 @@ import { chooseImage } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
 import { saveImageToAlbum } from '../../utils/file';
 import { handleError, showSuccess, showLoading } from '../../utils/error';
-import { ALL_FILTERS, generateFilterStyle } from '../../constants/filters';
+import { ALL_FILTERS } from '../../constants/filters';
 import type { ImageInfo, FilterParams } from '../../types/index';
 
 /** 滤镜页面数据接口 */
