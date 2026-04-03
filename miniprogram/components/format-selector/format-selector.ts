@@ -79,15 +79,16 @@ Component({
      * 点击格式选项
      */
     onFormatTap(e: WechatMiniprogram.TouchEvent) {
-      const format = e.currentTarget.dataset.format;
+      const format = e.currentTarget.dataset.format as string;
       const formatItem = this.data.formatList.find(item => item.id === format);
       
       // 如果格式被禁用，不响应点击
       if (formatItem?.disabled) return;
       
+      // 如果点击的是当前选中的格式，不触发事件
       if (format === this.data.value) return;
       
-      this.setData({ value: format });
+      // 触发 change 事件，让父组件更新 value
       this.triggerEvent('change', { format });
     }
   }

@@ -2,6 +2,9 @@
 
 .scroll-selector {
   padding: 20rpx 0;
+  background: #ffffff;
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
 }
 
 /* 标题栏 */
@@ -94,6 +97,17 @@
   white-space: nowrap;
 }
 
+.item-size {
+  font-size: 22rpx;
+  color: #86868b;
+  white-space: nowrap;
+}
+
 .selector-item.active .item-name {
   color: #41bc3f;
+}
+
+.selector-item.active .item-size {
+  color: #41bc3f;
+  opacity: 0.8;
 }

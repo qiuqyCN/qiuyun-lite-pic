@@ -64,14 +64,7 @@
       showHint="{{true}}"
       hintText="左右滑动查看更多"
       bind:select="onPresetSelect"
-    >
-      <view slot="item" slot-scope="item">
-        <view class="preset-item-content">
-          <text class="preset-name">{{item.name}}</text>
-          <text class="preset-size">{{item.width}}×{{item.height}}</text>
-        </view>
-      </view>
-    </scroll-selector>
+    />
 
     <!-- 自定义尺寸 -->
     <view class="custom-section">
