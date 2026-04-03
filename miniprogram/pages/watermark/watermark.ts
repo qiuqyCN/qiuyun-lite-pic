@@ -63,8 +63,8 @@ Component({
     watermarkImage: '',
 
     // 文字水印样式
-    fontSize: 40,
-    fontColor: '#ffffff',
+    fontSize: 50,
+    fontColor: '#41bc3f',
     opacity: 50,
     rotation: 0,
 
@@ -483,8 +483,8 @@ Component({
         watermarkType: 'text',
         watermarkText: '秋云轻图',
         watermarkImage: '',
-        fontSize: 40,
-        fontColor: '#ffffff',
+        fontSize: 50,
+        fontColor: '#41bc3f',
         opacity: 50,
         rotation: 0,
         position: 'bottomRight',
