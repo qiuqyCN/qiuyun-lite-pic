@@ -111,7 +111,12 @@ Component({
      */
     onFormatChange(e: WechatMiniprogram.CustomEvent) {
       const format = e.detail.format as 'jpg' | 'png';
-      this.setData({ fileType: format });
+      this.setData({ fileType: format }, () => {
+        // 如果已经有滤镜效果，重新应用以使用新格式
+        if (this.data.currentFilter !== 'original' && this.data.hasImage) {
+          this.applyFilter(this.data.currentFilter, this.data.filterIntensity);
+        }
+      });
     },
 
     /**

@@ -194,7 +194,12 @@ Component({
      */
     onFormatChange(e: WechatMiniprogram.CustomEvent) {
       const format = e.detail.format as 'jpg' | 'png';
-      this.setData({ fileType: format });
+      this.setData({ fileType: format }, () => {
+        // 如果已经生成了结果图，重新生成以使用新格式
+        if (this.data.resultPath && this.data.hasImage) {
+          this.generatePreview();
+        }
+      });
     },
 
     /**

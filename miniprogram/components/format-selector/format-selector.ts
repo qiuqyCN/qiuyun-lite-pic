@@ -83,7 +83,7 @@ Component({
       const formatItem = this.data.formatList.find(item => item.id === format);
       
       // 如果格式被禁用，不响应点击
-      if (formatItem?.disabled) return;
+      if (formatItem && formatItem.disabled) return;
       
       // 如果点击的是当前选中的格式，不触发事件
       if (format === this.data.value) return;
