@@ -152,7 +152,6 @@ Component({
           const info = await getImageInfo(path);
           infos.push({ width: info.width, height: info.height });
         } catch (err) {
-          console.error('获取图片信息失败:', path, err);
           infos.push({ width: 100, height: 100 });
         }
       }
@@ -297,7 +296,11 @@ Component({
      * @param e 组件事件
      */
     onWidthChange(e: WechatMiniprogram.CustomEvent) {
-      this.setData({ outputWidth: e.detail.value });
+      this.setData({ outputWidth: e.detail.value }, () => {
+        if (this.data.hasImages) {
+          this.debouncedGenerate();
+        }
+      });
     },
 
     /**
@@ -305,7 +308,11 @@ Component({
      * @param e 组件事件
      */
     onQualityChange(e: WechatMiniprogram.CustomEvent) {
-      this.setData({ outputQuality: e.detail.value });
+      this.setData({ outputQuality: e.detail.value }, () => {
+        if (this.data.hasImages) {
+          this.debouncedGenerate();
+        }
+      });
     },
 
     /**
@@ -453,8 +460,6 @@ Component({
           canvasNode.width = canvasWidth;
           canvasNode.height = canvasHeight;
 
-          console.log('Canvas尺寸:', canvasWidth, 'x', canvasHeight, '单元格:', cellWidth, 'x', cellHeight, '行列:', rows, 'x', cols);
-
           // 填充背景
           ctx.fillStyle = backgroundColor;
           ctx.fillRect(0, 0, canvasWidth, canvasHeight);
@@ -466,11 +471,8 @@ Component({
             const x = col * (cellWidth + spacing);
             const y = row * (cellHeight + spacing);
 
-            console.log('绘制图片', i, '位置:', x, y, '尺寸:', cellWidth, 'x', cellHeight);
             await this.drawImageToCanvas(ctx, canvasNode, images[i], x, y, cellWidth, cellHeight, borderRadius);
           }
-
-          console.log('所有图片绘制完成');
         }
 
         // 导出图片
@@ -486,7 +488,6 @@ Component({
         });
 
       } catch (err) {
-        console.error('拼图生成失败:', err);
         handleError(err, '拼图生成失败');
         this.setData({ isProcessing: false });
       }
@@ -518,14 +519,8 @@ Component({
 
       // 等待图片加载完成
       await new Promise<void>((resolve, reject) => {
-        image.onload = () => {
-          console.log('图片加载成功:', imagePath);
-          resolve();
-        };
-        image.onerror = (err: any) => {
-          console.error('图片加载失败:', imagePath, err);
-          reject(err);
-        };
+        image.onload = () => resolve();
+        image.onerror = reject;
         image.src = imagePath;
       });
 
@@ -575,8 +570,6 @@ Component({
 
         // 绘制图片
         ctx.drawImage(image, drawX, drawY, drawWidth, drawHeight);
-
-        console.log('图片绘制完成:', imagePath, '单元格:', x, y, width, height, '绘制尺寸:', drawWidth.toFixed(2), 'x', drawHeight.toFixed(2));
       } finally {
         // 确保恢复状态
         ctx.restore();

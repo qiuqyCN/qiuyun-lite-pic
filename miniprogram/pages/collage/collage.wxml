@@ -112,6 +112,9 @@
       activeColor="#41bc3f"
       bind:change="onQualityChange"
     />
+    <view class="quality-tip" wx:if="{{fileType === 'png'}}">
+      <text class="tip-text">提示：PNG为无损格式，画质设置仅对JPG有效</text>
+    </view>
   </view>
 
   <!-- 输出格式 -->
@@ -134,20 +137,22 @@
     />
   </view>
 
+  <!-- 操作按钮：始终显示重置+保存 -->
+  <action-buttons
+    hasResult="{{true}}"
+    isLoading="{{isProcessing}}"
+    primaryText="保存到相册"
+    secondaryText="重置"
+    saveText="保存到相册"
+    loadingText="处理中..."
+    bind:primary="saveToAlbum"
+    bind:secondary="resetCollage"
+    bind:save="saveToAlbum"
+  />
+
   <!-- 底部占位 -->
   <view class="bottom-space"></view>
 </view>
-
-<!-- 操作按钮 -->
-<action-buttons
-  hasResult="{{!!resultPath}}"
-  isLoading="{{isProcessing}}"
-  primaryText="保存到相册"
-  secondaryText="重置"
-  loadingText="保存中..."
-  bind:primary="saveToAlbum"
-  bind:secondary="resetCollage"
-/>
 
 <!-- 隐藏的 Canvas -->
 <canvas type="2d" id="collageCanvas" class="hidden-canvas"></canvas>

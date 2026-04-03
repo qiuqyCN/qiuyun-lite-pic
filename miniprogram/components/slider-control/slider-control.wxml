@@ -12,6 +12,7 @@
       value="{{currentValue}}"
       min="{{min}}"
       max="{{max}}"
+      step="{{step}}"
       activeColor="{{activeColor}}"
       block-size="20"
       bindchanging="onChanging"

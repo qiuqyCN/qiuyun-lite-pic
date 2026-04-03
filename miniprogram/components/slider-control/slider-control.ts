@@ -23,6 +23,11 @@ Component({
       type: Number,
       value: 100
     },
+    // 步长
+    step: {
+      type: Number,
+      value: 1
+    },
     // 单位
     unit: {
       type: String,
