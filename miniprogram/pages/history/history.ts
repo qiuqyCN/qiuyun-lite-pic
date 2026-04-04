@@ -300,8 +300,27 @@ Component({
         return;
       }
 
-      // 预览处理后的图片
-      if (item.resultPath) {
+      // 跳转到对应的工具页面
+      const toolPaths: Record<string, string> = {
+        'compress': '/pages/compress/compress',
+        'resize': '/pages/resize/resize',
+        'convert': '/pages/convert/convert',
+        'filter': '/pages/filter/filter',
+        'watermark': '/pages/watermark/watermark',
+        'collage': '/pages/collage/collage',
+        'crop': '/pages/crop/crop',
+        'rotate': '/pages/rotate/rotate',
+        'annotate': '/pages/annotate/annotate',
+        'colorpicker': '/pages/colorpicker/colorpicker'
+      };
+
+      const path = toolPaths[item.type];
+      if (path) {
+        wx.navigateTo({
+          url: path
+        });
+      } else if (item.resultPath) {
+        // 如果没有对应页面，预览处理后的图片
         wx.previewImage({
           urls: [item.resultPath],
           current: item.resultPath

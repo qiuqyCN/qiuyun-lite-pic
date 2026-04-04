@@ -49,6 +49,9 @@ Component({
     /**
      * 选择图片
      */
+    /**
+     * 选择图片
+     */
     async chooseImage() {
       try {
         const imageInfo = await chooseImage();
@@ -232,7 +235,8 @@ Component({
         params: {
           quality: this.data.quality,
           originalSize: this.data.originalSize,
-          compressedSize: this.data.compressedSize
+          compressedSize: this.data.compressedSize,
+          savedPercent: this.data.savedPercent
         }
       });
     },

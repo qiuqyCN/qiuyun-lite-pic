@@ -27,6 +27,27 @@
     </view>
   </view>
 
+  <!-- Share -->
+  <view class="section">
+    <view class="section-title">分享</view>
+    <view class="settings-card">
+      <view class="setting-item weapp-code-item">
+        <view class="setting-left">
+          <view class="icon-wrapper share-icon">
+            <text class="icon">📱</text>
+          </view>
+          <view class="setting-info">
+            <text class="setting-name">小程序码</text>
+            <text class="setting-desc">扫码体验秋云轻图</text>
+          </view>
+        </view>
+        <view class="setting-right">
+          <image class="weapp-code-img" src="/images/weappcode.png" mode="aspectFit" show-menu-by-longpress/>
+        </view>
+      </view>
+    </view>
+  </view>
+
   <!-- About -->
   <view class="section">
     <view class="section-title">关于</view>

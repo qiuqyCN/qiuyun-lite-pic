@@ -82,6 +82,10 @@
   background: #f6ffed;
 }
 
+.share-icon {
+  background: #e6fffb;
+}
+
 .icon {
   font-size: 36rpx;
 }
@@ -185,6 +189,18 @@
 .slogan {
   font-size: 24rpx;
   color: #c7c7cc;
+}
+
+/* 小程序码 */
+.weapp-code-item {
+  padding: 24rpx;
+}
+
+.weapp-code-img {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  border: 1rpx solid #f0f0f0;
 }
 
 /* Safe Area */
