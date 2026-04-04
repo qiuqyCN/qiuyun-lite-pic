@@ -112,11 +112,9 @@
 
     <!-- 操作按钮 -->
     <action-buttons
-      hasResult="{{true}}"
       saveText="复制颜色"
-      secondaryText="重置"
+      bind:reset="resetPicker"
       bind:save="copyColor"
-      bind:secondary="resetPicker"
     />
   </block>
 </view>

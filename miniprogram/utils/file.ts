@@ -39,9 +39,18 @@ export const previewImage = (urls: string[], current?: string): void => {
  * @param filePath 文件路径
  * @returns 文件大小
  */
-export const getFileSize = async (filePath: string): Promise<number> => {
-  const res = await wx.getFileInfo({ filePath });
-  return res.size;
+export const getFileSize = (filePath: string): Promise<number> => {
+  return new Promise((resolve, reject) => {
+    const fs = wx.getFileSystemManager();
+    fs.getFileInfo({
+      filePath,
+      success: (res) => resolve(res.size || 0),
+      fail: (err) => {
+        console.log('获取文件大小失败', err);
+        resolve(0);
+      }
+    });
+  });
 };
 
 /**
@@ -70,62 +79,82 @@ export const removeTempFiles = async (filePaths: string[]): Promise<void> => {
  * 计算缓存大小
  * @returns 缓存大小（字节）
  */
-export const calculateCacheSize = async (): Promise<number> => {
-  try {
-    const res: any = await wx.getFileSystemManager().stat({
+export const calculateCacheSize = (): Promise<number> => {
+  return new Promise((resolve) => {
+    const fs = wx.getFileSystemManager();
+    fs.stat({
       path: wx.env.USER_DATA_PATH,
-      recursive: true
-    });
-    
-    let totalSize = 0;
-    const calcSize = (stats: any[]) => {
-      for (const stat of stats) {
-        if (stat.stats.isFile()) {
-          totalSize += stat.stats.size;
-        } else if (stat.stats.isDirectory() && stat.children) {
-          calcSize(stat.children);
+      recursive: true,
+      success: (res: any) => {
+        if (!res || !res.stats) {
+          resolve(0);
+          return;
         }
+
+        let totalSize = 0;
+        const calcSize = (stats: any[]) => {
+          if (!stats || !Array.isArray(stats)) return;
+          for (const stat of stats) {
+            if (stat && stat.stats) {
+              if (typeof stat.stats.isFile === 'function' && stat.stats.isFile()) {
+                totalSize += stat.stats.size || 0;
+              } else if (typeof stat.stats.isDirectory === 'function' && stat.stats.isDirectory() && stat.children) {
+                calcSize(stat.children);
+              }
+            }
+          }
+        };
+
+        calcSize(res.stats);
+        resolve(totalSize);
+      },
+      fail: (err) => {
+        console.log('计算缓存大小失败', err);
+        resolve(0);
       }
-    };
-    
-    calcSize(res.stats || []);
-    return totalSize;
-  } catch (err) {
-    console.log('计算缓存大小失败', err);
-    return 0;
-  }
+    });
+  });
 };
 
 /**
  * 清理缓存
  */
-export const clearCache = async (): Promise<void> => {
-  try {
+export const clearCache = (): Promise<void> => {
+  return new Promise((resolve) => {
     const fs = wx.getFileSystemManager();
-    const res: any = await fs.stat({
+    fs.stat({
       path: wx.env.USER_DATA_PATH,
-      recursive: true
-    });
-    
-    const removeFiles = (stats: any[], basePath: string) => {
-      for (const stat of stats) {
-        const fullPath = `${basePath}/${stat.path}`;
-        if (stat.stats.isFile()) {
-          try {
-            fs.unlink({ filePath: fullPath } as any);
-          } catch (err) {
-            console.log('删除文件失败', fullPath);
-          }
-        } else if (stat.stats.isDirectory() && stat.children) {
-          removeFiles(stat.children, fullPath);
+      recursive: true,
+      success: (res: any) => {
+        if (!res || !res.stats) {
+          resolve();
+          return;
         }
+
+        const removeFiles = (stats: any[], basePath: string) => {
+          for (const stat of stats) {
+            const fullPath = `${basePath}/${stat.path}`;
+            if (stat.stats && typeof stat.stats.isFile === 'function' && stat.stats.isFile()) {
+              try {
+                fs.unlink({ filePath: fullPath } as any);
+              } catch (err) {
+                console.log('删除文件失败', fullPath);
+              }
+            } else if (stat.stats && typeof stat.stats.isDirectory === 'function' && stat.stats.isDirectory() && stat.children) {
+              removeFiles(stat.children, fullPath);
+            }
+          }
+        };
+
+        removeFiles(res.stats, wx.env.USER_DATA_PATH);
+        resolve();
+      },
+      fail: (err) => {
+        console.log('清理缓存失败', err);
+        resolve();
       }
-    };
-    
-    removeFiles(res.stats || [], wx.env.USER_DATA_PATH);
-  } catch (err) {
-    console.log('清理缓存失败', err);
-  }
+    });
+  });
 };
 
 /**

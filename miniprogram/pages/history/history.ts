@@ -1,12 +1,16 @@
 // history.ts
 // 历史记录页面
 
-import { getHistory, clearHistory } from '../../utils/history';
+import { getHistory, clearHistory, removeHistoryItem } from '../../utils/history';
 
 Component({
   data: {
     historyList: [] as any[],
-    hasMore: false
+    hasMore: false,
+    touchStartX: 0,
+    touchStartY: 0,
+    currentSwipingId: null as string | null,
+    swipeThreshold: -80 // 滑动阈值，负值表示向左滑动
   },
 
   lifetimes: {
@@ -22,15 +26,178 @@ Component({
   },
 
   methods: {
+    // 格式化相对时间
+    formatRelativeTime(timestamp: number): string {
+      const now = Date.now();
+      const diff = now - timestamp;
+      const minute = 60 * 1000;
+      const hour = 60 * minute;
+      const day = 24 * hour;
+      const week = 7 * day;
+      const month = 30 * day;
+
+      if (diff < minute) {
+        return '刚刚';
+      } else if (diff < hour) {
+        return `${Math.floor(diff / minute)}分钟前`;
+      } else if (diff < day) {
+        return `${Math.floor(diff / hour)}小时前`;
+      } else if (diff < week) {
+        return `${Math.floor(diff / day)}天前`;
+      } else if (diff < month) {
+        return `${Math.floor(diff / week)}周前`;
+      } else {
+        const date = new Date(timestamp);
+        return `${date.getMonth() + 1}月${date.getDate()}日`;
+      }
+    },
+
+    // 格式化完整时间
+    formatTime(timestamp: number): string {
+      const date = new Date(timestamp);
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${month}-${day} ${hours}:${minutes}`;
+    },
+
     loadHistory() {
       const history = getHistory();
+      // 添加相对时间和格式化时间
+      const formattedHistory = history.map(item => ({
+        ...item,
+        timeStr: this.formatTime(item.timestamp),
+        relativeTime: this.formatRelativeTime(item.timestamp),
+        translateX: 0
+      }));
       this.setData({
-        historyList: history
+        historyList: formattedHistory
+      });
+    },
+
+    // 触摸开始
+    onTouchStart(e: WechatMiniprogram.TouchEvent) {
+      const touch = e.touches[0];
+      const id = e.currentTarget.dataset.id;
+      
+      this.setData({
+        touchStartX: touch.clientX,
+        touchStartY: touch.clientY,
+        currentSwipingId: id
+      });
+
+      // 重置其他项的滑动状态
+      const { historyList } = this.data;
+      let needUpdate = false;
+      const newList = historyList.map((item: any) => {
+        if (item.id !== id && item.translateX !== 0) {
+          needUpdate = true;
+          return { ...item, translateX: 0 };
+        }
+        return item;
+      });
+      
+      if (needUpdate) {
+        this.setData({ historyList: newList });
+      }
+    },
+
+    // 触摸移动
+    onTouchMove(e: WechatMiniprogram.TouchEvent) {
+      const touch = e.touches[0];
+      const { touchStartX, currentSwipingId, swipeThreshold, historyList } = this.data;
+      
+      if (!currentSwipingId) return;
+
+      const deltaX = touch.clientX - touchStartX;
+      
+      // 只允许向左滑动
+      let translateX = deltaX;
+      if (translateX > 0) {
+        translateX = 0;
+      } else if (translateX < swipeThreshold) {
+        translateX = swipeThreshold;
+      }
+
+      const newList = historyList.map((item: any) => {
+        if (item.id === currentSwipingId) {
+          return { ...item, translateX };
+        }
+        return item;
+      });
+
+      this.setData({ historyList: newList });
+    },
+
+    // 触摸结束
+    onTouchEnd(e: WechatMiniprogram.TouchEvent) {
+      const { currentSwipingId, swipeThreshold, historyList } = this.data;
+      
+      if (!currentSwipingId) return;
+
+      const item = historyList.find((h: any) => h.id === currentSwipingId);
+      if (!item) return;
+
+      // 判断是否超过阈值，决定是展开还是收起
+      let translateX = 0;
+      if (item.translateX <= swipeThreshold / 2) {
+        translateX = swipeThreshold; // 展开
+      }
+
+      const newList = historyList.map((h: any) => {
+        if (h.id === currentSwipingId) {
+          return { ...h, translateX };
+        }
+        return h;
+      });
+
+      this.setData({
+        historyList: newList,
+        currentSwipingId: null
+      });
+    },
+
+    // 删除单条记录
+    onDeleteItem(e: WechatMiniprogram.TouchEvent) {
+      const { id } = e.currentTarget.dataset;
+      
+      wx.showModal({
+        title: '确认删除',
+        content: '确定要删除这条记录吗？',
+        showCancel: true,
+        cancelText: '取消',
+        confirmText: '删除',
+        confirmColor: '#ff4d4f',
+        success: (res) => {
+          if (res.confirm) {
+            removeHistoryItem(id);
+            this.loadHistory();
+            wx.showToast({
+              title: '已删除',
+              icon: 'success'
+            });
+          }
+        }
       });
     },
 
     onHistoryTap(e: WechatMiniprogram.TouchEvent) {
+      // 如果正在滑动，不触发点击
       const { item } = e.currentTarget.dataset;
+      if (item.translateX !== 0) {
+        // 收起滑动
+        const { historyList } = this.data;
+        const newList = historyList.map((h: any) => {
+          if (h.id === item.id) {
+            return { ...h, translateX: 0 };
+          }
+          return h;
+        });
+        this.setData({ historyList: newList });
+        return;
+      }
+
       // 预览处理后的图片
       if (item.resultPath) {
         wx.previewImage({

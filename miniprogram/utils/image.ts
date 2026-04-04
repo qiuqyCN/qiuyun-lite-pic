@@ -2,6 +2,7 @@
 // 图片处理工具函数
 
 import type { ImageInfo } from '../types/index';
+import { getFileSize } from './file';
 
 /**
  * 选择图片
@@ -64,16 +65,16 @@ export const chooseMultipleImages = async (count: number = 9): Promise<ImageInfo
  * @returns 图片信息
  */
 export const getImageInfo = async (path: string): Promise<ImageInfo> => {
-  const [imageInfo, fileInfo] = await Promise.all([
+  const [imageInfo, fileSize] = await Promise.all([
     wx.getImageInfo({ src: path }),
-    wx.getFileInfo({ filePath: path })
+    getFileSize(path)
   ]);
 
   return {
     path,
     width: imageInfo.width,
     height: imageInfo.height,
-    size: fileInfo.size,
+    size: fileSize,
     type: imageInfo.type
   };
 };

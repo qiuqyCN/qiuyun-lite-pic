@@ -1,30 +1,17 @@
 // components/action-buttons/action-buttons.ts
-// 操作按钮组件
+// 操作按钮组件 - 重置 + 保存到相册
 
 Component({
-  /**
-   * 组件属性
-   */
   properties: {
-    /** 是否有结果 */
-    hasResult: {
-      type: Boolean,
-      value: false
-    },
     /** 是否处理中 */
     isLoading: {
       type: Boolean,
       value: false
     },
-    /** 主按钮文字 */
-    primaryText: {
+    /** 重置按钮文字 */
+    resetText: {
       type: String,
-      value: '确认'
-    },
-    /** 次按钮文字 */
-    secondaryText: {
-      type: String,
-      value: '重新操作'
+      value: '重置'
     },
     /** 保存按钮文字 */
     saveText: {
@@ -36,36 +23,19 @@ Component({
       type: String,
       value: '处理中...'
     },
-    /** 是否禁用 */
+    /** 是否禁用保存按钮 */
     disabled: {
       type: Boolean,
       value: false
     }
   },
 
-  /**
-   * 组件方法
-   */
   methods: {
-    /**
-     * 点击主按钮
-     */
-    onPrimaryTap() {
+    onResetTap() {
       if (this.data.isLoading) return;
-      this.triggerEvent('primary');
+      this.triggerEvent('reset');
     },
 
-    /**
-     * 点击次按钮
-     */
-    onSecondaryTap() {
-      if (this.data.isLoading) return;
-      this.triggerEvent('secondary');
-    },
-
-    /**
-     * 点击保存按钮
-     */
     onSaveTap() {
       if (this.data.isLoading) return;
       this.triggerEvent('save');

@@ -4,13 +4,13 @@
   <view class="page-header">
     <view class="header-content">
       <text class="header-title">处理历史</text>
-      <text class="header-count" wx:if="{{historyList.length > 0}}">{{historyList.length}} 条记录</text>
+      <text class="header-count" wx:if="{{historyList.length > 0}}">共 {{historyList.length}} 条记录</text>
     </view>
     <view 
-      class="clear-btn" 
+      class="clear-btn {{historyList.length === 0 ? 'disabled' : ''}}"
       bindtap="onClearHistory"
-      wx:if="{{historyList.length > 0}}"
     >
+      <text class="clear-icon">🗑</text>
       <text class="clear-text">清空</text>
     </view>
   </view>
@@ -19,32 +19,120 @@
   <view wx:if="{{historyList.length > 0}}" class="history-container">
     <view class="history-list">
       <view 
-        class="history-item" 
+        class="history-item-wrapper"
         wx:for="{{historyList}}" 
         wx:key="id"
-        data-item="{{item}}"
-        bindtap="onHistoryTap"
+        data-id="{{item.id}}"
+        bindtouchstart="onTouchStart"
+        bindtouchmove="onTouchMove"
+        bindtouchend="onTouchEnd"
       >
-        <view class="image-wrapper">
-          <image class="history-thumb" src="{{item.resultPath}}" mode="aspectFill"/>
-          <view class="type-tag">{{item.typeName}}</view>
+        <!-- 删除按钮 -->
+        <view class="delete-btn" bindtap="onDeleteItem" data-id="{{item.id}}">
+          <text class="delete-text">删除</text>
         </view>
-        <view class="history-info">
-          <text class="history-time">{{item.timeStr}}</text>
-          <view class="history-meta" wx:if="{{item.params}}">
-            <text class="meta-item" wx:if="{{item.params.imageCount}}">{{item.params.imageCount}}张图片</text>
-            <text class="meta-item" wx:if="{{item.params.layout}}">{{item.params.layout}}</text>
-            <text class="meta-item" wx:if="{{item.params.watermarkText}}">文字水印</text>
+        
+        <!-- 历史记录项 -->
+        <view 
+          class="history-item" 
+          style="transform: translateX({{item.translateX || 0}}px)"
+          data-item="{{item}}"
+          bindtap="onHistoryTap"
+        >
+          <!-- 图片预览 -->
+          <view class="image-wrapper">
+            <image class="history-thumb" src="{{item.resultPath || item.originalPath}}" mode="aspectFill"/>
+            <view class="type-badge" style="background: {{item.type === 'colorpicker' ? '#ff6b6b' : '#41bc3f'}}">
+              {{item.typeName}}
+            </view>
           </view>
-        </view>
-        <view class="arrow">
-          <text class="arrow-icon">›</text>
+          
+          <!-- 信息区域 -->
+          <view class="history-info">
+            <view class="info-header">
+              <text class="history-time">{{item.timeStr}}</text>
+              <text class="history-relative-time">{{item.relativeTime}}</text>
+            </view>
+            
+            <!-- 参数标签 -->
+            <view class="params-tags">
+              <!-- 拼图 -->
+              <block wx:if="{{item.type === 'collage'}}">
+                <view class="tag">{{item.params.imageCount || (item.images && item.images.length) || 2}}张图片</view>
+                <view class="tag tag-primary">{{item.params.layout || '双格'}}</view>
+              </block>
+              
+              <!-- 水印 -->
+              <block wx:if="{{item.type === 'watermark'}}">
+                <view class="tag">{{item.params.watermarkType === 'image' ? '图片水印' : '文字水印'}}</view>
+                <view class="tag tag-primary" wx:if="{{item.params.watermarkText}}">{{item.params.watermarkText}}</view>
+              </block>
+              
+              <!-- 裁剪 -->
+              <block wx:if="{{item.type === 'crop'}}">
+                <view class="tag">{{item.params.originalWidth}}×{{item.params.originalHeight}}</view>
+                <view class="tag tag-primary">{{item.params.aspectRatio || '自由裁剪'}}</view>
+              </block>
+              
+              <!-- 旋转 -->
+              <block wx:if="{{item.type === 'rotate'}}">
+                <view class="tag" wx:if="{{item.params.rotation}}">旋转{{item.params.rotation}}°</view>
+                <view class="tag tag-primary" wx:if="{{item.params.flipH}}">水平翻转</view>
+                <view class="tag tag-primary" wx:if="{{item.params.flipV}}">垂直翻转</view>
+              </block>
+              
+              <!-- 标注 -->
+              <block wx:if="{{item.type === 'annotate'}}">
+                <view class="tag">{{item.params.isEraser ? '橡皮擦' : '画笔'}}</view>
+                <view class="tag tag-primary" style="background: {{item.params.brushColor}}; color: #fff;" wx:if="{{!item.params.isEraser}}">
+                  {{item.params.brushColor}}
+                </view>
+              </block>
+              
+              <!-- 取色 -->
+              <block wx:if="{{item.type === 'colorpicker'}}">
+                <view class="tag tag-primary" style="background: {{item.params.color}}; color: #fff;">
+                  {{item.params.color}}
+                </view>
+                <view class="tag">{{(item.params.format && item.params.format.toUpperCase()) || 'HEX'}}</view>
+              </block>
+              
+              <!-- 压缩 -->
+              <block wx:if="{{item.type === 'compress'}}">
+                <view class="tag">质量 {{item.params.quality}}%</view>
+                <view class="tag tag-success" wx:if="{{item.params.savedPercent}}">
+                  节省 {{item.params.savedPercent}}%
+                </view>
+              </block>
+              
+              <!-- 尺寸调整 -->
+              <block wx:if="{{item.type === 'resize'}}">
+                <view class="tag">{{item.params.targetWidth}}×{{item.params.targetHeight}}</view>
+              </block>
+              
+              <!-- 滤镜 -->
+              <block wx:if="{{item.type === 'filter'}}">
+                <view class="tag tag-primary">{{item.params.filter || '原图'}}</view>
+                <view class="tag">强度 {{item.params.intensity}}%</view>
+              </block>
+              
+              <!-- 格式转换 -->
+              <block wx:if="{{item.type === 'convert'}}">
+                <view class="tag">{{item.params.originalFormat}} → {{item.params.convertedFormat}}</view>
+              </block>
+            </view>
+          </view>
+          
+          <!-- 箭头 -->
+          <view class="arrow">
+            <text class="arrow-icon">›</text>
+          </view>
         </view>
       </view>
     </view>
     
     <view class="list-footer">
-      <text class="footer-text">仅保留最近 20 条记录</text>
+      <text class="footer-text">— 仅保留最近 20 条记录 —</text>
     </view>
   </view>
   
@@ -52,13 +140,13 @@
   <view wx:else class="empty-state">
     <view class="empty-illustration">
       <view class="empty-circle">
-        <text class="empty-icon">📝</text>
+        <text class="empty-icon">📷</text>
       </view>
     </view>
     <text class="empty-title">暂无处理记录</text>
-    <text class="empty-desc">您处理的图片将显示在这里</text>
+    <text class="empty-desc">开始处理图片，记录将显示在这里</text>
     <view class="empty-action" bindtap="goToHome">
-      <text class="action-text">开始处理图片</text>
+      <text class="action-text">去处理图片</text>
       <text class="action-arrow">→</text>
     </view>
   </view>

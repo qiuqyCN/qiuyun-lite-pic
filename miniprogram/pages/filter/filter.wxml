@@ -57,14 +57,8 @@
 
     <!-- 操作按钮：始终显示重置+保存 -->
     <action-buttons
-      hasResult="{{true}}"
       isLoading="{{isProcessing}}"
-      primaryText="保存到相册"
-      secondaryText="重置"
-      saveText="保存到相册"
-      loadingText="处理中..."
-      bind:primary="saveToAlbum"
-      bind:secondary="resetFilter"
+      bind:reset="resetFilter"
       bind:save="saveToAlbum"
     />
   </view>

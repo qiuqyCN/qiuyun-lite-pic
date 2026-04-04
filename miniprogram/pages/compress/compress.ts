@@ -3,7 +3,7 @@
 
 import { chooseImage, calculateSavedPercent } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
-import { saveImageToAlbum } from '../../utils/file';
+import { saveImageToAlbum, getFileSize } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
 import { handleError, showSuccess, showLoading } from '../../utils/error';
 import { debounce } from '../../utils/debounce';
@@ -188,8 +188,7 @@ Component({
         });
 
         // 获取压缩后文件大小
-        const fileInfo = await wx.getFileInfo({ filePath: tempFilePath });
-        const compressedSize = Math.round(fileInfo.size / 1024);
+        const compressedSize = await getFileSize(tempFilePath).then(size => Math.round(size / 1024));
         const savedPercent = calculateSavedPercent(this.data.originalSize, compressedSize);
 
         this.setData({

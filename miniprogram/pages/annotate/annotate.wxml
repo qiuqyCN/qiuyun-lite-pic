@@ -150,14 +150,8 @@
 
     <!-- 操作按钮 -->
     <action-buttons
-      hasResult="{{true}}"
       isLoading="{{isProcessing}}"
-      primaryText="保存到相册"
-      secondaryText="重置"
-      saveText="保存到相册"
-      loadingText="处理中..."
-      bind:primary="saveToAlbum"
-      bind:secondary="resetCanvas"
+      bind:reset="resetCanvas"
       bind:save="saveToAlbum"
     />
   </block>
