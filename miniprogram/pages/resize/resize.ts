@@ -405,6 +405,9 @@ Component({
       try {
         await saveImageToAlbum(resultPath);
         showSuccess('已保存到相册');
+
+        // 保存到历史记录
+        this.saveToHistory();
       } catch (err) {
         handleError(err, '保存失败');
       } finally {

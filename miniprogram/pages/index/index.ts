@@ -10,6 +10,7 @@ interface ToolItem {
   path: string;
   isHot?: boolean;
   isNew?: boolean;
+  isDeveloping?: boolean;
 }
 
 interface ToolCategory {
@@ -42,12 +43,21 @@ Component({
             isHot: true
           },
           {
+            id: 'convert',
+            name: '格式转换',
+            description: '多格式导入，转为 JPG/PNG',
+            icon: '🔄',
+            iconBg: '#fff0f0',
+            path: '/pages/convert/convert'
+          },
+          {
             id: 'resize',
             name: '尺寸调整',
             description: '裁剪、缩放，适配各种平台尺寸',
             icon: '📐',
             iconBg: '#f0f0ff',
-            path: '/pages/resize/resize'
+            path: '/pages/resize/resize',
+            isHot: true
           },
           {
             id: 'crop',
@@ -55,8 +65,7 @@ Component({
             description: '自由裁剪，支持多种比例',
             icon: '✂️',
             iconBg: '#ffe8e8',
-            path: '/pages/crop/crop',
-            isNew: true
+            path: '/pages/crop/crop'
           },
           {
             id: 'rotate',
@@ -64,16 +73,7 @@ Component({
             description: '任意角度旋转，水平垂直翻转',
             icon: '↻',
             iconBg: '#e8f8ff',
-            path: '/pages/rotate/rotate',
-            isNew: true
-          },
-          {
-            id: 'convert',
-            name: '格式转换',
-            description: '多格式导入，转为 JPG/PNG',
-            icon: '🔄',
-            iconBg: '#fff0f0',
-            path: '/pages/convert/convert'
+            path: '/pages/rotate/rotate'
           }
         ]
       },
@@ -90,15 +90,6 @@ Component({
             path: '/pages/filter/filter'
           },
           {
-            id: 'annotate',
-            name: '标注涂鸦',
-            description: '自由涂鸦标注，支持多种颜色',
-            icon: '✏️',
-            iconBg: '#fff0e8',
-            path: '/pages/annotate/annotate',
-            isNew: true
-          },
-          {
             id: 'watermark',
             name: '添加水印',
             description: '文字或图片水印，保护作品版权',
@@ -113,6 +104,15 @@ Component({
             icon: '🖼️',
             iconBg: '#f0fff0',
             path: '/pages/collage/collage'
+          },
+          {
+            id: 'annotate',
+            name: '标注涂鸦',
+            description: '自由涂鸦标注，支持多种颜色',
+            icon: '✏️',
+            iconBg: '#fff0e8',
+            path: '/pages/annotate/annotate',
+            isNew: true
           }
         ]
       },
@@ -126,7 +126,8 @@ Component({
             description: 'AI 自动识别，一键更换背景',
             icon: '✂️',
             iconBg: '#ffe8f0',
-            path: '/pages/cutout/cutout'
+            path: '/pages/cutout/cutout',
+            isDeveloping: true
           },
           {
             id: 'colorpicker',
@@ -179,7 +180,6 @@ Component({
       if (stats.lastDate !== today) {
         stats.todayCount = 0;
         stats.lastDate = today;
-        wx.setStorageSync('usageStats', stats);
       }
       
       this.setData({
@@ -190,42 +190,51 @@ Component({
         }
       });
     },
-    
-    // 工具点击
-    onToolTap(e: WechatMiniprogram.TouchEvent) {
-      const { toolId, path } = e.currentTarget.dataset;
+
+    // 导航到工具页面
+    navigateToTool(e: WechatMiniprogram.TouchEvent) {
+      const { path, isDeveloping } = e.currentTarget.dataset;
       
-      if (toolId === 'more') {
+      // 如果是开发中，显示提示
+      if (isDeveloping) {
         wx.showToast({
-          title: '更多功能开发中',
+          title: '功能开发中',
           icon: 'none'
         });
         return;
       }
       
-      // 记录最近使用
-      this.addToRecent(toolId);
+      wx.navigateTo({ url: path });
+    },
+
+    // 更新使用统计
+    updateUsageStats(savedSpace: number = 0) {
+      const stats = wx.getStorageSync('usageStats') || {
+        todayCount: 0,
+        totalCount: 0,
+        savedSpace: 0,
+        lastDate: new Date().toDateString()
+      };
       
-      // 跳转到功能页面
-      wx.navigateTo({
-        url: path
+      const today = new Date().toDateString();
+      if (stats.lastDate !== today) {
+        stats.todayCount = 0;
+        stats.lastDate = today;
+      }
+      
+      stats.todayCount++;
+      stats.totalCount++;
+      stats.savedSpace += savedSpace;
+      
+      wx.setStorageSync('usageStats', stats);
+      
+      this.setData({
+        usageStats: {
+          todayCount: stats.todayCount,
+          totalCount: stats.totalCount,
+          savedSpace: stats.savedSpace
+        }
       });
-    },
-    
-    // 添加到最近使用
-    addToRecent(toolId: string) {
-      let recent = wx.getStorageSync('recentUsed') || [];
-      recent = recent.filter((id: string) => id !== toolId);
-      recent.unshift(toolId);
-      recent = recent.slice(0, 4);
-      wx.setStorageSync('recentUsed', recent);
-      this.setData({ recentUsed: recent });
-    },
-    
-    // 下拉刷新
-    onPullDownRefresh() {
-      this.loadUsageStats();
-      wx.stopPullDownRefresh();
     }
   }
 });

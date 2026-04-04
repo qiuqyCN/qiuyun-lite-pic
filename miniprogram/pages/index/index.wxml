@@ -23,13 +23,14 @@
       <!-- 工具列表 -->
       <view class="tools-list">
         <view 
-          class="tool-card"
+          class="tool-card {{tool.isDeveloping ? 'tool-developing' : ''}}"
           wx:for="{{category.tools}}"
           wx:key="id"
           wx:for-item="tool"
           data-tool-id="{{tool.id}}"
           data-path="{{tool.path}}"
-          bindtap="onToolTap"
+          data-is-developing="{{tool.isDeveloping}}"
+          bindtap="navigateToTool"
         >
           <!-- 左侧图标 -->
           <view class="tool-icon-wrapper" style="background: {{tool.iconBg}};">
@@ -43,6 +44,7 @@
               <view class="tool-badges">
                 <view wx:if="{{tool.isHot}}" class="badge-hot">HOT</view>
                 <view wx:if="{{tool.isNew}}" class="badge-new">NEW</view>
+                <view wx:if="{{tool.isDeveloping}}" class="badge-developing">开发中</view>
               </view>
             </view>
             <text class="tool-description">{{tool.description}}</text>
