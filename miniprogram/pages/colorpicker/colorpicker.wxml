@@ -1,5 +1,5 @@
 <!-- colorpicker.wxml -->
-<!-- 图片取色页面 -->
+<!-- 图片取色页面 - 增强版 -->
 
 <view class="container">
   <!-- 未选择图片状态 -->
@@ -23,13 +23,14 @@
     />
 
     <!-- 取色画布 -->
-    <view class="section">
+    <view class="section picker-section">
       <view class="section-title">点击取色</view>
-      <view class="canvas-wrapper">
+      <view class="canvas-wrapper" style="width: {{canvasWidth}}px; height: {{canvasHeight}}px; margin: 0 auto;">
         <canvas
           type="2d"
           id="colorCanvas"
           class="color-canvas"
+          style="width: {{canvasWidth}}px; height: {{canvasHeight}}px;"
           bindtouchstart="onTouchStart"
           bindtouchmove="onTouchMove"
           bindtouchend="onTouchEnd"
@@ -40,48 +41,82 @@
           class="magnifier"
           style="left: {{magnifierX}}px; top: {{magnifierY}}px;"
         >
-          <view class="magnifier-inner"></view>
+          <canvas
+            type="2d"
+            id="magnifierCanvas"
+            class="magnifier-canvas"
+          ></canvas>
         </view>
       </view>
-      <view class="canvas-hint">点击图片任意位置取色</view>
+      <view class="canvas-hint">长按并拖动取色，松开后查看结果</view>
     </view>
 
     <!-- 取色结果 -->
     <view wx:if="{{pickedColor}}" class="section">
       <view class="section-title">取色结果</view>
-      <view class="color-result" bindtap="copyColor">
+      <view class="color-result">
         <view
           class="color-preview"
           style="background-color: {{pickedColor}};"
-        ></view>
-        <view class="color-info">
-          <text class="color-hex">{{pickedColor}}</text>
-          <text class="color-rgb">{{pickedColorRgb}}</text>
+          bindtap="toggleFavorite"
+        >
+          <text class="favorite-icon">{{favoriteColors.includes(pickedColor) ? '★' : '☆'}}</text>
         </view>
-        <text class="copy-hint">点击复制</text>
+        <view class="color-info" bindtap="switchColorFormat">
+          <text class="color-value">
+            {{colorFormat === 'hex' ? pickedColor : (colorFormat === 'rgb' ? pickedColorRgb : pickedColorHsl)}}
+          </text>
+          <text class="color-format">点击切换格式 (支持 HEX / RGB / HSL)</text>
+        </view>
+        <view class="copy-btn" bindtap="copyColor">
+          <text class="copy-icon">📋</text>
+          <text class="copy-text">复制</text>
+        </view>
       </view>
     </view>
 
-    <!-- 输出格式 -->
-    <format-selector
-      value="{{fileType}}"
-      mode="horizontal"
-      showDesc="{{false}}"
-      bind:change="onFormatChange"
-    />
+    <!-- 最近取色历史 -->
+    <view wx:if="{{colorHistory.length > 0}}" class="section">
+      <view class="section-title">最近取色</view>
+      <scroll-view scroll-x class="history-scroll">
+        <view class="history-list">
+          <view
+            wx:for="{{colorHistory}}"
+            wx:key="*this"
+            class="history-item"
+            style="background-color: {{item}};"
+            data-color="{{item}}"
+            bindtap="selectFromHistory"
+          ></view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 收藏颜色 -->
+    <view class="section">
+      <view class="section-title">收藏颜色</view>
+      <view class="favorite-list">
+        <view
+          wx:for="{{favoriteColors}}"
+          wx:key="*this"
+          class="favorite-item"
+          style="background-color: {{item}};"
+          data-color="{{item}}"
+          bindtap="selectFromFavorites"
+        ></view>
+        <view wx:if="{{favoriteColors.length === 0}}" class="favorite-empty">
+          点击取色结果中的星号收藏颜色
+        </view>
+      </view>
+    </view>
 
     <!-- 操作按钮 -->
     <action-buttons
       hasResult="{{true}}"
-      isLoading="{{isProcessing}}"
-      primaryText="保存到相册"
-      saveText="保存到相册"
-      loadingText="处理中..."
-      bind:primary="saveToAlbum"
-      bind:save="saveToAlbum"
+      saveText="复制颜色"
+      secondaryText="重置"
+      bind:save="copyColor"
+      bind:secondary="resetPicker"
     />
-
-    <!-- 隐藏Canvas -->
-    <canvas type="2d" id="saveCanvas" class="hidden-canvas"></canvas>
   </block>
 </view>
