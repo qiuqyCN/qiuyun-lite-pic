@@ -64,17 +64,75 @@ Component({
 
     /**
      * 判断颜色是否为浅色
-     * @param color 颜色值（HEX格式）
+     * 支持 HEX、RGB、HSL 格式
+     * @param color 颜色值
      * @returns 是否为浅色
      */
     isLightColor(color: string): boolean {
-      if (!color || !color.startsWith('#')) return false;
+      if (!color) return false;
 
-      // 提取RGB值
-      const hex = color.replace('#', '');
-      const r = parseInt(hex.substring(0, 2), 16) || 0;
-      const g = parseInt(hex.substring(2, 4), 16) || 0;
-      const b = parseInt(hex.substring(4, 6), 16) || 0;
+      let r = 0, g = 0, b = 0;
+
+      // HEX 格式: #ffffff 或 #fff
+      if (color.startsWith('#')) {
+        const hex = color.replace('#', '');
+        if (hex.length === 3) {
+          // 短格式 #fff
+          r = parseInt(hex[0] + hex[0], 16) || 0;
+          g = parseInt(hex[1] + hex[1], 16) || 0;
+          b = parseInt(hex[2] + hex[2], 16) || 0;
+        } else {
+          // 长格式 #ffffff
+          r = parseInt(hex.substring(0, 2), 16) || 0;
+          g = parseInt(hex.substring(2, 4), 16) || 0;
+          b = parseInt(hex.substring(4, 6), 16) || 0;
+        }
+      }
+      // RGB 格式: rgb(255, 255, 255)
+      else if (color.startsWith('rgb(')) {
+        const match = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+        if (match) {
+          r = parseInt(match[1], 10) || 0;
+          g = parseInt(match[2], 10) || 0;
+          b = parseInt(match[3], 10) || 0;
+        }
+      }
+      // RGBA 格式: rgba(255, 255, 255, 1)
+      else if (color.startsWith('rgba(')) {
+        const match = color.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*[\d.]+\)/);
+        if (match) {
+          r = parseInt(match[1], 10) || 0;
+          g = parseInt(match[2], 10) || 0;
+          b = parseInt(match[3], 10) || 0;
+        }
+      }
+      // HSL 格式: hsl(360, 100%, 100%)
+      else if (color.startsWith('hsl(')) {
+        const match = color.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+        if (match) {
+          const h = parseInt(match[1], 10) / 360;
+          const s = parseInt(match[2], 10) / 100;
+          const l = parseInt(match[3], 10) / 100;
+          // HSL 转 RGB
+          const hue2rgb = (p: number, q: number, t: number) => {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1/6) return p + (q - p) * 6 * t;
+            if (t < 1/2) return q;
+            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+          };
+          const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+          const p = 2 * l - q;
+          r = Math.round(hue2rgb(p, q, h + 1/3) * 255);
+          g = Math.round(hue2rgb(p, q, h) * 255);
+          b = Math.round(hue2rgb(p, q, h - 1/3) * 255);
+        }
+      }
+      // 不支持的格式
+      else {
+        return false;
+      }
 
       // 计算亮度（YIQ公式）
       const brightness = (r * 299 + g * 587 + b * 114) / 1000;
