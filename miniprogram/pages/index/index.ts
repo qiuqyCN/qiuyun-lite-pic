@@ -1,8 +1,6 @@
 // index.ts
 // 首页逻辑 - 分类+列表式工具展示
 
-import { STORAGE_KEYS } from '../../constants/storage-keys';
-
 interface ToolItem {
   id: string;
   name: string;
@@ -19,12 +17,6 @@ interface ToolCategory {
   id: string;
   name: string;
   tools: ToolItem[];
-}
-
-interface UsageStats {
-  todayCount: number;
-  totalCount: number;
-  savedSpace: number;
 }
 
 Component({
@@ -142,61 +134,14 @@ Component({
           }
         ]
       }
-    ] as ToolCategory[],
-    
-    // 使用统计
-    usageStats: {
-      todayCount: 0,
-      totalCount: 0,
-      savedSpace: 0
-    } as UsageStats,
-    
-    // 最近使用
-    // recentUsed: [] as string[]
-  },
-
-  lifetimes: {
-    attached() {
-      this.loadUsageStats();
-    }
-  },
-
-  pageLifetimes: {
-    show() {
-      this.loadUsageStats();
-    }
+    ] as ToolCategory[]
   },
 
   methods: {
-    // 加载使用统计
-    loadUsageStats() {
-      const stats = wx.getStorageSync(STORAGE_KEYS.USAGE_STATS) || {
-        todayCount: 0,
-        totalCount: 0,
-        savedSpace: 0,
-        lastDate: new Date().toDateString()
-      };
-      
-      // 检查是否是新的一天
-      const today = new Date().toDateString();
-      if (stats.lastDate !== today) {
-        stats.todayCount = 0;
-        stats.lastDate = today;
-      }
-      
-      this.setData({
-        usageStats: {
-          todayCount: stats.todayCount || 0,
-          totalCount: stats.totalCount || 0,
-          savedSpace: stats.savedSpace || 0
-        }
-      });
-    },
-
     // 导航到工具页面
     navigateToTool(e: WechatMiniprogram.TouchEvent) {
       const { path, isDeveloping } = e.currentTarget.dataset;
-      
+
       // 如果是开发中，显示提示
       if (isDeveloping) {
         wx.showToast({
@@ -205,38 +150,8 @@ Component({
         });
         return;
       }
-      
+
       wx.navigateTo({ url: path });
-    },
-
-    // 更新使用统计
-    updateUsageStats(savedSpace: number = 0) {
-      const stats = wx.getStorageSync(STORAGE_KEYS.USAGE_STATS) || {
-        todayCount: 0,
-        totalCount: 0,
-        savedSpace: 0,
-        lastDate: new Date().toDateString()
-      };
-
-      const today = new Date().toDateString();
-      if (stats.lastDate !== today) {
-        stats.todayCount = 0;
-        stats.lastDate = today;
-      }
-
-      stats.todayCount++;
-      stats.totalCount++;
-      stats.savedSpace += savedSpace;
-
-      wx.setStorageSync(STORAGE_KEYS.USAGE_STATS, stats);
-      
-      this.setData({
-        usageStats: {
-          todayCount: stats.todayCount,
-          totalCount: stats.totalCount,
-          savedSpace: stats.savedSpace
-        }
-      });
     }
   }
 });

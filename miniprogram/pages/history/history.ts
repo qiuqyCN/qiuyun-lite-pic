@@ -207,6 +207,19 @@ Component({
       }
     },
 
+    // 图片加载失败
+    onImageError(e: WechatMiniprogram.TouchEvent) {
+      const { id } = e.currentTarget.dataset;
+      const { historyList } = this.data;
+      const newList = historyList.map((item: any) => {
+        if (item.id === id) {
+          return { ...item, imageError: true };
+        }
+        return item;
+      });
+      this.setData({ historyList: newList });
+    },
+
     onClearHistory() {
       if (this.data.historyList.length === 0) {
         console.log('历史记录为空，不执行清除');

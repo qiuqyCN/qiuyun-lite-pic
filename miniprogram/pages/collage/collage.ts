@@ -3,9 +3,9 @@
 
 import { chooseImage, chooseMultipleImages, getImageInfo } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
-import { saveImageToAlbum } from '../../utils/file';
+import { saveImageToAlbumWithUI } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
-import { handleError, showSuccess } from '../../utils/error';
+import { handleError } from '../../utils/error';
 import { debounce } from '../../utils/debounce';
 
 /** 布局模板 */
@@ -594,13 +594,9 @@ Component({
     async saveToAlbum() {
       if (!this.data.resultPath) return;
 
-      try {
-        await saveImageToAlbum(this.data.resultPath);
-        showSuccess('已保存到相册');
-        this.saveToHistory();
-      } catch (error) {
-        handleError(error, '保存失败');
-      }
+      await saveImageToAlbumWithUI(this.data.resultPath, {
+        onSuccess: () => this.saveToHistory()
+      });
     },
 
     /**

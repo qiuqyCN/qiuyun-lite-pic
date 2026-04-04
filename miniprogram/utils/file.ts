@@ -2,14 +2,62 @@
 // 文件操作工具函数
 
 import { STORAGE_KEYS } from '../constants/storage-keys';
+import { showSuccess, showLoading } from './ui';
+import { handleError } from './error';
 
 /**
- * 保存图片到相册
+ * 保存图片到相册（基础函数）
  * @param filePath 文件路径
  * @returns Promise
  */
-export const saveImageToAlbum = async (filePath: string): Promise<void> => {
-  await wx.saveImageToPhotosAlbum({ filePath });
+export const saveImageToAlbum = (filePath: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    wx.saveImageToPhotosAlbum({
+      filePath,
+      success: () => resolve(),
+      fail: (err) => reject(err)
+    });
+  });
+};
+
+/**
+ * 保存图片到相册（带UI提示）
+ * 统一处理 loading、成功提示和错误处理
+ * @param filePath 文件路径
+ * @param options 可选配置
+ * @returns Promise<boolean> 是否保存成功
+ */
+export const saveImageToAlbumWithUI = async (
+  filePath: string,
+  options?: {
+    loadingText?: string;
+    successText?: string;
+    errorText?: string;
+    onSuccess?: () => void;
+  }
+): Promise<boolean> => {
+  const {
+    loadingText = '保存中...',
+    successText = '已保存到相册',
+    errorText = '保存失败',
+    onSuccess
+  } = options || {};
+
+  const hideLoading = showLoading(loadingText);
+
+  try {
+    await saveImageToAlbum(filePath);
+    showSuccess(successText);
+    if (onSuccess) {
+      onSuccess();
+    }
+    return true;
+  } catch (err) {
+    handleError(err, errorText);
+    return false;
+  } finally {
+    hideLoading();
+  }
 };
 
 /**
@@ -131,7 +179,6 @@ export const clearCache = (): Promise<void> => {
     try {
       wx.removeStorageSync(STORAGE_KEYS.HISTORIES);
       wx.removeStorageSync(STORAGE_KEYS.FAVORITE_COLORS);
-      wx.removeStorageSync(STORAGE_KEYS.USAGE_STATS);
       console.log('本地存储已清理');
     } catch (err) {
       console.log('清理本地存储失败', err);

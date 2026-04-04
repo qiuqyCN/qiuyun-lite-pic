@@ -2,7 +2,8 @@
 // 设置页面
 
 import { calculateCacheSize, clearCache } from '../../utils/file';
-import { handleError, showSuccess } from '../../utils/error';
+import { handleError } from '../../utils/error';
+import { showSuccess } from '../../utils/ui';
 import { formatFileSize } from '../../utils/format';
 
 /** 设置页面数据接口 */

@@ -11,9 +11,10 @@ import {
   canvasToTempFile,
   fillBackground
 } from '../../utils/canvas';
-import { saveImageToAlbum } from '../../utils/file';
+import { saveImageToAlbumWithUI } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
-import { handleError, showSuccess, showLoading } from '../../utils/error';
+import { handleError } from '../../utils/error';
+import { showLoading } from '../../utils/ui';
 import { debounce } from '../../utils/debounce';
 import { ALL_PRESETS } from '../../constants/presets';
 import type { PresetSize } from '../../types/index';
@@ -400,19 +401,9 @@ Component({
         }
       }
 
-      const hideLoading = showLoading('保存中...');
-
-      try {
-        await saveImageToAlbum(resultPath);
-        showSuccess('已保存到相册');
-
-        // 保存到历史记录
-        this.saveToHistory();
-      } catch (err) {
-        handleError(err, '保存失败');
-      } finally {
-        hideLoading();
-      }
+      await saveImageToAlbumWithUI(resultPath, {
+        onSuccess: () => this.saveToHistory()
+      });
     },
 
     /**

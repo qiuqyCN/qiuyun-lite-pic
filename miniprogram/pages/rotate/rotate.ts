@@ -3,9 +3,9 @@
 
 import { chooseImage, getImageInfo } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
-import { saveImageToAlbum } from '../../utils/file';
+import { saveImageToAlbumWithUI } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
-import { handleError, showSuccess, showLoading } from '../../utils/error';
+import { handleError } from '../../utils/error';
 import { debounce } from '../../utils/debounce';
 
 interface RotateData {
@@ -234,18 +234,9 @@ Component({
 
       if (!this.data.resultPath) return;
 
-      const hideLoading = showLoading('保存中...');
-
-      try {
-        await saveImageToAlbum(this.data.resultPath);
-        // 保存到历史记录
-        this.saveHistory();
-        showSuccess('已保存到相册');
-      } catch (err) {
-        handleError(err, '保存失败');
-      } finally {
-        hideLoading();
-      }
+      await saveImageToAlbumWithUI(this.data.resultPath, {
+        onSuccess: () => this.saveHistory()
+      });
     },
 
     /**

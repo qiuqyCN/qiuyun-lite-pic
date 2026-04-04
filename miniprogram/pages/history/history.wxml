@@ -41,7 +41,16 @@
         >
           <!-- 图片预览 -->
           <view class="image-wrapper">
-            <image class="history-thumb" src="{{item.resultPath || item.originalPath}}" mode="aspectFill"/>
+            <image 
+              class="history-thumb" 
+              src="{{item.resultPath || item.originalPath}}" 
+              mode="aspectFill"
+              binderror="onImageError"
+              data-id="{{item.id}}"
+            />
+            <view class="image-placeholder {{item.imageError ? 'show' : ''}}">
+              <text class="placeholder-icon">🖼️</text>
+            </view>
             <view class="type-badge" style="background: {{item.type === 'colorpicker' ? '#ff6b6b' : '#41bc3f'}}">
               {{item.typeName}}
             </view>
@@ -140,7 +149,10 @@
   <view wx:else class="empty-state">
     <view class="empty-illustration">
       <view class="empty-circle">
-        <text class="empty-icon">📷</text>
+        <view class="camera-icon">
+          <view class="camera-body"></view>
+          <view class="camera-lens"></view>
+        </view>
       </view>
     </view>
     <text class="empty-title">暂无处理记录</text>

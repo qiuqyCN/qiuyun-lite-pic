@@ -3,11 +3,11 @@
 
 import { chooseImage, calculateSavedPercent } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
-import { saveImageToAlbum, getFileSize } from '../../utils/file';
+import { saveImageToAlbumWithUI, getFileSize } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
-import { handleError, showSuccess, showLoading } from '../../utils/error';
+import { handleError } from '../../utils/error';
+import { showLoading } from '../../utils/ui';
 import { debounce } from '../../utils/debounce';
-import { STORAGE_KEYS } from '../../constants/storage-keys';
 
 interface CompressData {
   // 图片信息
@@ -214,9 +214,6 @@ Component({
         // 保存到历史记录
         this.saveToHistory();
 
-        // 更新使用统计
-        this.updateUsageStats();
-
         // 不显示弹窗提示，节省信息已在页面上展示
 
       } catch (err) {
@@ -261,43 +258,12 @@ Component({
     },
 
     /**
-     * 更新使用统计
-     */
-    updateUsageStats() {
-      const stats = wx.getStorageSync(STORAGE_KEYS.USAGE_STATS) || {
-        todayCount: 0,
-        totalCount: 0,
-        savedSpace: 0,
-        lastDate: new Date().toDateString()
-      };
-
-      const today = new Date().toDateString();
-      if (stats.lastDate !== today) {
-        stats.todayCount = 0;
-        stats.lastDate = today;
-      }
-
-      stats.todayCount++;
-      stats.totalCount++;
-      if (this.data.originalSize > this.data.compressedSize) {
-        stats.savedSpace += (this.data.originalSize - this.data.compressedSize);
-      }
-
-      wx.setStorageSync(STORAGE_KEYS.USAGE_STATS, stats);
-    },
-
-    /**
      * 保存到相册
      */
     async saveToAlbum() {
       if (!this.data.compressedPath) return;
 
-      try {
-        await saveImageToAlbum(this.data.compressedPath);
-        showSuccess('已保存到相册');
-      } catch (err) {
-        handleError(err, '保存失败');
-      }
+      await saveImageToAlbumWithUI(this.data.compressedPath);
     }
   }
 });

@@ -10,8 +10,6 @@ export const STORAGE_KEYS = {
   HISTORIES: 'histories',
   /** 收藏颜色 */
   FAVORITE_COLORS: 'favoriteColors',
-  /** 使用统计 */
-  USAGE_STATS: 'usageStats',
 } as const;
 
 /** 存储 key 类型 */

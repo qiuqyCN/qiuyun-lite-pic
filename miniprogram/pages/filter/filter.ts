@@ -3,9 +3,10 @@
 
 import { chooseImage } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
-import { saveImageToAlbum } from '../../utils/file';
+import { saveImageToAlbumWithUI } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
-import { handleError, showSuccess, showLoading } from '../../utils/error';
+import { handleError } from '../../utils/error';
+import { showLoading } from '../../utils/ui';
 import { ALL_FILTERS } from '../../constants/filters';
 import type { ImageInfo, FilterParams } from '../../types/index';
 
@@ -337,19 +338,9 @@ Component({
         await this.applyFilter(this.data.currentFilter, this.data.filterIntensity);
       }
 
-      const hideLoading = showLoading('保存中...');
-
-      try {
-        await saveImageToAlbum(this.data.filteredPath);
-        showSuccess('已保存到相册');
-
-        // 保存到历史记录
-        this.saveToHistory();
-      } catch (err) {
-        handleError(err, '保存失败');
-      } finally {
-        hideLoading();
-      }
+      await saveImageToAlbumWithUI(this.data.filteredPath, {
+        onSuccess: () => this.saveToHistory()
+      });
     },
 
     /**

@@ -3,9 +3,9 @@
 
 import { chooseImage } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
-import { saveImageToAlbum } from '../../utils/file';
+import { saveImageToAlbumWithUI } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
-import { handleError, showSuccess, showLoading } from '../../utils/error';
+import { handleError } from '../../utils/error';
 
 /** 水印位置类型 */
 type WatermarkPosition = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight' | 'center' | 'tile';
@@ -441,17 +441,9 @@ Component({
     async saveToAlbum() {
       if (!this.data.watermarkedPath) return;
 
-      const hideLoading = showLoading('保存中...');
-
-      try {
-        await saveImageToAlbum(this.data.watermarkedPath);
-        hideLoading();
-        showSuccess('已保存到相册');
-        this.saveToHistory();
-      } catch (error) {
-        hideLoading();
-        handleError(error, '保存失败');
-      }
+      await saveImageToAlbumWithUI(this.data.watermarkedPath, {
+        onSuccess: () => this.saveToHistory()
+      });
     },
 
     /**

@@ -3,11 +3,11 @@
 
 import { chooseImage, getImageInfo } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
-import { saveImageToAlbum } from '../../utils/file';
+import { saveImageToAlbumWithUI } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
-import { handleError, showSuccess, showLoading } from '../../utils/error';
+import { handleError } from '../../utils/error';
+import { showLoading } from '../../utils/ui';
 import { debounce } from '../../utils/debounce';
-import { STORAGE_KEYS } from '../../constants/storage-keys';
 
 /** 页面数据 */
 interface ConvertData {
@@ -239,8 +239,6 @@ Component({
         // 保存到历史记录
         this.saveToHistory();
 
-        // 更新使用统计
-        this.updateUsageStats();
       } catch (err) {
         handleError(err, '转换失败');
         this.setData({ isProcessing: false });
@@ -283,40 +281,12 @@ Component({
     },
 
     /**
-     * 更新使用统计
-     */
-    updateUsageStats() {
-      const stats = wx.getStorageSync(STORAGE_KEYS.USAGE_STATS) || {
-        todayCount: 0,
-        totalCount: 0,
-        savedSpace: 0,
-        lastDate: new Date().toDateString()
-      };
-
-      const today = new Date().toDateString();
-      if (stats.lastDate !== today) {
-        stats.todayCount = 0;
-        stats.lastDate = today;
-      }
-
-      stats.todayCount++;
-      stats.totalCount++;
-
-      wx.setStorageSync(STORAGE_KEYS.USAGE_STATS, stats);
-    },
-
-    /**
      * 保存到相册
      */
     async saveToAlbum() {
       if (!this.data.convertedPath) return;
 
-      try {
-        await saveImageToAlbum(this.data.convertedPath);
-        showSuccess('已保存到相册');
-      } catch (err) {
-        handleError(err, '保存失败');
-      }
+      await saveImageToAlbumWithUI(this.data.convertedPath);
     }
   }
 });

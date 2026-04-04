@@ -2,7 +2,8 @@
 // 图片取色页面 - 增强版
 
 import { chooseImage, getImageInfo } from '../../utils/image';
-import { handleError, showSuccess } from '../../utils/error';
+import { handleError } from '../../utils/error';
+import { showSuccess } from '../../utils/ui';
 import { saveToHistory } from '../../utils/history';
 import { STORAGE_KEYS } from '../../constants/storage-keys';
 
@@ -38,11 +39,7 @@ interface ColorPickerData {
   hasImage: boolean;
 }
 
-// 默认收藏颜色
-const DEFAULT_FAVORITES = [
-  '#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff',
-  '#ffff00', '#ff00ff', '#00ffff', '#41bc3f'
-];
+
 
 Component({
   data: {

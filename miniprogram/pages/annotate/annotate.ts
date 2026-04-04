@@ -2,8 +2,9 @@
 // 图片标注/涂鸦页面
 
 import { chooseImage, getImageInfo } from '../../utils/image';
-import { saveImageToAlbum } from '../../utils/file';
-import { handleError, showSuccess, showLoading } from '../../utils/error';
+import { saveImageToAlbumWithUI } from '../../utils/file';
+import { handleError } from '../../utils/error';
+import { showLoading } from '../../utils/ui';
 import { saveToHistory } from '../../utils/history';
 
 interface AnnotateData {
@@ -388,10 +389,9 @@ Component({
           });
         });
 
-        await saveImageToAlbum(res.tempFilePath);
-        // 保存到历史记录
-        this.saveHistory(res.tempFilePath);
-        showSuccess('已保存到相册');
+        await saveImageToAlbumWithUI(res.tempFilePath, {
+          onSuccess: () => this.saveHistory(res.tempFilePath)
+        });
       } catch (err) {
         handleError(err, '保存失败');
       } finally {
