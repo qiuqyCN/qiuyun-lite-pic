@@ -12,10 +12,21 @@ import { handleError } from './error';
  */
 export const saveImageToAlbum = (filePath: string): Promise<void> => {
   return new Promise((resolve, reject) => {
+    // 添加超时处理，10秒后自动失败
+    const timeoutId = setTimeout(() => {
+      reject(new Error('保存超时，请重试'));
+    }, 10000);
+
     wx.saveImageToPhotosAlbum({
       filePath,
-      success: () => resolve(),
-      fail: (err) => reject(err)
+      success: () => {
+        clearTimeout(timeoutId);
+        resolve();
+      },
+      fail: (err) => {
+        clearTimeout(timeoutId);
+        reject(err);
+      }
     });
   });
 };

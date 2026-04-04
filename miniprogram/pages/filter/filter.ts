@@ -128,7 +128,10 @@ Component({
     async applyFilter(filterType: string, intensity: number) {
       if (!this.data.hasImage || filterType === 'original') {
         if (filterType === 'original') {
-          this.setData({ filteredPath: this.data.imagePath });
+          this.setData({
+            filteredPath: this.data.imagePath,
+            isProcessing: false
+          });
         }
         return;
       }
@@ -333,20 +336,31 @@ Component({
     async saveToAlbum() {
       if (!this.data.filteredPath) return;
 
-      // 如果当前是原图滤镜，需要重新应用当前滤镜设置
+      // 原图不需要保存，直接提示用户
       if (this.data.currentFilter === 'original') {
-        await this.applyFilter(this.data.currentFilter, this.data.filterIntensity);
+        wx.showToast({
+          title: '原图无需保存',
+          icon: 'none',
+          duration: 2000
+        });
+        return;
       }
 
       // 保存时禁用按钮
+      console.log('保存开始，设置 isProcessing: true');
       this.setData({ isProcessing: true });
 
-      await saveImageToAlbumWithUI(this.data.filteredPath, {
-        onSuccess: () => this.saveToHistory()
-      });
-
-      // 保存完成后恢复按钮
-      this.setData({ isProcessing: false });
+      try {
+        await saveImageToAlbumWithUI(this.data.filteredPath, {
+          onSuccess: () => this.saveToHistory()
+        });
+      } catch (err) {
+        console.log('保存失败:', err);
+      } finally {
+        // 无论成功失败，都恢复按钮状态
+        console.log('保存结束，设置 isProcessing: false');
+        this.setData({ isProcessing: false });
+      }
     },
 
     /**

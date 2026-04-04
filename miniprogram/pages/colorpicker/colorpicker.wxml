@@ -113,6 +113,7 @@
     <!-- 操作按钮 -->
     <action-buttons
       saveText="复制颜色"
+      disabled="{{!pickedColor}}"
       bind:reset="resetPicker"
       bind:save="copyColor"
     />

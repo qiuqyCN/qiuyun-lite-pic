@@ -93,14 +93,14 @@
               <!-- 标注 -->
               <block wx:if="{{item.type === 'annotate'}}">
                 <view class="tag">{{item.params.isEraser ? '橡皮擦' : '画笔'}}</view>
-                <view class="tag tag-primary" style="background: {{item.params.brushColor}}; color: #fff;" wx:if="{{!item.params.isEraser}}">
+                <view class="tag tag-primary" style="background: {{item.params.brushColor}}; border: {{item.colorBorder || 'none'}}; color: {{item.colorText || '#fff'}};" wx:if="{{!item.params.isEraser}}">
                   {{item.params.brushColor}}
                 </view>
               </block>
               
               <!-- 取色 -->
               <block wx:if="{{item.type === 'colorpicker'}}">
-                <view class="tag tag-primary" style="background: {{item.params.color}}; color: #fff;">
+                <view class="tag tag-primary" style="background: {{item.params.color}}; border: {{item.colorBorder || 'none'}}; color: {{item.colorText || '#fff'}};">
                   {{item.params.color}}
                 </view>
                 <view class="tag">{{(item.params.format && item.params.format.toUpperCase()) || 'HEX'}}</view>

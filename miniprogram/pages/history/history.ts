@@ -62,15 +62,59 @@ Component({
       return `${month}-${day} ${hours}:${minutes}`;
     },
 
+    /**
+     * 判断颜色是否为浅色
+     * @param color 颜色值（HEX格式）
+     * @returns 是否为浅色
+     */
+    isLightColor(color: string): boolean {
+      if (!color || !color.startsWith('#')) return false;
+
+      // 提取RGB值
+      const hex = color.replace('#', '');
+      const r = parseInt(hex.substring(0, 2), 16) || 0;
+      const g = parseInt(hex.substring(2, 4), 16) || 0;
+      const b = parseInt(hex.substring(4, 6), 16) || 0;
+
+      // 计算亮度（YIQ公式）
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+      // 亮度大于200认为是浅色
+      return brightness > 200;
+    },
+
     loadHistory() {
       const history = getHistory();
-      // 添加相对时间和格式化时间
-      const formattedHistory = history.map(item => ({
-        ...item,
-        timeStr: this.formatTime(item.timestamp),
-        relativeTime: this.formatRelativeTime(item.timestamp),
-        translateX: 0
-      }));
+
+      // 调试：打印原始数据到控制台
+      console.log('=== 历史记录原始数据 ===');
+      console.log(JSON.stringify(history, null, 2));
+      console.log('========================');
+
+      // 添加相对时间和格式化时间，以及颜色文字颜色
+      const formattedHistory = history.map(item => {
+        const formattedItem: any = {
+          ...item,
+          timeStr: this.formatTime(item.timestamp),
+          relativeTime: this.formatRelativeTime(item.timestamp),
+          translateX: 0
+        };
+
+        // 为取色和标注涂鸦添加边框和文字颜色（浅色时需要才能看清）
+        if (item.type === 'colorpicker' && item.params && item.params.color) {
+          const isLight = this.isLightColor(item.params.color);
+          formattedItem.colorBorder = isLight ? '1px solid #ddd' : 'none';
+          formattedItem.colorText = isLight ? '#666' : '#fff';
+        }
+        if (item.type === 'annotate' && item.params && item.params.brushColor) {
+          const isLight = this.isLightColor(item.params.brushColor);
+          formattedItem.colorBorder = isLight ? '1px solid #ddd' : 'none';
+          formattedItem.colorText = isLight ? '#666' : '#fff';
+        }
+
+        return formattedItem;
+      });
+
       this.setData({
         historyList: formattedHistory
       });
@@ -131,7 +175,7 @@ Component({
     },
 
     // 触摸结束
-    onTouchEnd(e: WechatMiniprogram.TouchEvent) {
+    onTouchEnd(_e: WechatMiniprogram.TouchEvent) {
       const { currentSwipingId, swipeThreshold, historyList } = this.data;
       
       if (!currentSwipingId) return;

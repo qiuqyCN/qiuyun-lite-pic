@@ -38,7 +38,7 @@ Component({
     originalHeight: 0,
     compressedPath: '',
     compressedSize: 0,
-    quality: 60,
+    quality: 30,
     fileType: 'jpg',
     savedPercent: 0,
     isProcessing: false,
@@ -47,28 +47,14 @@ Component({
 
   methods: {
     /**
-     * 根据原图大小推荐质量
-     */
-    recommendQuality(originalSizeKB: number): number {
-      // 原图小于100KB，已经是小图，建议较低质量避免变大
-      if (originalSizeKB < 100) return 50;
-      // 原图100-500KB，建议使用中等质量
-      if (originalSizeKB < 500) return 60;
-      // 原图500KB-2MB，建议使用较高质量
-      if (originalSizeKB < 2048) return 70;
-      // 原图大于2MB，建议使用高质量压缩
-      return 80;
-    },
-
-    /**
      * 选择图片
      */
     async chooseImage() {
       try {
         const imageInfo = await chooseImage();
         const originalSizeKB = Math.round(imageInfo.size / 1024);
-        // 智能推荐质量
-        const quality = this.recommendQuality(originalSizeKB);
+        // 使用默认质量（极速30%）
+        const quality = 30;
 
         this.setData({
           imagePath: imageInfo.path,
@@ -139,8 +125,6 @@ Component({
       }
     }, 500),
 
-
-
     /**
      * 预览图片
      */
@@ -185,7 +169,7 @@ Component({
         // 导出压缩后的图片（压缩只支持JPG格式）
         const tempFilePath = await canvasToTempFile(canvas, {
           quality: this.data.quality / 100,
-          fileType: this.data.fileType === 'jpg' ? 'jpg' : 'jpg'
+          fileType: 'jpg'
         });
 
         // 获取压缩后文件大小
@@ -214,8 +198,6 @@ Component({
         // 保存到历史记录
         this.saveToHistory();
 
-        // 不显示弹窗提示，节省信息已在页面上展示
-
       } catch (err) {
         hideLoading();
         handleError(err, '压缩失败');
@@ -227,13 +209,11 @@ Component({
      * 重新压缩
      */
     resetCompress() {
-      // 使用智能推荐质量
-      const quality = this.recommendQuality(this.data.originalSize);
       this.setData({
         compressedPath: '',
         compressedSize: 0,
         savedPercent: 0,
-        quality
+        quality: 30
       }, () => {
         // 重置后自动触发压缩
         this.startCompress();
