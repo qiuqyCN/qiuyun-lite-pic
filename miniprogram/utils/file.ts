@@ -1,6 +1,8 @@
 // utils/file.ts
 // 文件操作工具函数
 
+import { STORAGE_KEYS } from '../constants/storage-keys';
+
 /**
  * 保存图片到相册
  * @param filePath 文件路径
@@ -118,35 +120,89 @@ export const calculateCacheSize = (): Promise<number> => {
 
 /**
  * 清理缓存
+ * 包括：临时文件、本地存储的历史记录、收藏颜色、使用统计
  */
 export const clearCache = (): Promise<void> => {
   return new Promise((resolve) => {
     const fs = wx.getFileSystemManager();
+    const userDataPath = wx.env.USER_DATA_PATH;
+
+    // 清理本地存储
+    try {
+      wx.removeStorageSync(STORAGE_KEYS.HISTORIES);
+      wx.removeStorageSync(STORAGE_KEYS.FAVORITE_COLORS);
+      wx.removeStorageSync(STORAGE_KEYS.USAGE_STATS);
+      console.log('本地存储已清理');
+    } catch (err) {
+      console.log('清理本地存储失败', err);
+    }
+
+    // 清理文件系统
     fs.stat({
-      path: wx.env.USER_DATA_PATH,
+      path: userDataPath,
       recursive: true,
-      success: (res: any) => {
+      success: async (res: any) => {
         if (!res || !res.stats) {
           resolve();
           return;
         }
 
-        const removeFiles = (stats: any[], basePath: string) => {
+        const filesToDelete: string[] = [];
+        const dirsToDelete: string[] = [];
+
+        // 收集文件和目录
+        const collectPaths = (stats: any[], basePath: string) => {
+          if (!stats || !Array.isArray(stats)) return;
           for (const stat of stats) {
             const fullPath = `${basePath}/${stat.path}`;
-            if (stat.stats && typeof stat.stats.isFile === 'function' && stat.stats.isFile()) {
-              try {
-                fs.unlink({ filePath: fullPath } as any);
-              } catch (err) {
-                console.log('删除文件失败', fullPath);
+            if (stat && stat.stats) {
+              if (typeof stat.stats.isFile === 'function' && stat.stats.isFile()) {
+                filesToDelete.push(fullPath);
+              } else if (typeof stat.stats.isDirectory === 'function' && stat.stats.isDirectory()) {
+                if (stat.children) {
+                  collectPaths(stat.children, fullPath);
+                }
+                // 空目录稍后删除
+                dirsToDelete.push(fullPath);
               }
-            } else if (stat.stats && typeof stat.stats.isDirectory === 'function' && stat.stats.isDirectory() && stat.children) {
-              removeFiles(stat.children, fullPath);
             }
           }
         };
 
-        removeFiles(res.stats, wx.env.USER_DATA_PATH);
+        collectPaths(res.stats, userDataPath);
+
+        // 删除文件
+        for (const filePath of filesToDelete) {
+          try {
+            await new Promise<void>((resolveUnlink) => {
+              fs.unlink({
+                filePath,
+                success: () => resolveUnlink(),
+                fail: () => resolveUnlink()
+              });
+            });
+          } catch (err) {
+            console.log('删除文件失败', filePath);
+          }
+        }
+
+        // 删除空目录（从深到浅）
+        dirsToDelete.sort((a, b) => b.length - a.length);
+        for (const dirPath of dirsToDelete) {
+          try {
+            await new Promise<void>((resolveRmdir) => {
+              fs.rmdir({
+                dirPath,
+                success: () => resolveRmdir(),
+                fail: () => resolveRmdir()
+              });
+            });
+          } catch (err) {
+            console.log('删除目录失败', dirPath);
+          }
+        }
+
+        console.log('文件系统缓存已清理');
         resolve();
       },
       fail: (err) => {

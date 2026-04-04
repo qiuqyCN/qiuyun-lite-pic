@@ -164,7 +164,7 @@ export const tryCatchAsync = async <T>(
  * @param message 消息
  * @param duration 持续时间
  */
-export const showSuccess = (message: string, duration: number = 1500): void => {
+export const showSuccess = (message: string, duration: number = 2500): void => {
   wx.showToast({
     title: message,
     icon: 'success',

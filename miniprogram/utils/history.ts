@@ -2,8 +2,8 @@
 // 历史记录管理工具
 
 import { HistoryItem } from '../types/index';
+import { STORAGE_KEYS } from '../constants/storage-keys';
 
-const HISTORY_KEY = 'processHistory';
 const MAX_HISTORY_COUNT = 20;
 
 /**
@@ -23,7 +23,7 @@ export function saveToHistory(
 
   // 添加到开头，限制数量
   history.unshift(newItem);
-  wx.setStorageSync(HISTORY_KEY, history.slice(0, MAX_HISTORY_COUNT));
+  wx.setStorageSync(STORAGE_KEYS.HISTORIES, history.slice(0, MAX_HISTORY_COUNT));
 }
 
 /**
@@ -31,14 +31,14 @@ export function saveToHistory(
  * @returns 历史记录列表
  */
 export function getHistory(): HistoryItem[] {
-  return wx.getStorageSync(HISTORY_KEY) || [];
+  return wx.getStorageSync(STORAGE_KEYS.HISTORIES) || [];
 }
 
 /**
  * 清空所有历史记录
  */
 export function clearHistory(): void {
-  wx.removeStorageSync(HISTORY_KEY);
+  wx.removeStorageSync(STORAGE_KEYS.HISTORIES);
 }
 
 /**
@@ -48,7 +48,7 @@ export function clearHistory(): void {
 export function removeHistoryItem(id: string): void {
   const history = getHistory();
   const newHistory = history.filter((item) => item.id !== id);
-  wx.setStorageSync(HISTORY_KEY, newHistory);
+  wx.setStorageSync(STORAGE_KEYS.HISTORIES, newHistory);
 }
 
 /**

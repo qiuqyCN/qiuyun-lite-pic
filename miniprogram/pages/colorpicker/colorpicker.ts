@@ -4,6 +4,7 @@
 import { chooseImage, getImageInfo } from '../../utils/image';
 import { handleError, showSuccess } from '../../utils/error';
 import { saveToHistory } from '../../utils/history';
+import { STORAGE_KEYS } from '../../constants/storage-keys';
 
 interface ColorPickerData {
   // 图片信息
@@ -63,7 +64,7 @@ Component({
     canvasHeight: 0,
 
     colorHistory: [],
-    favoriteColors: DEFAULT_FAVORITES,
+    favoriteColors: [],
 
     hasImage: false,
   } as ColorPickerData,
@@ -71,7 +72,7 @@ Component({
   lifetimes: {
     attached() {
       // 加载收藏的本地存储
-      const favorites = wx.getStorageSync('favoriteColors');
+      const favorites = wx.getStorageSync(STORAGE_KEYS.FAVORITE_COLORS);
       if (favorites && favorites.length > 0) {
         this.setData({ favoriteColors: favorites });
       }
@@ -481,7 +482,7 @@ Component({
       }
 
       this.setData({ favoriteColors: newFavorites });
-      wx.setStorageSync('favoriteColors', newFavorites);
+      wx.setStorageSync(STORAGE_KEYS.FAVORITE_COLORS, newFavorites);
       showSuccess(favoriteColors.includes(pickedColor) ? '已取消收藏' : '已收藏');
     },
 

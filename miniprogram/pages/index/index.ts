@@ -1,6 +1,8 @@
 // index.ts
 // 首页逻辑 - 分类+列表式工具展示
 
+import { STORAGE_KEYS } from '../../constants/storage-keys';
+
 interface ToolItem {
   id: string;
   name: string;
@@ -150,7 +152,7 @@ Component({
     } as UsageStats,
     
     // 最近使用
-    recentUsed: [] as string[]
+    // recentUsed: [] as string[]
   },
 
   lifetimes: {
@@ -168,7 +170,7 @@ Component({
   methods: {
     // 加载使用统计
     loadUsageStats() {
-      const stats = wx.getStorageSync('usageStats') || {
+      const stats = wx.getStorageSync(STORAGE_KEYS.USAGE_STATS) || {
         todayCount: 0,
         totalCount: 0,
         savedSpace: 0,
@@ -209,24 +211,24 @@ Component({
 
     // 更新使用统计
     updateUsageStats(savedSpace: number = 0) {
-      const stats = wx.getStorageSync('usageStats') || {
+      const stats = wx.getStorageSync(STORAGE_KEYS.USAGE_STATS) || {
         todayCount: 0,
         totalCount: 0,
         savedSpace: 0,
         lastDate: new Date().toDateString()
       };
-      
+
       const today = new Date().toDateString();
       if (stats.lastDate !== today) {
         stats.todayCount = 0;
         stats.lastDate = today;
       }
-      
+
       stats.todayCount++;
       stats.totalCount++;
       stats.savedSpace += savedSpace;
-      
-      wx.setStorageSync('usageStats', stats);
+
+      wx.setStorageSync(STORAGE_KEYS.USAGE_STATS, stats);
       
       this.setData({
         usageStats: {

@@ -7,6 +7,7 @@ import { saveImageToAlbum, getFileSize } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
 import { handleError, showSuccess, showLoading } from '../../utils/error';
 import { debounce } from '../../utils/debounce';
+import { STORAGE_KEYS } from '../../constants/storage-keys';
 
 interface CompressData {
   // 图片信息
@@ -263,7 +264,7 @@ Component({
      * 更新使用统计
      */
     updateUsageStats() {
-      const stats = wx.getStorageSync('usageStats') || {
+      const stats = wx.getStorageSync(STORAGE_KEYS.USAGE_STATS) || {
         todayCount: 0,
         totalCount: 0,
         savedSpace: 0,
@@ -282,7 +283,7 @@ Component({
         stats.savedSpace += (this.data.originalSize - this.data.compressedSize);
       }
 
-      wx.setStorageSync('usageStats', stats);
+      wx.setStorageSync(STORAGE_KEYS.USAGE_STATS, stats);
     },
 
     /**
