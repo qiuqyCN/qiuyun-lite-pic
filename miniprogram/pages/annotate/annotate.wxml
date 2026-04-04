@@ -25,16 +25,19 @@
     />
 
     <!-- 涂鸦画布 -->
-    <view class="section">
+    <view class="section annotate-section">
       <view class="section-title">涂鸦区域</view>
-      <canvas
-        type="2d"
-        id="annotateCanvas"
-        class="annotate-canvas"
-        bindtouchstart="onTouchStart"
-        bindtouchmove="onTouchMove"
-        bindtouchend="onTouchEnd"
-      ></canvas>
+      <view class="canvas-container" style="width: {{canvasWidth}}px; height: {{canvasHeight}}px; margin: 0 auto;">
+        <canvas
+          type="2d"
+          id="annotateCanvas"
+          class="annotate-canvas"
+          style="width: {{canvasWidth}}px; height: {{canvasHeight}}px;"
+          bindtouchstart="onTouchStart"
+          bindtouchmove="onTouchMove"
+          bindtouchend="onTouchEnd"
+        ></canvas>
+      </view>
       <view class="canvas-hint">在图片上涂鸦标注</view>
     </view>
 
@@ -42,33 +45,92 @@
     <view class="section">
       <view class="section-title">画笔设置</view>
 
-      <!-- 颜色选择 -->
-      <view class="color-section">
-        <text class="setting-label">画笔颜色</text>
-        <view class="color-list">
+      <!-- 工具选择 -->
+      <view class="tool-section">
+        <view
+          class="tool-item {{!isEraser ? 'active' : ''}}"
+          bindtap="toggleEraser"
+        >
+          <text class="tool-icon">✏️</text>
+          <text class="tool-label">画笔</text>
+        </view>
+        <view
+          class="tool-item {{isEraser ? 'active' : ''}}"
+          bindtap="toggleEraser"
+        >
+          <text class="tool-icon">🧹</text>
+          <text class="tool-label">橡皮擦</text>
+        </view>
+      </view>
+
+      <!-- 画笔类型选择 -->
+      <view class="brush-type-section" wx:if="{{!isEraser}}">
+        <text class="setting-label">画笔类型</text>
+        <view class="brush-type-list">
           <view
-            wx:for="{{presetColors}}"
-            wx:key="*this"
-            class="color-item {{brushColor === item ? 'active' : ''}}"
-            style="background-color: {{item}};"
-            data-color="{{item}}"
-            bindtap="onColorSelect"
+            class="brush-type-item {{brushType === 'normal' ? 'active' : ''}}"
+            data-type="normal"
+            bindtap="onBrushTypeSelect"
           >
-            <text wx:if="{{brushColor === item}}" class="color-check">✓</text>
+            <text class="type-icon">●</text>
+            <text class="type-label">普通</text>
+          </view>
+          <view
+            class="brush-type-item {{brushType === 'neon' ? 'active' : ''}}"
+            data-type="neon"
+            bindtap="onBrushTypeSelect"
+          >
+            <text class="type-icon">✨</text>
+            <text class="type-label">霓虹</text>
+          </view>
+          <view
+            class="brush-type-item {{brushType === 'marker' ? 'active' : ''}}"
+            data-type="marker"
+            bindtap="onBrushTypeSelect"
+          >
+            <text class="type-icon">▪</text>
+            <text class="type-label">马克</text>
+          </view>
+          <view
+            class="brush-type-item {{brushType === 'blur' ? 'active' : ''}}"
+            data-type="blur"
+            bindtap="onBrushTypeSelect"
+          >
+            <text class="type-icon">☁</text>
+            <text class="type-label">模糊</text>
           </view>
         </view>
+      </view>
+
+      <!-- 颜色选择 -->
+      <view class="color-section" wx:if="{{!isEraser}}">
+        <text class="setting-label">画笔颜色</text>
+        <scroll-view scroll-x class="color-scroll">
+          <view class="color-list">
+            <view
+              wx:for="{{presetColors}}"
+              wx:key="*this"
+              class="color-item {{brushColor === item ? 'active' : ''}}"
+              style="background-color: {{item}};"
+              data-color="{{item}}"
+              bindtap="onColorSelect"
+            >
+              <text wx:if="{{brushColor === item}}" class="color-check">✓</text>
+            </view>
+          </view>
+        </scroll-view>
       </view>
 
       <!-- 画笔大小 -->
       <view class="size-section">
         <view class="size-header">
-          <text class="setting-label">画笔大小</text>
+          <text class="setting-label">{{isEraser ? '橡皮擦大小' : '画笔大小'}}</text>
           <text class="size-value">{{brushSize}}px</text>
         </view>
         <slider
           class="size-slider"
-          min="1"
-          max="20"
+          min="2"
+          max="30"
           value="{{brushSize}}"
           block-size="24"
           activeColor="#41bc3f"
@@ -91,11 +153,11 @@
       hasResult="{{true}}"
       isLoading="{{isProcessing}}"
       primaryText="保存到相册"
-      secondaryText="清空"
+      secondaryText="重置"
       saveText="保存到相册"
       loadingText="处理中..."
       bind:primary="saveToAlbum"
-      bind:secondary="clearCanvas"
+      bind:secondary="resetCanvas"
       bind:save="saveToAlbum"
     />
   </block>

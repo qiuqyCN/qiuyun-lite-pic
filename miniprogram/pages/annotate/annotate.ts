@@ -14,6 +14,14 @@ interface AnnotateData {
   // 画笔设置
   brushColor: string;
   brushSize: number;
+  isEraser: boolean;
+  brushType: 'normal' | 'neon' | 'marker' | 'blur';
+
+  // Canvas 显示尺寸
+  canvasWidth: number;
+  canvasHeight: number;
+  canvasOffsetX: number;
+  canvasOffsetY: number;
 
   // 输出格式
   fileType: 'jpg' | 'png';
@@ -24,10 +32,28 @@ interface AnnotateData {
   isDrawing: boolean;
 }
 
-// 预设颜色
+// 预设颜色（更多颜色选择）
 const PRESET_COLORS = [
-  '#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff',
-  '#ffff00', '#ff00ff', '#00ffff', '#ff6600', '#41bc3f'
+  // 基础色
+  '#000000', '#ffffff', '#808080',
+  // 红色系
+  '#ff0000', '#ff4444', '#ff8888', '#ffaaaa',
+  // 橙色系
+  '#ff6600', '#ff8800', '#ffaa00', '#ffcc00',
+  // 黄色系
+  '#ffff00', '#ffff44', '#ffff88',
+  // 绿色系
+  '#00ff00', '#44ff44', '#88ff88', '#41bc3f', '#2d8c2b',
+  // 青色系
+  '#00ffff', '#44ffff', '#88ffff',
+  // 蓝色系
+  '#0000ff', '#4444ff', '#8888ff', '#0066ff', '#0088ff',
+  // 紫色系
+  '#ff00ff', '#ff44ff', '#ff88ff', '#8800ff', '#aa44ff',
+  // 粉色系
+  '#ff0088', '#ff44aa', '#ff88cc', '#ffcccc',
+  // 棕色系
+  '#8b4513', '#a0522d', '#cd853f', '#deb887'
 ];
 
 Component({
@@ -38,6 +64,13 @@ Component({
 
     brushColor: '#41bc3f',
     brushSize: 5,
+    isEraser: false,
+    brushType: 'normal' as const,
+
+    canvasWidth: 0,
+    canvasHeight: 0,
+    canvasOffsetX: 0,
+    canvasOffsetY: 0,
 
     fileType: 'jpg',
 
@@ -81,27 +114,44 @@ Component({
       try {
         // 获取canvas上下文
         const query = wx.createSelectorQuery().in(this);
-        const canvasNode = await new Promise<any>((resolve) => {
+        const canvasRes = await new Promise<any>((resolve) => {
           query.select('#annotateCanvas')
             .fields({ node: true, size: true })
             .exec((res) => {
-              resolve(res[0].node);
+              resolve(res[0]);
             });
         });
 
-        if (!canvasNode) return;
+        if (!canvasRes || !canvasRes.node) return;
 
-        // 计算显示尺寸
+        const canvasNode = canvasRes.node;
+        const canvasRect = canvasRes;
+
+        // 计算显示尺寸 - 保持图片比例
         const sysInfo = wx.getSystemInfoSync();
-        const maxWidth = sysInfo.windowWidth - 60;
+        const containerWidth = sysInfo.windowWidth - 60; // 减去padding
         const maxHeight = 400;
 
-        const scaleX = maxWidth / originalWidth;
-        const scaleY = maxHeight / originalHeight;
-        const scale = Math.min(scaleX, scaleY, 1);
+        // 计算保持比例的缩放
+        const imgRatio = originalWidth / originalHeight;
+        const containerRatio = containerWidth / maxHeight;
 
-        const displayWidth = Math.floor(originalWidth * scale);
-        const displayHeight = Math.floor(originalHeight * scale);
+        let displayWidth: number;
+        let displayHeight: number;
+
+        if (imgRatio > containerRatio) {
+          // 图片更宽，以宽度为基准
+          displayWidth = Math.floor(containerWidth);
+          displayHeight = Math.floor(containerWidth / imgRatio);
+        } else {
+          // 图片更高，以高度为基准
+          displayHeight = Math.floor(maxHeight);
+          displayWidth = Math.floor(maxHeight * imgRatio);
+        }
+
+        // 计算居中偏移
+        const offsetX = Math.floor((containerWidth - displayWidth) / 2);
+        const offsetY = Math.floor((maxHeight - displayHeight) / 2);
 
         // 设置canvas尺寸
         canvasNode.width = displayWidth;
@@ -119,7 +169,15 @@ Component({
 
         ctx.drawImage(image, 0, 0, displayWidth, displayHeight);
 
-        this.canvasContext = { canvas: canvasNode, ctx, scale };
+        // 保存canvas信息
+        this.setData({
+          canvasWidth: displayWidth,
+          canvasHeight: displayHeight,
+          canvasOffsetX: offsetX,
+          canvasOffsetY: offsetY,
+        });
+
+        this.canvasContext = { canvas: canvasNode, ctx, scale: displayWidth / originalWidth };
       } catch (err) {
         handleError(err, '画布初始化失败');
       }
@@ -132,23 +190,58 @@ Component({
       if (!this.canvasContext) return;
 
       const touch = e.touches[0];
-      const { ctx, canvas } = this.canvasContext;
-      const { brushColor, brushSize } = this.data;
+      const { ctx } = this.canvasContext;
+      const { brushColor, brushSize, isEraser, brushType } = this.data;
 
-      // 获取canvas位置
-      const rect = (e.target as any).getBoundingClientRect();
-      const x = touch.clientX - rect.left;
-      const y = touch.clientY - rect.top;
+      // 获取触摸点在canvas上的坐标（使用target的相对坐标）
+      const x = touch.x;
+      const y = touch.y;
 
       this.setData({ isDrawing: true });
 
       // 开始路径
       ctx.beginPath();
       ctx.moveTo(x, y);
-      ctx.strokeStyle = brushColor;
-      ctx.lineWidth = brushSize;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
+
+      if (isEraser) {
+        // 橡皮擦模式
+        ctx.strokeStyle = 'rgba(255, 255, 255, 1)';
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.lineWidth = brushSize;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.shadowBlur = 0;
+      } else {
+        // 画笔模式 - 根据画笔类型设置样式
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = brushColor;
+        ctx.lineWidth = brushSize;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        // 根据画笔类型设置特效
+        switch (brushType) {
+          case 'neon':
+            // 霓虹效果
+            ctx.shadowBlur = brushSize * 2;
+            ctx.shadowColor = brushColor;
+            break;
+          case 'marker':
+            // 马克笔效果 - 半透明
+            ctx.globalAlpha = 0.6;
+            ctx.shadowBlur = 0;
+            break;
+          case 'blur':
+            // 模糊效果
+            ctx.shadowBlur = brushSize;
+            ctx.shadowColor = brushColor;
+            break;
+          default:
+            // 普通画笔
+            ctx.shadowBlur = 0;
+            ctx.globalAlpha = 1;
+        }
+      }
     },
 
     /**
@@ -160,10 +253,9 @@ Component({
       const touch = e.touches[0];
       const { ctx } = this.canvasContext;
 
-      // 获取canvas位置
-      const rect = (e.target as any).getBoundingClientRect();
-      const x = touch.clientX - rect.left;
-      const y = touch.clientY - rect.top;
+      // 获取触摸点在canvas上的坐标
+      const x = touch.x;
+      const y = touch.y;
 
       // 绘制线条
       ctx.lineTo(x, y);
@@ -174,7 +266,22 @@ Component({
      * 触摸结束
      */
     onTouchEnd() {
+      if (this.canvasContext) {
+        const { ctx } = this.canvasContext;
+        // 重置画笔特效
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = 'source-over';
+      }
       this.setData({ isDrawing: false });
+    },
+
+    /**
+     * 选择画笔类型
+     */
+    onBrushTypeSelect(e: WechatMiniprogram.TouchEvent) {
+      const type = e.currentTarget.dataset.type;
+      this.setData({ brushType: type, isEraser: false });
     },
 
     /**
@@ -193,9 +300,16 @@ Component({
     },
 
     /**
-     * 清空画布
+     * 切换橡皮擦模式
      */
-    clearCanvas() {
+    toggleEraser() {
+      this.setData({ isEraser: !this.data.isEraser });
+    },
+
+    /**
+     * 重置画布 - 清空涂鸦并恢复初始状态
+     */
+    resetCanvas() {
       if (!this.canvasContext) return;
 
       const { ctx, canvas } = this.canvasContext;
@@ -207,13 +321,14 @@ Component({
         ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
       };
       image.src = this.data.imagePath;
-    },
 
-    /**
-     * 撤销上一步（简化版：重新加载原图）
-     */
-    undo() {
-      this.clearCanvas();
+      // 重置画笔设置
+      this.setData({
+        brushColor: '#41bc3f',
+        brushSize: 5,
+        isEraser: false,
+        brushType: 'normal',
+      });
     },
 
     /**
