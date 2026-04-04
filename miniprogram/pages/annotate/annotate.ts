@@ -4,7 +4,6 @@
 import { chooseImage, getImageInfo } from '../../utils/image';
 import { saveImageToAlbumWithUI } from '../../utils/file';
 import { handleError } from '../../utils/error';
-import { showLoading } from '../../utils/ui';
 import { saveToHistory } from '../../utils/history';
 
 interface AnnotateData {
@@ -372,8 +371,6 @@ Component({
       const canvasContext = (this as any)._canvasContext;
       if (!canvasContext) return;
 
-      const hideLoading = showLoading('保存中...');
-
       try {
         const { canvas } = canvasContext;
         const { fileType } = this.data;
@@ -390,12 +387,11 @@ Component({
         });
 
         await saveImageToAlbumWithUI(res.tempFilePath, {
+          loadingText: '导出并保存中...',
           onSuccess: () => this.saveHistory(res.tempFilePath)
         });
       } catch (err) {
         handleError(err, '保存失败');
-      } finally {
-        hideLoading();
       }
     },
 

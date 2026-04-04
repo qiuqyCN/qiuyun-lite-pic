@@ -47,16 +47,16 @@ export const saveImageToAlbumWithUI = async (
 
   try {
     await saveImageToAlbum(filePath);
+    hideLoading();
     showSuccess(successText);
     if (onSuccess) {
       onSuccess();
     }
     return true;
   } catch (err) {
+    hideLoading();
     handleError(err, errorText);
     return false;
-  } finally {
-    hideLoading();
   }
 };
 
@@ -90,7 +90,7 @@ export const previewImage = (urls: string[], current?: string): void => {
  * @returns 文件大小
  */
 export const getFileSize = (filePath: string): Promise<number> => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const fs = wx.getFileSystemManager();
     fs.getFileInfo({
       filePath,

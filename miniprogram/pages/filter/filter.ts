@@ -338,9 +338,15 @@ Component({
         await this.applyFilter(this.data.currentFilter, this.data.filterIntensity);
       }
 
+      // 保存时禁用按钮
+      this.setData({ isProcessing: true });
+
       await saveImageToAlbumWithUI(this.data.filteredPath, {
         onSuccess: () => this.saveToHistory()
       });
+
+      // 保存完成后恢复按钮
+      this.setData({ isProcessing: false });
     },
 
     /**
