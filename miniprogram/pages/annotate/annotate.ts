@@ -126,8 +126,8 @@ Component({
         const canvasNode = canvasRes.node;
 
         // 计算显示尺寸 - 保持图片比例
-        const sysInfo = wx.getSystemInfoSync();
-        const containerWidth = sysInfo.windowWidth - 60; // 减去padding
+        const windowInfo = (wx as any).getWindowInfo();
+        const containerWidth = windowInfo.windowWidth - 60; // 减去padding
         const maxHeight = 400;
 
         // 计算保持比例的缩放

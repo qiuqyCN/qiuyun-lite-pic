@@ -115,8 +115,8 @@ Component({
      * 计算显示缩放
      */
     calculateDisplayScale(imgWidth: number, imgHeight: number) {
-      const sysInfo = wx.getSystemInfoSync();
-      const containerWidth = sysInfo.windowWidth - 60;
+      const windowInfo = (wx as any).getWindowInfo();
+      const containerWidth = windowInfo.windowWidth - 60;
       const maxHeight = 400;
 
       const imgRatio = imgWidth / imgHeight;

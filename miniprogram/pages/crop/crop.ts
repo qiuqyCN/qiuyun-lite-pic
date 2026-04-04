@@ -123,8 +123,8 @@ Component({
      * 计算显示缩放
      */
     calculateDisplayScale(imgWidth: number, imgHeight: number) {
-      const sysInfo = wx.getSystemInfoSync();
-      const windowWidth = sysInfo.windowWidth - 60; // 减去padding
+      const windowInfo = (wx as any).getWindowInfo();
+      const windowWidth = windowInfo.windowWidth - 60; // 减去padding
       const maxHeight = 400; // 最大显示高度
 
       const scaleX = windowWidth / imgWidth;
@@ -467,6 +467,10 @@ Component({
       const { imagePath, croppedPath, originalWidth, originalHeight, cropWidth, cropHeight, aspectRatio } = this.data;
       if (!croppedPath) return;
 
+      // 查找比例对应的标签
+      const ratioItem = ASPECT_RATIOS.find(r => r.value === aspectRatio);
+      const aspectRatioLabel = ratioItem ? ratioItem.label : (aspectRatio === 0 ? '自由裁剪' : '自定义');
+
       saveToHistory({
         type: 'crop',
         typeName: '图片裁剪',
@@ -477,7 +481,7 @@ Component({
           originalHeight,
           cropWidth,
           cropHeight,
-          aspectRatio: aspectRatio === 0 ? '自由' : aspectRatio
+          aspectRatio: aspectRatioLabel
         }
       });
     },

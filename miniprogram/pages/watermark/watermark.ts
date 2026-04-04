@@ -63,7 +63,7 @@ Component({
     watermarkImage: '',
 
     // 文字水印样式
-    fontSize: 25,
+    fontSize: 40,
     fontColor: '#41bc3f',
     opacity: 50,
     rotation: 0,
