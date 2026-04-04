@@ -114,15 +114,15 @@ Component({
         id: 'advanced',
         name: '高级功能',
         tools: [
-          {
-            id: 'cutout',
-            name: '智能抠图',
-            description: 'AI 自动识别，一键更换背景',
-            icon: '✂️',
-            iconBg: '#ffe8f0',
-            path: '/pages/cutout/cutout',
-            isDeveloping: true
-          },
+          // {
+          //   id: 'cutout',
+          //   name: '智能抠图',
+          //   description: 'AI 自动识别，一键更换背景',
+          //   icon: '✂️',
+          //   iconBg: '#ffe8f0',
+          //   path: '/pages/cutout/cutout',
+          //   isDeveloping: true
+          // },
           {
             id: 'colorpicker',
             name: '图片取色',
