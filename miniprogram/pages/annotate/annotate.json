@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "标注涂鸦",
+  "usingComponents": {
+    "image-upload": "../../components/image-upload/image-upload",
+    "image-preview": "../../components/image-preview/image-preview",
+    "action-buttons": "../../components/action-buttons/action-buttons",
+    "format-selector": "../../components/format-selector/format-selector"
+  },
+  "navigationBarBackgroundColor": "#41bc3f",
+  "navigationBarTextStyle": "white"
+}

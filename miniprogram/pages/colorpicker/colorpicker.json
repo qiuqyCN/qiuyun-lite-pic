@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "图片取色",
+  "usingComponents": {
+    "image-upload": "../../components/image-upload/image-upload",
+    "image-preview": "../../components/image-preview/image-preview",
+    "format-selector": "../../components/format-selector/format-selector",
+    "action-buttons": "../../components/action-buttons/action-buttons"
+  },
+  "navigationBarBackgroundColor": "#41bc3f",
+  "navigationBarTextStyle": "white"
+}

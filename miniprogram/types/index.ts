@@ -128,7 +128,7 @@ export interface CanvasContext {
   /** Canvas 节点 */
   canvas: any;
   /** 2D 上下文 */
-  ctx: CanvasRenderingContext2D;
+  ctx: any;
   /** Canvas 宽度 */
   width: number;
   /** Canvas 高度 */

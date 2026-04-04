@@ -1,0 +1,87 @@
+<!-- colorpicker.wxml -->
+<!-- 图片取色页面 -->
+
+<view class="container">
+  <!-- 未选择图片状态 -->
+  <image-upload
+    wx:if="{{!hasImage}}"
+    icon="🎨"
+    title="选择图片"
+    hint="点击从相册选择或拍照"
+    bind:upload="chooseImage"
+  />
+
+  <!-- 已选择图片 -->
+  <block wx:else>
+    <!-- 图片预览区域 -->
+    <image-preview
+      imagePath="{{imagePath}}"
+      title="图片预览"
+      showChange="{{true}}"
+      bind:change="chooseImage"
+      bind:preview="previewImage"
+    />
+
+    <!-- 取色画布 -->
+    <view class="section">
+      <view class="section-title">点击取色</view>
+      <view class="canvas-wrapper">
+        <canvas
+          type="2d"
+          id="colorCanvas"
+          class="color-canvas"
+          bindtouchstart="onTouchStart"
+          bindtouchmove="onTouchMove"
+          bindtouchend="onTouchEnd"
+        ></canvas>
+        <!-- 放大镜 -->
+        <view
+          wx:if="{{showMagnifier}}"
+          class="magnifier"
+          style="left: {{magnifierX}}px; top: {{magnifierY}}px;"
+        >
+          <view class="magnifier-inner"></view>
+        </view>
+      </view>
+      <view class="canvas-hint">点击图片任意位置取色</view>
+    </view>
+
+    <!-- 取色结果 -->
+    <view wx:if="{{pickedColor}}" class="section">
+      <view class="section-title">取色结果</view>
+      <view class="color-result" bindtap="copyColor">
+        <view
+          class="color-preview"
+          style="background-color: {{pickedColor}};"
+        ></view>
+        <view class="color-info">
+          <text class="color-hex">{{pickedColor}}</text>
+          <text class="color-rgb">{{pickedColorRgb}}</text>
+        </view>
+        <text class="copy-hint">点击复制</text>
+      </view>
+    </view>
+
+    <!-- 输出格式 -->
+    <format-selector
+      value="{{fileType}}"
+      mode="horizontal"
+      showDesc="{{false}}"
+      bind:change="onFormatChange"
+    />
+
+    <!-- 操作按钮 -->
+    <action-buttons
+      hasResult="{{true}}"
+      isLoading="{{isProcessing}}"
+      primaryText="保存到相册"
+      saveText="保存到相册"
+      loadingText="处理中..."
+      bind:primary="saveToAlbum"
+      bind:save="saveToAlbum"
+    />
+
+    <!-- 隐藏Canvas -->
+    <canvas type="2d" id="saveCanvas" class="hidden-canvas"></canvas>
+  </block>
+</view>

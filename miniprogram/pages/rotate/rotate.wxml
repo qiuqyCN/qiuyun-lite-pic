@@ -1,0 +1,89 @@
+<!-- rotate.wxml -->
+<!-- 图片旋转/翻转页面 -->
+
+<view class="container">
+  <!-- 未选择图片状态 -->
+  <image-upload
+    wx:if="{{!hasImage}}"
+    icon="↻"
+    title="选择图片"
+    hint="点击从相册选择或拍照"
+    bind:upload="chooseImage"
+  />
+
+  <!-- 已选择图片 -->
+  <block wx:else>
+    <!-- 图片预览区域 -->
+    <image-preview
+      imagePath="{{resultPath || imagePath}}"
+      title="图片预览"
+      showChange="{{true}}"
+      isProcessing="{{isProcessing}}"
+      processingText="处理中..."
+      bind:change="chooseImage"
+      bind:preview="previewImage"
+    />
+
+    <!-- 旋转选择 -->
+    <view class="section">
+      <view class="section-title">旋转角度</view>
+      <view class="rotation-list">
+        <view
+          wx:for="{{rotationOptions}}"
+          wx:key="value"
+          class="rotation-item {{rotation === item.value ? 'active' : ''}}"
+          data-rotation="{{item.value}}"
+          bindtap="onRotationSelect"
+        >
+          <text class="rotation-icon">{{item.icon}}</text>
+          <text class="rotation-label">{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 翻转选择 -->
+    <view class="section">
+      <view class="section-title">翻转</view>
+      <view class="flip-list">
+        <view
+          class="flip-item {{flipH ? 'active' : ''}}"
+          bindtap="toggleFlipH"
+        >
+          <text class="flip-icon">⇋</text>
+          <text class="flip-label">水平翻转</text>
+        </view>
+        <view
+          class="flip-item {{flipV ? 'active' : ''}}"
+          bindtap="toggleFlipV"
+        >
+          <text class="flip-icon">⇵</text>
+          <text class="flip-label">垂直翻转</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 输出格式 -->
+    <format-selector
+      value="{{fileType}}"
+      mode="horizontal"
+      showDesc="{{false}}"
+      bind:change="onFormatChange"
+    />
+
+    <!-- 操作按钮 -->
+    <action-buttons
+      hasResult="{{true}}"
+      isLoading="{{isProcessing}}"
+      primaryText="保存到相册"
+      secondaryText="重置"
+      saveText="保存到相册"
+      loadingText="处理中..."
+      bind:primary="saveToAlbum"
+      bind:secondary="resetTransform"
+      bind:save="saveToAlbum"
+    />
+
+    <!-- 隐藏Canvas -->
+    <canvas type="2d" id="rotateCanvas" class="hidden-canvas"></canvas>
+  </block>
+</view>

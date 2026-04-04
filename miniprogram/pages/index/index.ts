@@ -50,6 +50,24 @@ Component({
             path: '/pages/resize/resize'
           },
           {
+            id: 'crop',
+            name: '图片裁剪',
+            description: '自由裁剪，支持多种比例',
+            icon: '✂️',
+            iconBg: '#ffe8e8',
+            path: '/pages/crop/crop',
+            isNew: true
+          },
+          {
+            id: 'rotate',
+            name: '旋转翻转',
+            description: '任意角度旋转，水平垂直翻转',
+            icon: '↻',
+            iconBg: '#e8f8ff',
+            path: '/pages/rotate/rotate',
+            isNew: true
+          },
+          {
             id: 'convert',
             name: '格式转换',
             description: '多格式导入，转为 JPG/PNG',
@@ -70,6 +88,15 @@ Component({
             icon: '✨',
             iconBg: '#fff8e8',
             path: '/pages/filter/filter'
+          },
+          {
+            id: 'annotate',
+            name: '标注涂鸦',
+            description: '自由涂鸦标注，支持多种颜色',
+            icon: '✏️',
+            iconBg: '#fff0e8',
+            path: '/pages/annotate/annotate',
+            isNew: true
           },
           {
             id: 'watermark',
@@ -99,7 +126,15 @@ Component({
             description: 'AI 自动识别，一键更换背景',
             icon: '✂️',
             iconBg: '#ffe8f0',
-            path: '/pages/cutout/cutout',
+            path: '/pages/cutout/cutout'
+          },
+          {
+            id: 'colorpicker',
+            name: '图片取色',
+            description: '点击图片获取任意位置颜色值',
+            icon: '🎨',
+            iconBg: '#f8e8ff',
+            path: '/pages/colorpicker/colorpicker',
             isNew: true
           }
         ]

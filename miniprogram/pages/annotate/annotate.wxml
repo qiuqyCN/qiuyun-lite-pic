@@ -1,0 +1,102 @@
+<!-- annotate.wxml -->
+<!-- 图片标注/涂鸦页面 -->
+
+<view class="container">
+  <!-- 未选择图片状态 -->
+  <image-upload
+    wx:if="{{!hasImage}}"
+    icon="✏️"
+    title="选择图片"
+    hint="点击从相册选择或拍照"
+    bind:upload="chooseImage"
+  />
+
+  <!-- 已选择图片 -->
+  <block wx:else>
+    <!-- 图片预览区域 -->
+    <image-preview
+      imagePath="{{imagePath}}"
+      title="图片预览"
+      showChange="{{true}}"
+      isProcessing="{{isProcessing}}"
+      processingText="处理中..."
+      bind:change="chooseImage"
+      bind:preview="previewImage"
+    />
+
+    <!-- 涂鸦画布 -->
+    <view class="section">
+      <view class="section-title">涂鸦区域</view>
+      <canvas
+        type="2d"
+        id="annotateCanvas"
+        class="annotate-canvas"
+        bindtouchstart="onTouchStart"
+        bindtouchmove="onTouchMove"
+        bindtouchend="onTouchEnd"
+      ></canvas>
+      <view class="canvas-hint">在图片上涂鸦标注</view>
+    </view>
+
+    <!-- 画笔设置 -->
+    <view class="section">
+      <view class="section-title">画笔设置</view>
+
+      <!-- 颜色选择 -->
+      <view class="color-section">
+        <text class="setting-label">画笔颜色</text>
+        <view class="color-list">
+          <view
+            wx:for="{{presetColors}}"
+            wx:key="*this"
+            class="color-item {{brushColor === item ? 'active' : ''}}"
+            style="background-color: {{item}};"
+            data-color="{{item}}"
+            bindtap="onColorSelect"
+          >
+            <text wx:if="{{brushColor === item}}" class="color-check">✓</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 画笔大小 -->
+      <view class="size-section">
+        <view class="size-header">
+          <text class="setting-label">画笔大小</text>
+          <text class="size-value">{{brushSize}}px</text>
+        </view>
+        <slider
+          class="size-slider"
+          min="1"
+          max="20"
+          value="{{brushSize}}"
+          block-size="24"
+          activeColor="#41bc3f"
+          backgroundColor="#e8e8ed"
+          bindchange="onSizeChange"
+        />
+      </view>
+    </view>
+
+    <!-- 输出格式 -->
+    <format-selector
+      value="{{fileType}}"
+      mode="horizontal"
+      showDesc="{{false}}"
+      bind:change="onFormatChange"
+    />
+
+    <!-- 操作按钮 -->
+    <action-buttons
+      hasResult="{{true}}"
+      isLoading="{{isProcessing}}"
+      primaryText="保存到相册"
+      secondaryText="清空"
+      saveText="保存到相册"
+      loadingText="处理中..."
+      bind:primary="saveToAlbum"
+      bind:secondary="clearCanvas"
+      bind:save="saveToAlbum"
+    />
+  </block>
+</view>

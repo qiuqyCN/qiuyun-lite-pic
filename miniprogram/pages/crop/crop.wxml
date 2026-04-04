@@ -1,0 +1,124 @@
+<!-- crop.wxml -->
+<!-- 图片裁剪页面 -->
+
+<view class="container">
+  <!-- 未选择图片状态 -->
+  <image-upload
+    wx:if="{{!hasImage}}"
+    icon="✂️"
+    title="选择图片"
+    hint="点击从相册选择或拍照"
+    bind:upload="chooseImage"
+  />
+
+  <!-- 已选择图片 -->
+  <block wx:else>
+    <!-- 图片预览区域 -->
+    <image-preview
+      imagePath="{{croppedPath || imagePath}}"
+      title="图片预览"
+      showChange="{{true}}"
+      isProcessing="{{isProcessing}}"
+      processingText="裁剪中..."
+      bind:change="chooseImage"
+      bind:preview="previewImage"
+    />
+
+    <!-- 裁剪区域 -->
+    <view class="section crop-section">
+      <view class="section-title">裁剪区域</view>
+      <view
+        class="crop-area"
+        style="width: {{originalWidth * scale}}px; height: {{originalHeight * scale}}px;"
+        bindtouchstart="onTouchStart"
+        bindtouchmove="onTouchMove"
+        bindtouchend="onTouchEnd"
+      >
+        <image
+          class="crop-image"
+          src="{{imagePath}}"
+          mode="scaleToFill"
+          style="width: {{originalWidth * scale}}px; height: {{originalHeight * scale}}px;"
+        />
+        <!-- 裁剪框 -->
+        <view
+          class="crop-frame"
+          style="left: {{cropX * scale}}px; top: {{cropY * scale}}px; width: {{cropWidth * scale}}px; height: {{cropHeight * scale}}px;"
+          bindtouchstart="onTouchStart"
+          bindtouchmove="onTouchMove"
+          bindtouchend="onTouchEnd"
+        >
+          <view class="crop-frame-inner"></view>
+          <!-- 四个角的手柄 -->
+          <view 
+            class="resize-handle tl" 
+            data-corner="tl"
+            bindtouchstart="onResizeStart"
+            bindtouchmove="onResizeMove"
+          ></view>
+          <view 
+            class="resize-handle tr" 
+            data-corner="tr"
+            bindtouchstart="onResizeStart"
+            bindtouchmove="onResizeMove"
+          ></view>
+          <view 
+            class="resize-handle bl" 
+            data-corner="bl"
+            bindtouchstart="onResizeStart"
+            bindtouchmove="onResizeMove"
+          ></view>
+          <view 
+            class="resize-handle br" 
+            data-corner="br"
+            bindtouchstart="onResizeStart"
+            bindtouchmove="onResizeMove"
+          ></view>
+        </view>
+      </view>
+      <view class="crop-hint">拖动调整裁剪位置</view>
+    </view>
+
+    <!-- 比例选择 -->
+    <view class="section">
+      <view class="section-title">裁剪比例</view>
+      <scroll-view scroll-x class="ratio-scroll">
+        <view class="ratio-list">
+          <view
+            wx:for="{{aspectRatios}}"
+            wx:key="label"
+            class="ratio-item {{aspectRatio === item.value ? 'active' : ''}}"
+            data-ratio="{{item.value}}"
+            bindtap="onRatioSelect"
+          >
+            <text class="ratio-label">{{item.label}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 输出格式 -->
+    <format-selector
+      value="{{fileType}}"
+      mode="horizontal"
+      showDesc="{{false}}"
+      bind:change="onFormatChange"
+    />
+
+    <!-- 操作按钮 -->
+    <action-buttons
+      hasResult="{{true}}"
+      isLoading="{{isProcessing}}"
+      primaryText="保存到相册"
+      secondaryText="重置"
+      saveText="保存到相册"
+      loadingText="处理中..."
+      bind:primary="saveToAlbum"
+      bind:secondary="resetCrop"
+      bind:save="saveToAlbum"
+    />
+
+    <!-- 隐藏Canvas -->
+    <canvas type="2d" id="cropCanvas" class="hidden-canvas"></canvas>
+  </block>
+</view>
