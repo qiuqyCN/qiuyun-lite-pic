@@ -23,6 +23,10 @@ Component({
     envVersion: ''
   } as SettingsData,
 
+  options: {
+    addGlobalClass: true
+  },
+
   lifetimes: {
     attached() {
       this.loadCacheSize();
@@ -30,9 +34,24 @@ Component({
     }
   },
 
+  // 页面生命周期
   pageLifetimes: {
     show() {
+      // 刷新缓存大小
       this.loadCacheSize();
+
+      // 设置页面分享配置
+      const pages = getCurrentPages();
+      const currentPage = pages[pages.length - 1];
+      if (currentPage) {
+        currentPage.onShareAppMessage = () => {
+          return {
+            title: '秋云轻图 - 极简高效的图片处理工具',
+            path: '/pages/index/index',
+            imageUrl: '/images/logo.png'
+          };
+        };
+      }
     }
   },
 
@@ -110,8 +129,8 @@ Component({
 
     /**
      * 获取环境版本文本
-     * @param envVersion 环境版本标识
-     * @returns 环境版本中文描述
+     * @param envVersion 环境版本标识/**
+     * 获取环境版本文本
      */
     getEnvText(envVersion: string): string {
       const envMap: Record<string, string> = {
@@ -120,6 +139,16 @@ Component({
         'release': '正式版'
       };
       return envMap[envVersion] || envVersion;
+    },
+
+    /**
+     * 预览小程序码
+     */
+    onShareWeappCode() {
+      wx.previewImage({
+        urls: ['/images/weappcode.png'],
+        current: '/images/weappcode.png'
+      });
     }
   }
 });
