@@ -172,15 +172,13 @@ Component({
           image.src = imagePath;
         });
 
-        // 绘制图片（注意：旋转后坐标系变化）
-        const drawWidth = isRotated90 ? originalHeight : originalWidth;
-        const drawHeight = isRotated90 ? originalWidth : originalHeight;
+        // 绘制图片（使用原始尺寸，因为旋转是在变换矩阵中完成的）
         ctx.drawImage(
           image,
-          -drawWidth / 2,
-          -drawHeight / 2,
-          drawWidth,
-          drawHeight
+          -originalWidth / 2,
+          -originalHeight / 2,
+          originalWidth,
+          originalHeight
         );
 
         // 恢复上下文
