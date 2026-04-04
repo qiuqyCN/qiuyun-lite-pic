@@ -3,6 +3,7 @@
 
 import { chooseImage, getImageInfo } from '../../utils/image';
 import { handleError, showSuccess } from '../../utils/error';
+import { saveToHistory } from '../../utils/history';
 
 interface ColorPickerData {
   // 图片信息
@@ -406,8 +407,31 @@ Component({
         data: color,
         success: () => {
           showSuccess('颜色已复制');
-          // 添加到历史记录
+          // 添加到页面历史记录
           (this as any).addToHistory(this.data.pickedColor);
+          // 保存到全局历史记录
+          this.saveHistory();
+        }
+      });
+    },
+
+    /**
+     * 保存到全局历史记录
+     */
+    saveHistory() {
+      const { imagePath, pickedColor, pickedColorRgb, pickedColorHsl, colorFormat } = this.data;
+      if (!pickedColor) return;
+
+      saveToHistory({
+        type: 'colorpicker',
+        typeName: '图片取色',
+        originalPath: imagePath,
+        resultPath: '', // 取色不生成图片
+        params: {
+          color: pickedColor,
+          rgb: pickedColorRgb,
+          hsl: pickedColorHsl,
+          format: colorFormat
         }
       });
     },

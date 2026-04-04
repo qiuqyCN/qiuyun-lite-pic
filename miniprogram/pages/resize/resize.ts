@@ -12,6 +12,7 @@ import {
   fillBackground
 } from '../../utils/canvas';
 import { saveImageToAlbum } from '../../utils/file';
+import { saveToHistory } from '../../utils/history';
 import { handleError, showSuccess, showLoading } from '../../utils/error';
 import { debounce } from '../../utils/debounce';
 import { ALL_PRESETS } from '../../constants/presets';
@@ -432,15 +433,11 @@ Component({
      * 将处理记录保存到本地存储
      */
     saveToHistory() {
-      const history = wx.getStorageSync('processHistory') || [];
-      history.unshift({
-        id: Date.now().toString(),
+      saveToHistory({
         type: 'resize',
         typeName: '尺寸调整',
         originalPath: this.data.imagePath,
         resultPath: this.data.resultPath,
-        createTime: Date.now(),
-        timeStr: new Date().toLocaleString(),
         params: {
           originalWidth: this.data.originalWidth,
           originalHeight: this.data.originalHeight,
@@ -448,7 +445,6 @@ Component({
           targetHeight: this.data.targetHeight,
         }
       });
-      wx.setStorageSync('processHistory', history.slice(0, 20));
     },
   }
 });

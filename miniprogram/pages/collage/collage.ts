@@ -4,6 +4,7 @@
 import { chooseImage, chooseMultipleImages, getImageInfo } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
 import { saveImageToAlbum } from '../../utils/file';
+import { saveToHistory } from '../../utils/history';
 import { handleError, showSuccess } from '../../utils/error';
 import { debounce } from '../../utils/debounce';
 
@@ -76,7 +77,7 @@ Component({
     ],
 
     // 当前布局
-    currentLayout: { id: 'grid4', name: '四宫格', cols: 2, rows: 2, maxImages: 9, mode: 'grid' } as LayoutTemplate,
+    currentLayout: { id: 'grid2', name: '双格', cols: 2, rows: 1, maxImages: 9, mode: 'grid' } as LayoutTemplate,
 
     // 间距设置
     spacing: 10,
@@ -606,22 +607,17 @@ Component({
      * 保存到历史记录
      */
     saveToHistory() {
-      const history = wx.getStorageSync('processHistory') || [];
-      history.unshift({
-        id: Date.now().toString(),
+      saveToHistory({
         type: 'collage',
         typeName: '拼图拼接',
         originalPath: this.data.images[0],
         resultPath: this.data.resultPath,
-        createTime: Date.now(),
-        timeStr: new Date().toLocaleString(),
         params: {
           layout: this.data.currentLayout.name,
           imageCount: this.data.images.length,
           spacing: this.data.spacing
         }
       });
-      wx.setStorageSync('processHistory', history.slice(0, 20));
     }
   }
 });

@@ -4,8 +4,8 @@
 import { chooseImage } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
 import { saveImageToAlbum } from '../../utils/file';
+import { saveToHistory } from '../../utils/history';
 import { handleError, showSuccess, showLoading } from '../../utils/error';
-import type { HistoryItem } from '../../types/index';
 
 /** 水印位置类型 */
 type WatermarkPosition = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight' | 'center' | 'tile';
@@ -63,7 +63,7 @@ Component({
     watermarkImage: '',
 
     // 文字水印样式
-    fontSize: 50,
+    fontSize: 25,
     fontColor: '#41bc3f',
     opacity: 50,
     rotation: 0,
@@ -459,19 +459,16 @@ Component({
      * 将处理记录保存到本地存储
      */
     saveToHistory() {
-      const history = wx.getStorageSync('processHistory') || [];
-      const historyItem: HistoryItem = {
-        id: Date.now().toString(),
+      saveToHistory({
         type: 'watermark',
         typeName: '添加水印',
         originalPath: this.data.imagePath,
         resultPath: this.data.watermarkedPath,
-        timestamp: Date.now(),
-        fileSize: 0
-      };
-
-      history.unshift(historyItem);
-      wx.setStorageSync('processHistory', history.slice(0, 20));
+        params: {
+          watermarkType: this.data.watermarkType,
+          watermarkText: this.data.watermarkText
+        }
+      });
     },
 
     /**

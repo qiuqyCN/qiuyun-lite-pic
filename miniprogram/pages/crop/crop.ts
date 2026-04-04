@@ -4,6 +4,7 @@
 import { chooseImage, getImageInfo } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
 import { saveImageToAlbum } from '../../utils/file';
+import { saveToHistory } from '../../utils/history';
 import { handleError, showSuccess, showLoading } from '../../utils/error';
 import { debounce } from '../../utils/debounce';
 
@@ -449,12 +450,36 @@ Component({
 
       try {
         await saveImageToAlbum(this.data.croppedPath);
+        // 保存到历史记录
+        this.saveHistory();
         showSuccess('已保存到相册');
       } catch (err) {
         handleError(err, '保存失败');
       } finally {
         hideLoading();
       }
+    },
+
+    /**
+     * 保存到历史记录
+     */
+    saveHistory() {
+      const { imagePath, croppedPath, originalWidth, originalHeight, cropWidth, cropHeight, aspectRatio } = this.data;
+      if (!croppedPath) return;
+
+      saveToHistory({
+        type: 'crop',
+        typeName: '图片裁剪',
+        originalPath: imagePath,
+        resultPath: croppedPath,
+        params: {
+          originalWidth,
+          originalHeight,
+          cropWidth,
+          cropHeight,
+          aspectRatio: aspectRatio === 0 ? '自由' : aspectRatio
+        }
+      });
     },
   },
 });

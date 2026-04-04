@@ -120,7 +120,9 @@ export interface HistoryItem {
   /** 处理时间 */
   timestamp: number;
   /** 文件大小 */
-  fileSize: number;
+  fileSize?: number;
+  /** 处理参数 */
+  params?: Record<string, any>;
 }
 
 /** Canvas 上下文信息 */

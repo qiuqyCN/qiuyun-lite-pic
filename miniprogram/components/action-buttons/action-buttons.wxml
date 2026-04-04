@@ -3,9 +3,9 @@
   <!-- 处理前：单个大按钮 -->
   <button
     wx:if="{{!hasResult}}"
-    class="btn btn-primary btn-lg btn-block {{isLoading ? 'btn-loading' : ''}}"
+    class="btn btn-primary btn-lg btn-block {{isLoading || disabled ? 'btn-disabled' : ''}}"
     bindtap="onPrimaryTap"
-    disabled="{{isLoading}}"
+    disabled="{{isLoading || disabled}}"
   >
     <text wx:if="{{isLoading}}">{{loadingText}}</text>
     <text wx:else>{{primaryText}}</text>
@@ -14,16 +14,16 @@
   <!-- 处理后：两个按钮 -->
   <view wx:if="{{hasResult}}" class="action-row">
     <button 
-      class="btn btn-secondary btn-flex" 
+      class="btn btn-secondary btn-flex {{isLoading ? 'btn-disabled' : ''}}"
       bindtap="onSecondaryTap"
       disabled="{{isLoading}}"
     >
       {{secondaryText}}
     </button>
     <button 
-      class="btn btn-primary btn-flex" 
+      class="btn btn-primary btn-flex {{isLoading || disabled ? 'btn-disabled' : ''}}"
       bindtap="onSaveTap"
-      disabled="{{isLoading}}"
+      disabled="{{isLoading || disabled}}"
     >
       {{saveText}}
     </button>

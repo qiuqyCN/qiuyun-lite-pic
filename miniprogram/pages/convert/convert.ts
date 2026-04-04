@@ -4,6 +4,7 @@
 import { chooseImage, getImageInfo } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
 import { saveImageToAlbum } from '../../utils/file';
+import { saveToHistory } from '../../utils/history';
 import { handleError, showSuccess, showLoading } from '../../utils/error';
 import { debounce } from '../../utils/debounce';
 
@@ -265,15 +266,11 @@ Component({
      * 保存到历史记录
      */
     saveToHistory() {
-      const history = wx.getStorageSync('processHistory') || [];
-      history.unshift({
-        id: Date.now().toString(),
+      saveToHistory({
         type: 'convert',
         typeName: '格式转换',
         originalPath: this.data.imagePath,
         resultPath: this.data.convertedPath,
-        createTime: Date.now(),
-        timeStr: new Date().toLocaleString(),
         params: {
           originalFormat: this.data.originalFormat,
           convertedFormat: this.data.convertedFormat,
@@ -282,7 +279,6 @@ Component({
           quality: this.data.quality
         }
       });
-      wx.setStorageSync('processHistory', history.slice(0, 20));
     },
 
     /**

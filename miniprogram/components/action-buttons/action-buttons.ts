@@ -35,6 +35,11 @@ Component({
     loadingText: {
       type: String,
       value: '处理中...'
+    },
+    /** 是否禁用 */
+    disabled: {
+      type: Boolean,
+      value: false
     }
   },
 

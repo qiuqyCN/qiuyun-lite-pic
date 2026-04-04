@@ -4,6 +4,7 @@
 import { chooseImage } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
 import { saveImageToAlbum } from '../../utils/file';
+import { saveToHistory } from '../../utils/history';
 import { handleError, showSuccess, showLoading } from '../../utils/error';
 import { ALL_FILTERS } from '../../constants/filters';
 import type { ImageInfo, FilterParams } from '../../types/index';
@@ -355,21 +356,16 @@ Component({
      * 保存到历史记录
      */
     saveToHistory() {
-      const history = wx.getStorageSync('processHistory') || [];
-      history.unshift({
-        id: Date.now().toString(),
+      saveToHistory({
         type: 'filter',
         typeName: '滤镜美化',
         originalPath: this.data.imagePath,
         resultPath: this.data.filteredPath,
-        createTime: Date.now(),
-        timeStr: new Date().toLocaleString(),
         params: {
           filter: this.data.currentFilter,
           intensity: this.data.filterIntensity
         }
       });
-      wx.setStorageSync('processHistory', history.slice(0, 20));
     },
 
     /**

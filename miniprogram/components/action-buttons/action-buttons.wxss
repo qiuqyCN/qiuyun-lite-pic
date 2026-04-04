@@ -64,3 +64,8 @@
 .btn-loading {
   opacity: 0.8;
 }
+
+/* 禁用状态 */
+.btn-disabled {
+  opacity: 0.5;
+}

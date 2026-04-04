@@ -1,8 +1,6 @@
 // utils/file.ts
 // 文件操作工具函数
 
-import type { HistoryItem } from '../types/index';
-
 /**
  * 保存图片到相册
  * @param filePath 文件路径
@@ -66,52 +64,6 @@ export const removeTempFiles = async (filePaths: string[]): Promise<void> => {
   for (const path of filePaths) {
     await removeTempFile(path);
   }
-};
-
-/**
- * 保存到历史记录
- * @param item 历史记录项
- */
-export const saveToHistory = (item: Omit<HistoryItem, 'id' | 'timestamp'>): void => {
-  const history = wx.getStorageSync('processHistory') || [];
-  const newItem: HistoryItem = {
-    ...item,
-    id: Date.now().toString(),
-    timestamp: Date.now()
-  };
-  history.unshift(newItem);
-  
-  // 只保留最近50条
-  if (history.length > 50) {
-    history.pop();
-  }
-  
-  wx.setStorageSync('processHistory', history);
-};
-
-/**
- * 获取历史记录
- * @returns 历史记录数组
- */
-export const getHistory = (): HistoryItem[] => {
-  return wx.getStorageSync('processHistory') || [];
-};
-
-/**
- * 清空历史记录
- */
-export const clearHistory = (): void => {
-  wx.setStorageSync('processHistory', []);
-};
-
-/**
- * 删除单条历史记录
- * @param id 记录ID
- */
-export const removeHistoryItem = (id: string): void => {
-  const history = wx.getStorageSync('processHistory') || [];
-  const filtered = history.filter((item: HistoryItem) => item.id !== id);
-  wx.setStorageSync('processHistory', filtered);
 };
 
 /**

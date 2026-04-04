@@ -4,6 +4,7 @@
 import { chooseImage, calculateSavedPercent } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
 import { saveImageToAlbum } from '../../utils/file';
+import { saveToHistory } from '../../utils/history';
 import { handleError, showSuccess, showLoading } from '../../utils/error';
 import { debounce } from '../../utils/debounce';
 
@@ -246,22 +247,17 @@ Component({
      * 保存到历史记录
      */
     saveToHistory() {
-      const history = wx.getStorageSync('processHistory') || [];
-      history.unshift({
-        id: Date.now().toString(),
+      saveToHistory({
         type: 'compress',
         typeName: '图片压缩',
         originalPath: this.data.imagePath,
         resultPath: this.data.compressedPath,
-        createTime: Date.now(),
-        timeStr: new Date().toLocaleString(),
         params: {
           quality: this.data.quality,
           originalSize: this.data.originalSize,
           compressedSize: this.data.compressedSize
         }
       });
-      wx.setStorageSync('processHistory', history.slice(0, 20));
     },
 
     /**

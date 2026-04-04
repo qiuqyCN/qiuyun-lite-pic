@@ -4,6 +4,7 @@
 import { chooseImage, getImageInfo } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
 import { saveImageToAlbum } from '../../utils/file';
+import { saveToHistory } from '../../utils/history';
 import { handleError, showSuccess, showLoading } from '../../utils/error';
 import { debounce } from '../../utils/debounce';
 
@@ -237,12 +238,34 @@ Component({
 
       try {
         await saveImageToAlbum(this.data.resultPath);
+        // 保存到历史记录
+        this.saveHistory();
         showSuccess('已保存到相册');
       } catch (err) {
         handleError(err, '保存失败');
       } finally {
         hideLoading();
       }
+    },
+
+    /**
+     * 保存到历史记录
+     */
+    saveHistory() {
+      const { imagePath, resultPath, rotation, flipH, flipV } = this.data;
+      if (!resultPath) return;
+
+      saveToHistory({
+        type: 'rotate',
+        typeName: '旋转翻转',
+        originalPath: imagePath,
+        resultPath: resultPath,
+        params: {
+          rotation,
+          flipH,
+          flipV
+        }
+      });
     },
   },
 });

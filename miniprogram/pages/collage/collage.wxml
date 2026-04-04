@@ -137,10 +137,11 @@
     />
   </view>
 
-  <!-- 操作按钮：始终显示重置+保存 -->
+  <!-- 操作按钮 -->
   <action-buttons
     hasResult="{{true}}"
     isLoading="{{isProcessing}}"
+    disabled="{{!hasImages}}"
     primaryText="保存到相册"
     secondaryText="重置"
     saveText="保存到相册"

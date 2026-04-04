@@ -4,6 +4,7 @@
 import { chooseImage, getImageInfo } from '../../utils/image';
 import { saveImageToAlbum } from '../../utils/file';
 import { handleError, showSuccess, showLoading } from '../../utils/error';
+import { saveToHistory } from '../../utils/history';
 
 interface AnnotateData {
   // 图片信息
@@ -81,8 +82,6 @@ Component({
     presetColors: PRESET_COLORS,
   } as AnnotateData & { presetColors: typeof PRESET_COLORS },
 
-  canvasContext: null as any,
-
   methods: {
     /**
      * 选择图片
@@ -125,7 +124,6 @@ Component({
         if (!canvasRes || !canvasRes.node) return;
 
         const canvasNode = canvasRes.node;
-        const canvasRect = canvasRes;
 
         // 计算显示尺寸 - 保持图片比例
         const sysInfo = wx.getSystemInfoSync();
@@ -177,7 +175,7 @@ Component({
           canvasOffsetY: offsetY,
         });
 
-        this.canvasContext = { canvas: canvasNode, ctx, scale: displayWidth / originalWidth };
+        (this as any)._canvasContext = { canvas: canvasNode, ctx, scale: displayWidth / originalWidth };
       } catch (err) {
         handleError(err, '画布初始化失败');
       }
@@ -187,15 +185,17 @@ Component({
      * 触摸开始
      */
     onTouchStart(e: WechatMiniprogram.TouchEvent) {
-      if (!this.canvasContext) return;
+      const canvasContext = (this as any)._canvasContext;
+      if (!canvasContext) return;
 
       const touch = e.touches[0];
-      const { ctx } = this.canvasContext;
+      const { ctx } = canvasContext;
       const { brushColor, brushSize, isEraser, brushType } = this.data;
 
       // 获取触摸点在canvas上的坐标（使用target的相对坐标）
-      const x = touch.x;
-      const y = touch.y;
+      const touchAny = touch as any;
+      const x = touchAny.x;
+      const y = touchAny.y;
 
       this.setData({ isDrawing: true });
 
@@ -248,14 +248,16 @@ Component({
      * 触摸移动
      */
     onTouchMove(e: WechatMiniprogram.TouchEvent) {
-      if (!this.data.isDrawing || !this.canvasContext) return;
+      const canvasContext = (this as any)._canvasContext;
+      if (!this.data.isDrawing || !canvasContext) return;
 
       const touch = e.touches[0];
-      const { ctx } = this.canvasContext;
+      const { ctx } = canvasContext;
 
       // 获取触摸点在canvas上的坐标
-      const x = touch.x;
-      const y = touch.y;
+      const touchAny = touch as any;
+      const x = touchAny.x;
+      const y = touchAny.y;
 
       // 绘制线条
       ctx.lineTo(x, y);
@@ -266,8 +268,9 @@ Component({
      * 触摸结束
      */
     onTouchEnd() {
-      if (this.canvasContext) {
-        const { ctx } = this.canvasContext;
+      const canvasContext = (this as any)._canvasContext;
+      if (canvasContext) {
+        const { ctx } = canvasContext;
         // 重置画笔特效
         ctx.shadowBlur = 0;
         ctx.globalAlpha = 1;
@@ -310,9 +313,10 @@ Component({
      * 重置画布 - 清空涂鸦并恢复初始状态
      */
     resetCanvas() {
-      if (!this.canvasContext) return;
+      const canvasContext = (this as any)._canvasContext;
+      if (!canvasContext) return;
 
-      const { ctx, canvas } = this.canvasContext;
+      const { ctx, canvas } = canvasContext;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // 重新绘制原图
@@ -335,9 +339,10 @@ Component({
      * 预览图片
      */
     previewImage() {
-      if (!this.canvasContext) return;
+      const canvasContext = (this as any)._canvasContext;
+      if (!canvasContext) return;
 
-      const { canvas } = this.canvasContext;
+      const { canvas } = canvasContext;
 
       // 导出canvas为图片
       wx.canvasToTempFilePath({
@@ -363,12 +368,13 @@ Component({
      * 保存到相册
      */
     async saveToAlbum() {
-      if (!this.canvasContext) return;
+      const canvasContext = (this as any)._canvasContext;
+      if (!canvasContext) return;
 
       const hideLoading = showLoading('保存中...');
 
       try {
-        const { canvas } = this.canvasContext;
+        const { canvas } = canvasContext;
         const { fileType } = this.data;
 
         // 导出canvas为图片
@@ -383,12 +389,34 @@ Component({
         });
 
         await saveImageToAlbum(res.tempFilePath);
+        // 保存到历史记录
+        this.saveHistory(res.tempFilePath);
         showSuccess('已保存到相册');
       } catch (err) {
         handleError(err, '保存失败');
       } finally {
         hideLoading();
       }
+    },
+
+    /**
+     * 保存到历史记录
+     */
+    saveHistory(resultPath: string) {
+      const { imagePath, brushColor, brushSize, brushType, isEraser } = this.data;
+
+      saveToHistory({
+        type: 'annotate',
+        typeName: '标注涂鸦',
+        originalPath: imagePath,
+        resultPath: resultPath,
+        params: {
+          brushColor,
+          brushSize,
+          brushType,
+          isEraser
+        }
+      });
     },
   },
 });

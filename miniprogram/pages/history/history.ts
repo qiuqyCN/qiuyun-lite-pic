@@ -1,6 +1,8 @@
 // history.ts
 // 历史记录页面
 
+import { getHistory, clearHistory } from '../../utils/history';
+
 Component({
   data: {
     historyList: [] as any[],
@@ -21,19 +23,21 @@ Component({
 
   methods: {
     loadHistory() {
-      const history = wx.getStorageSync('processHistory') || [];
+      const history = getHistory();
       this.setData({
-        historyList: history.slice(0, 20)
+        historyList: history
       });
     },
 
     onHistoryTap(e: WechatMiniprogram.TouchEvent) {
       const { item } = e.currentTarget.dataset;
       // 预览处理后的图片
-      wx.previewImage({
-        urls: [item.resultPath],
-        current: item.resultPath
-      });
+      if (item.resultPath) {
+        wx.previewImage({
+          urls: [item.resultPath],
+          current: item.resultPath
+        });
+      }
     },
 
     onClearHistory() {
@@ -54,7 +58,7 @@ Component({
           console.log('对话框结果:', res);
           if (res.confirm) {
             console.log('用户确认清除');
-            wx.removeStorageSync('processHistory');
+            clearHistory();
             this.setData({ historyList: [] });
             wx.showToast({
               title: '已清除',
