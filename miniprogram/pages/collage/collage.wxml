@@ -7,7 +7,6 @@
     <!-- 未选择图片状态 -->
     <image-upload
       wx:if="{{!hasImages}}"
-      icon="🖼️"
       title="点击选择图片"
       hint="最多支持 {{currentLayout.maxImages}} 张图片"
       bind:upload="chooseImages"

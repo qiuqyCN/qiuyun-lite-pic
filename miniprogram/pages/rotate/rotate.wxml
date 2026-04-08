@@ -5,9 +5,14 @@
   <!-- 未选择图片状态 -->
   <image-upload
     wx:if="{{!hasImage}}"
-    icon="↻"
+    headerTitle="旋转翻转"
+    headerDesc="90度旋转，镜像翻转"
     title="选择图片"
     hint="点击从相册选择或拍照"
+    tips="{{[
+      {icon: '🔄', text: '支持 90度 旋转'},
+      {icon: '🔃', text: '水平/垂直翻转'}
+    ]}}"
     bind:upload="chooseImage"
   />
 

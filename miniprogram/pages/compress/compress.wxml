@@ -3,9 +3,14 @@
   <!-- 未选择图片状态 -->
   <image-upload
     wx:if="{{!hasImage}}"
-    icon="✨"
+    headerTitle="图片压缩"
+    headerDesc="极速压缩，节省空间"
     title="选择图片"
     hint="点击从相册选择或拍照"
+    tips="{{[
+      {icon: '💡', text: '支持 JPG、PNG 格式'},
+      {icon: '📉', text: '压缩后可节省 50%-90% 空间'}
+    ]}}"
     bind:upload="chooseImage"
   />
 

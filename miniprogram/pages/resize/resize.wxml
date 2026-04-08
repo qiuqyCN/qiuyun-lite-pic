@@ -3,9 +3,14 @@
   <!-- 未选择图片状态 -->
   <image-upload
     wx:if="{{!hasImage}}"
-    icon="📐"
+    headerTitle="尺寸调整"
+    headerDesc="等比缩放，常用预设"
     title="选择图片"
     hint="支持证件照、考试报名等常用尺寸"
+    tips="{{[
+      {icon: '📏', text: '支持 1寸、2寸等常用证件照尺寸'},
+      {icon: '⚖️', text: '等比缩放保持图片比例'}
+    ]}}"
     bind:upload="chooseImage"
   />
 

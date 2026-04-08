@@ -3,9 +3,14 @@
   <!-- 未选择图片状态 -->
   <image-upload
     wx:if="{{!hasImage}}"
-    icon="💧"
+    headerTitle="添加水印"
+    headerDesc="文字水印，位置可调"
     title="选择图片"
     hint="点击从相册选择或拍照"
+    tips="{{[
+      {icon: '💧', text: '支持自定义文字水印'},
+      {icon: '📍', text: '9个位置可选，透明度可调'}
+    ]}}"
     bind:upload="chooseImage"
   />
 

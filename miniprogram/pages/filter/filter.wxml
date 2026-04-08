@@ -3,9 +3,14 @@
   <!-- 未选择图片状态 -->
   <image-upload
     wx:if="{{!hasImage}}"
-    icon="✨"
+    headerTitle="滤镜美化"
+    headerDesc="20+滤镜，一键美化"
     title="选择图片"
     hint="点击从相册选择或拍照"
+    tips="{{[
+      {icon: '🎨', text: '20+ 精选滤镜效果'},
+      {icon: '⚡', text: '实时预览，即时生效'}
+    ]}}"
     bind:upload="chooseImage"
   />
 

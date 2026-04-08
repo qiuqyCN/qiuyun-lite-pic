@@ -3,9 +3,14 @@
   <!-- 未选择图片状态 -->
   <image-upload
     wx:if="{{!hasImage}}"
-    icon="+"
+    headerTitle="格式转换"
+    headerDesc="多格式互转，一键完成"
     title="选择图片"
     hint="支持多种格式导入，可转为 JPG、PNG"
+    tips="{{[
+      {icon: '🔄', text: '支持将多种格式转换为 JPG、PNG'},
+      {icon: '🚫', text: '不能转换为原图相同格式'}
+    ]}}"
     bind:upload="chooseImage"
   />
 

@@ -5,9 +5,14 @@
   <!-- 未选择图片状态 -->
   <image-upload
     wx:if="{{!hasImage}}"
-    icon="✂️"
+    headerTitle="图片裁剪"
+    headerDesc="自由裁剪，四角调整"
     title="选择图片"
     hint="点击从相册选择或拍照"
+    tips="{{[
+      {icon: '✂️', text: '自由拖拽选择裁剪区域'},
+      {icon: '📐', text: '四角可拖动调整大小'}
+    ]}}"
     bind:upload="chooseImage"
   />
 

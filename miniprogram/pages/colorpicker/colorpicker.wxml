@@ -5,9 +5,14 @@
   <!-- 未选择图片状态 -->
   <image-upload
     wx:if="{{!hasImage}}"
-    icon="🎨"
+    headerTitle="图片取色"
+    headerDesc="点击取色，精准识别"
     title="选择图片"
     hint="点击从相册选择或拍照"
+    tips="{{[
+      {icon: '🎨', text: '点击图片任意位置获取颜色'},
+      {icon: '📋', text: '支持 HEX、RGB、HSL 格式复制'}
+    ]}}"
     bind:upload="chooseImage"
   />
 

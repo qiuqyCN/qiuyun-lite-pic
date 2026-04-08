@@ -6,6 +6,16 @@ Component({
    * 组件属性
    */
   properties: {
+    /** 头部标题 */
+    headerTitle: {
+      type: String,
+      value: ''
+    },
+    /** 头部描述 */
+    headerDesc: {
+      type: String,
+      value: ''
+    },
     /** 图标 */
     icon: {
       type: String,
@@ -25,6 +35,11 @@ Component({
     disabled: {
       type: Boolean,
       value: false
+    },
+    /** 提示列表 */
+    tips: {
+      type: Array,
+      value: []
     }
   },
 

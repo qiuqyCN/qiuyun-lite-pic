@@ -1,13 +1,28 @@
 <!--components/image-upload/image-upload.wxml-->
 <view class="upload-section">
+  <!-- 标题和描述 -->
+  <view class="upload-header" wx:if="{{headerTitle || headerDesc}}">
+    <text class="header-title" wx:if="{{headerTitle}}">{{headerTitle}}</text>
+    <text class="header-desc" wx:if="{{headerDesc}}">{{headerDesc}}</text>
+  </view>
+
+  <!-- 上传卡片 -->
   <view 
     class="upload-card {{disabled ? 'disabled' : ''}}" 
     bindtap="onTap"
   >
     <view class="upload-icon-box">
-      <text class="upload-icon">+</text>
+      <text class="upload-icon">{{icon}}</text>
     </view>
     <text class="upload-title">{{title}}</text>
     <text class="upload-hint">{{hint}}</text>
+  </view>
+
+  <!-- 说明区域 -->
+  <view class="upload-footer" wx:if="{{tips && tips.length > 0}}">
+    <view class="tip-item" wx:for="{{tips}}" wx:key="index">
+      <text class="tip-icon">{{item.icon}}</text>
+      <text class="tip-text">{{item.text}}</text>
+    </view>
   </view>
 </view>
