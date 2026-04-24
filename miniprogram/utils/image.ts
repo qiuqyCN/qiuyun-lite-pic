@@ -5,28 +5,102 @@ import type { ImageInfo } from '../types/index';
 import { getFileSize } from './file';
 
 /**
+ * 显示选择图片菜单
+ * @param isMultiple 是否多选（用于拼图场景）
+ * @returns 用户选择的索引 0-拍摄 1-相册 2-聊天记录
+ */
+const showImageSourceMenu = (isMultiple: boolean = false): Promise<number> => {
+  const itemList = isMultiple
+    ? ['从手机相册选择', '从聊天记录选择']
+    : ['拍摄', '从手机相册选择', '从聊天记录选择'];
+
+  return new Promise((resolve) => {
+    wx.showActionSheet({
+      itemList,
+      success: (res) => {
+        // 多选模式下，索引需要+1（因为没有拍摄选项）
+        resolve(isMultiple ? res.tapIndex + 1 : res.tapIndex);
+      },
+      fail: () => {
+        resolve(-1);
+      }
+    });
+  });
+};
+
+/**
+ * 从聊天记录选择图片
+ * @param count 选择数量
+ * @returns 临时文件路径数组
+ */
+const chooseImageFromMessage = async (count: number = 1): Promise<string[]> => {
+  const res = await wx.chooseMessageFile({
+    count,
+    type: 'image'
+  });
+  return res.tempFiles.map(file => file.path);
+};
+
+/**
+ * 处理图片信息
+ * @param tempFilePaths 临时文件路径数组
+ * @returns 图片信息数组
+ */
+const processImageInfos = async (tempFilePaths: string[]): Promise<ImageInfo[]> => {
+  const images: ImageInfo[] = [];
+  for (const path of tempFilePaths) {
+    const [imageInfo, fileSize] = await Promise.all([
+      wx.getImageInfo({ src: path }),
+      getFileSize(path)
+    ]);
+
+    images.push({
+      path,
+      width: imageInfo.width,
+      height: imageInfo.height,
+      size: fileSize,
+      type: imageInfo.type
+    });
+  }
+  return images;
+};
+
+/**
  * 选择图片
  * @returns 图片信息
  */
 export const chooseImage = async (): Promise<ImageInfo> => {
-  const res = await wx.chooseMedia({
-    count: 1,
-    mediaType: ['image'],
-    sourceType: ['album', 'camera']
-  });
+  const sourceIndex = await showImageSourceMenu(false);
 
-  const tempFile = res.tempFiles[0];
-  const imageInfo = await wx.getImageInfo({
-    src: tempFile.tempFilePath
-  });
+  if (sourceIndex === -1) {
+    throw new Error('用户取消选择');
+  }
 
-  return {
-    path: tempFile.tempFilePath,
-    width: imageInfo.width,
-    height: imageInfo.height,
-    size: tempFile.size,
-    type: imageInfo.type
-  };
+  let tempFilePaths: string[] = [];
+
+  if (sourceIndex === 0) {
+    // 拍摄
+    const res = await wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['camera']
+    });
+    tempFilePaths = [res.tempFiles[0].tempFilePath];
+  } else if (sourceIndex === 1) {
+    // 相册
+    const res = await wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album']
+    });
+    tempFilePaths = [res.tempFiles[0].tempFilePath];
+  } else if (sourceIndex === 2) {
+    // 聊天记录
+    tempFilePaths = await chooseImageFromMessage(1);
+  }
+
+  const images = await processImageInfos(tempFilePaths);
+  return images[0];
 };
 
 /**
@@ -35,28 +109,28 @@ export const chooseImage = async (): Promise<ImageInfo> => {
  * @returns 图片信息数组
  */
 export const chooseMultipleImages = async (count: number = 9): Promise<ImageInfo[]> => {
-  const res = await wx.chooseMedia({
-    count,
-    mediaType: ['image'],
-    sourceType: ['album', 'camera']
-  });
+  const sourceIndex = await showImageSourceMenu(true);
 
-  const images: ImageInfo[] = [];
-  for (const tempFile of res.tempFiles) {
-    const imageInfo = await wx.getImageInfo({
-      src: tempFile.tempFilePath
-    });
-
-    images.push({
-      path: tempFile.tempFilePath,
-      width: imageInfo.width,
-      height: imageInfo.height,
-      size: tempFile.size,
-      type: imageInfo.type
-    });
+  if (sourceIndex === -1) {
+    throw new Error('用户取消选择');
   }
 
-  return images;
+  let tempFilePaths: string[] = [];
+
+  if (sourceIndex === 1) {
+    // 相册
+    const res = await wx.chooseMedia({
+      count,
+      mediaType: ['image'],
+      sourceType: ['album']
+    });
+    tempFilePaths = res.tempFiles.map(f => f.tempFilePath);
+  } else if (sourceIndex === 2) {
+    // 聊天记录
+    tempFilePaths = await chooseImageFromMessage(count);
+  }
+
+  return await processImageInfos(tempFilePaths);
 };
 
 /**
