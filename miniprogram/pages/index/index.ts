@@ -134,7 +134,18 @@ Component({
           }
         ]
       }
-    ] as ToolCategory[]
+    ] as ToolCategory[],
+    // 是否显示 Tooltip 引导
+    showAddGuideTooltip: false,
+    // Tooltip 位置
+    tooltipTop: 80
+  },
+
+  lifetimes: {
+    attached() {
+      // 检查是否需要显示添加引导
+      this.checkShowAddGuide();
+    }
   },
 
   methods: {
@@ -152,6 +163,76 @@ Component({
       }
 
       wx.navigateTo({ url: path });
+    },
+
+    // 检查是否显示添加引导
+    checkShowAddGuide() {
+      // 检查本地存储，是否用户选择过不再提示
+      const neverShow = wx.getStorageSync('neverShowAddGuide');
+      if (neverShow) {
+        return;
+      }
+
+      // 获取打开次数
+      let launchCount = wx.getStorageSync('launchCount') || 0;
+      launchCount++;
+      wx.setStorageSync('launchCount', launchCount);
+
+      // 检查是否是今天第一次打开
+      const lastShowDate = wx.getStorageSync('lastShowGuideDate');
+      const today = new Date().toDateString();
+
+      if (lastShowDate === today) {
+        // 今天已经显示过了
+        return;
+      }
+
+      // 判断是否应该显示引导
+      // 第1、5、10次显示，最多显示3次
+      const shouldShow = launchCount === 1 || launchCount === 5 || launchCount === 10;
+
+      if (!shouldShow) {
+        return;
+      }
+
+      // 计算 Tooltip 位置
+      // 胶囊按钮在右上角
+      // 导航栏高度 = 状态栏高度 + 44
+      const systemInfo = wx.getSystemInfoSync();
+      const statusBarHeight = systemInfo.statusBarHeight || 20;
+      // Tooltip 顶部位置，向上移动
+      const tooltipTop = statusBarHeight - 20;
+
+      // 延迟显示，等页面加载完成
+      setTimeout(() => {
+        this.setData({
+          showAddGuideTooltip: true,
+          tooltipTop: tooltipTop
+        });
+        // 记录今天显示过
+        wx.setStorageSync('lastShowGuideDate', today);
+
+        // 3秒后自动关闭
+        setTimeout(() => {
+          this.closeAddGuide();
+        }, 3000);
+      }, 1000);
+    },
+
+    // 关闭添加引导
+    closeAddGuide() {
+      this.setData({ showAddGuideTooltip: false });
+    },
+
+    // 不再提示
+    neverShowAddGuide() {
+      wx.setStorageSync('neverShowAddGuide', true);
+      this.setData({ showAddGuideTooltip: false });
+    },
+
+    // 阻止事件冒泡
+    preventBubble() {
+      // 什么都不做，只是阻止冒泡
     }
   }
 });

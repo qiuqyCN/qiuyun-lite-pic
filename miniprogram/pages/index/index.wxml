@@ -65,4 +65,23 @@
   </view>
 
   <view class="safe-area-bottom"></view>
+
+  <!-- Tooltip 引导 - 添加到我的小程序 -->
+  <view wx:if="{{showAddGuideTooltip}}" class="tooltip-mask" bindtap="closeAddGuide">
+    <!-- Tooltip 气泡 -->
+    <view class="tooltip-container" style="top: {{tooltipTop}}px; right: 25px;">
+      <view class="tooltip-arrow"></view>
+      <view class="tooltip-content" catchtap="preventBubble">
+        <view class="tooltip-header">
+          <text class="tooltip-icon">👆</text>
+          <text class="tooltip-title">点击右上角"⋯"</text>
+        </view>
+        <text class="tooltip-text">添加到我的小程序，下次使用更方便</text>
+        <view class="tooltip-actions">
+          <text class="tooltip-close" bindtap="closeAddGuide">知道了</text>
+          <text class="tooltip-never" bindtap="neverShowAddGuide">不再提示</text>
+        </view>
+      </view>
+    </view>
+  </view>
 </view>
