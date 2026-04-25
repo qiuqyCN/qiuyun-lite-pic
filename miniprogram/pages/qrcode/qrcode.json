@@ -1,5 +1,7 @@
 {
   "navigationBarTitleText": "二维码生成",
+  "navigationBarBackgroundColor": "#41bc3f",
+  "navigationBarTextStyle": "white",
   "usingComponents": {
     "scroll-selector": "../../components/scroll-selector/scroll-selector",
     "format-selector": "../../components/format-selector/format-selector",

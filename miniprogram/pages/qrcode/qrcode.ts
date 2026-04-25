@@ -1,4 +1,5 @@
 import drawQrcode from '../../miniprogram_npm/weapp-qrcode-canvas-2d/index';
+import { saveToHistory } from '../../utils/history';
 
 interface QRCodeData {
   currentType: string;
@@ -49,7 +50,7 @@ Page({
     backgroundColor: '#ffffff',
     logoPath: '',
     logoSize: 20,
-    correctLevel: 0,
+    correctLevel: 1,
     correctLevelList: [
       { id: 0, name: 'L - 低', value: 1 },
       { id: 1, name: 'M - 中', value: 0 },
@@ -58,7 +59,7 @@ Page({
     ],
     hasGenerated: false,
     qrImagePath: '',
-    fileType: 'png',
+    fileType: 'jpg',
     isSaving: false,
     colorOptions: [
       { id: 'black', name: '黑色', color: '#000000' },
@@ -288,6 +289,7 @@ Page({
       filePath: this.data.qrImagePath,
       success: () => {
         wx.showToast({ title: '保存成功', icon: 'success' });
+        this.saveToHistory();
       },
       fail: (err) => {
         if (err.errMsg.includes('auth deny')) {
@@ -310,6 +312,31 @@ Page({
     });
   },
 
+  saveToHistory() {
+    const { currentType, qrImagePath, textContent, urlContent, wifiSsid, cardName } = this.data;
+    const typeMap: Record<string, string> = {
+      text: '文本',
+      url: '网址',
+      wifi: 'WiFi',
+      card: '名片'
+    };
+
+    saveToHistory({
+      type: 'qrcode',
+      typeName: `二维码生成 - ${typeMap[currentType]}`,
+      originalPath: '',
+      resultPath: qrImagePath,
+      params: {
+        qrcodeType: currentType,
+        content: currentType === 'text' ? textContent :
+                 currentType === 'url' ? urlContent :
+                 currentType === 'wifi' ? wifiSsid :
+                 currentType === 'card' ? cardName : ''
+      }
+    });
+  },
+  
+
   onReset() {
     this.setData({
       textContent: '',
@@ -325,10 +352,10 @@ Page({
       backgroundColor: '#ffffff',
       logoPath: '',
       logoSize: 20,
-      correctLevel: 0,
+      correctLevel: 1,
       hasGenerated: false,
       qrImagePath: '',
-      fileType: 'png'
+      fileType: 'jpg'
     });
   }
 });
