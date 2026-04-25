@@ -1,0 +1,224 @@
+<view class="qrcode-container">
+  <!-- 类型选择 -->
+  <view class="section">
+    <scroll-selector
+      list="{{typeList}}"
+      selectedId="{{currentType}}"
+      title="二维码类型"
+      bind:select="onTypeSelect"
+    />
+  </view>
+
+  <!-- 必要参数 -->
+  <view class="section">
+    <view class="section-title">内容输入</view>
+
+    <!-- 文本 -->
+    <block wx:if="{{currentType === 'text'}}">
+      <textarea
+        class="input-textarea"
+        placeholder="请输入文本内容"
+        value="{{textContent}}"
+        data-field="textContent"
+        bindinput="onInputChange"
+        maxlength="500"
+      />
+    </block>
+
+    <!-- 网址 -->
+    <block wx:if="{{currentType === 'url'}}">
+      <input
+        class="input-field"
+        placeholder="https://example.com"
+        value="{{urlContent}}"
+        data-field="urlContent"
+        bindinput="onInputChange"
+      />
+    </block>
+
+    <!-- WiFi -->
+    <block wx:if="{{currentType === 'wifi'}}">
+      <input
+        class="input-field"
+        placeholder="WiFi名称（SSID）"
+        value="{{wifiSsid}}"
+        data-field="wifiSsid"
+        bindinput="onInputChange"
+      />
+      <input
+        class="input-field"
+        placeholder="WiFi密码"
+        value="{{wifiPassword}}"
+        data-field="wifiPassword"
+        bindinput="onInputChange"
+        password
+      />
+    </block>
+
+    <!-- 名片 -->
+    <block wx:if="{{currentType === 'card'}}">
+      <input
+        class="input-field"
+        placeholder="姓名"
+        value="{{cardName}}"
+        data-field="cardName"
+        bindinput="onInputChange"
+      />
+      <input
+        class="input-field"
+        placeholder="电话"
+        value="{{cardPhone}}"
+        data-field="cardPhone"
+        bindinput="onInputChange"
+        type="number"
+      />
+    </block>
+  </view>
+
+  <!-- 更多参数 -->
+  <view class="section">
+    <view class="more-header" bindtap="toggleMoreParams">
+      <text class="more-title">更多参数</text>
+      <text class="more-arrow {{showMoreParams ? 'up' : 'down'}}">›</text>
+    </view>
+
+    <block wx:if="{{showMoreParams}}">
+      <!-- WiFi 加密方式 -->
+      <block wx:if="{{currentType === 'wifi'}}">
+        <picker bindchange="onWifiTypeChange" value="{{wifiType === 'WPA' ? 0 : wifiType === 'WEP' ? 1 : 2}}" range="{{['WPA/WPA2', 'WEP', '无密码']}}">
+          <view class="picker-field">
+            <text class="picker-label">加密方式</text>
+            <text class="picker-value">{{wifiType === 'WPA' ? 'WPA/WPA2' : wifiType === 'WEP' ? 'WEP' : '无密码'}}</text>
+          </view>
+        </picker>
+      </block>
+
+      <!-- 名片扩展 -->
+      <block wx:if="{{currentType === 'card'}}">
+        <input
+          class="input-field"
+          placeholder="邮箱（选填）"
+          value="{{cardEmail}}"
+          data-field="cardEmail"
+          bindinput="onInputChange"
+        />
+        <input
+          class="input-field"
+          placeholder="公司（选填）"
+          value="{{cardCompany}}"
+          data-field="cardCompany"
+          bindinput="onInputChange"
+        />
+      </block>
+
+      <!-- 前景色 -->
+      <view class="param-row">
+        <text class="param-label">前景色</text>
+        <view class="color-options">
+          <view
+            wx:for="{{colorOptions}}"
+            wx:key="id"
+            class="color-dot {{foregroundColor === item.color ? 'active' : ''}}"
+            style="background-color: {{item.color}};"
+            data-color="{{item.color}}"
+            bindtap="onForegroundColorChange"
+          />
+        </view>
+      </view>
+
+      <!-- 背景色 -->
+      <view class="param-row">
+        <text class="param-label">背景色</text>
+        <view class="color-options">
+          <view
+            wx:for="{{colorOptions}}"
+            wx:key="id"
+            class="color-dot {{backgroundColor === item.color ? 'active' : ''}}"
+            style="background-color: {{item.color}};"
+            data-color="{{item.color}}"
+            bindtap="onBackgroundColorChange"
+          />
+          <view
+            class="color-dot {{backgroundColor === '#ffffff' ? 'active' : ''}}"
+            style="background-color: #ffffff; border: 1px solid #e8e8ed;"
+            data-color="#ffffff"
+            bindtap="onBackgroundColorChange"
+          />
+        </view>
+      </view>
+
+      <!-- Logo -->
+      <view class="param-row">
+        <text class="param-label">中心Logo</text>
+        <view class="logo-actions">
+          <view wx:if="{{logoPath}}" class="logo-preview-wrap">
+            <image class="logo-preview" src="{{logoPath}}" mode="aspectFill" />
+            <view class="logo-remove" bindtap="removeLogo">×</view>
+          </view>
+          <view class="logo-add" bindtap="chooseLogo">
+            <text>{{logoPath ? '更换' : '选择图片'}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- Logo大小 -->
+      <view wx:if="{{logoPath}}" class="param-row">
+        <text class="param-label">Logo大小</text>
+        <view class="slider-wrap">
+          <slider
+            min="10"
+            max="30"
+            value="{{logoSize}}"
+            step="1"
+            activeColor="#41bc3f"
+            block-size="18"
+            show-value
+            bindchange="onLogoSizeChange"
+          />
+        </view>
+      </view>
+
+      <!-- 纠错等级 -->
+      <view class="param-row">
+        <text class="param-label">纠错等级</text>
+        <picker bindchange="onCorrectLevelChange" value="{{correctLevel}}" range="{{correctLevelList}}" range-key="name">
+          <view class="picker-value-inline">{{correctLevelList[correctLevel].name}}</view>
+        </picker>
+      </view>
+    </block>
+  </view>
+
+  <!-- 实时预览 -->
+  <view class="section">
+    <view class="section-title">实时预览</view>
+    <view class="preview-wrapper">
+      <canvas
+        type="2d"
+        id="qrcodeCanvas"
+        class="qrcode-canvas"
+      />
+      <view wx:if="{{!hasGenerated}}" class="preview-placeholder">
+        <text class="placeholder-icon">🔲</text>
+        <text class="placeholder-text">输入内容后自动生成二维码</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 输出格式 -->
+  <view class="section">
+    <format-selector
+      value="{{fileType}}"
+      mode="horizontal"
+      showDesc="{{false}}"
+      bind:change="onFormatChange"
+    />
+  </view>
+
+  <!-- 操作按钮 -->
+  <action-buttons
+    isLoading="{{isSaving}}"
+    disabled="{{!hasGenerated}}"
+    bind:reset="onReset"
+    bind:save="onSave"
+  />
+</view>

@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "二维码生成",
+  "usingComponents": {
+    "scroll-selector": "../../components/scroll-selector/scroll-selector",
+    "format-selector": "../../components/format-selector/format-selector",
+    "action-buttons": "../../components/action-buttons/action-buttons"
+  }
+}

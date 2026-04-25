@@ -131,6 +131,15 @@ Component({
             iconBg: '#f8e8ff',
             path: '/pages/colorpicker/colorpicker',
             isNew: true
+          },
+          {
+            id: 'qrcode',
+            name: '二维码生成',
+            description: '文本、网址、WiFi、名片二维码',
+            icon: '🔲',
+            iconBg: '#e8f0ff',
+            path: '/pages/qrcode/qrcode',
+            isNew: true
           }
         ]
       }
