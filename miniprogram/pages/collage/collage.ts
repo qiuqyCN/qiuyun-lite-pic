@@ -7,6 +7,7 @@ import { saveImageToAlbumWithUI } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
 import { handleError } from '../../utils/error';
 import { debounce } from '../../utils/debounce';
+import { onShareAppMessage, onShareTimeline } from '../../utils/share';
 
 /** 布局模板 */
 interface LayoutTemplate {
@@ -102,6 +103,19 @@ Component({
   } as CollageData,
 
   methods: {
+    /**
+     * 分享到聊天
+     */
+    onShareAppMessage() {
+      return onShareAppMessage('collage');
+    },
+
+    /**
+     * 分享到朋友圈
+     */
+    onShareTimeline() {
+      return onShareTimeline('collage');
+    },
     /**
      * 选择图片
      * 根据当前布局的最大图片数量选择图片

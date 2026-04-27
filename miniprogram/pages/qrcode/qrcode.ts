@@ -1,5 +1,6 @@
 import drawQrcode from '../../miniprogram_npm/weapp-qrcode-canvas-2d/index';
 import { saveToHistory } from '../../utils/history';
+import { onShareAppMessage, onShareTimeline } from '../../utils/share';
 
 interface QRCodeData {
   currentType: string;
@@ -75,6 +76,14 @@ Page({
 
   onLoad() {
     this.initCanvas();
+  },
+
+  onShareAppMessage() {
+    return onShareAppMessage('qrcode');
+  },
+
+  onShareTimeline() {
+    return onShareTimeline('qrcode');
   },
 
   initCanvas() {

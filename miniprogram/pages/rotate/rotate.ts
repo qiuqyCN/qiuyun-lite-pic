@@ -7,6 +7,7 @@ import { saveImageToAlbumWithUI } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
 import { handleError } from '../../utils/error';
 import { debounce } from '../../utils/debounce';
+import { onShareAppMessage, onShareTimeline } from '../../utils/share';
 
 interface RotateData {
   // 图片信息
@@ -56,6 +57,19 @@ Component({
   } as RotateData & { rotationOptions: typeof ROTATION_OPTIONS },
 
   methods: {
+    /**
+     * 分享到聊天
+     */
+    onShareAppMessage() {
+      return onShareAppMessage('rotate');
+    },
+
+    /**
+     * 分享到朋友圈
+     */
+    onShareTimeline() {
+      return onShareTimeline('rotate');
+    },
     /**
      * 选择图片
      */

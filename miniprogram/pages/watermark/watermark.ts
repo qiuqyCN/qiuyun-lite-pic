@@ -6,6 +6,7 @@ import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
 import { saveImageToAlbumWithUI } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
 import { handleError } from '../../utils/error';
+import { onShareAppMessage, onShareTimeline } from '../../utils/share';
 
 /** 水印位置类型 */
 type WatermarkPosition = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight' | 'center' | 'tile';
@@ -83,6 +84,19 @@ Component({
   } as WatermarkData,
 
   methods: {
+    /**
+     * 分享到聊天
+     */
+    onShareAppMessage() {
+      return onShareAppMessage('watermark');
+    },
+
+    /**
+     * 分享到朋友圈
+     */
+    onShareTimeline() {
+      return onShareTimeline('watermark');
+    },
     /**
      * 选择图片
      * 从相册或相机选择图片并获取图片信息

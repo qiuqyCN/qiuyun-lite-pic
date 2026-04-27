@@ -1,6 +1,8 @@
 // index.ts
 // 首页逻辑 - 分类+列表式工具展示
 
+import { onShareAppMessage, onShareTimeline } from '../../utils/share';
+
 interface ToolItem {
   id: string;
   name: string;
@@ -158,6 +160,20 @@ Component({
   },
 
   methods: {
+    /**
+     * 分享到聊天
+     */
+    onShareAppMessage() {
+      return onShareAppMessage('index');
+    },
+
+    /**
+     * 分享到朋友圈
+     */
+    onShareTimeline() {
+      return onShareTimeline('index');
+    },
+
     // 导航到工具页面
     navigateToTool(e: WechatMiniprogram.TouchEvent) {
       const { path, isDeveloping } = e.currentTarget.dataset;

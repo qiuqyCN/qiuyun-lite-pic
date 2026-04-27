@@ -8,6 +8,7 @@ import { saveToHistory } from '../../utils/history';
 import { handleError } from '../../utils/error';
 import { showLoading } from '../../utils/ui';
 import { debounce } from '../../utils/debounce';
+import { onShareAppMessage, onShareTimeline } from '../../utils/share';
 
 interface CompressData {
   // 图片信息
@@ -46,6 +47,19 @@ Component({
   } as CompressData,
 
   methods: {
+    /**
+     * 分享到聊天
+     */
+    onShareAppMessage() {
+      return onShareAppMessage('compress');
+    },
+
+    /**
+     * 分享到朋友圈
+     */
+    onShareTimeline() {
+      return onShareTimeline('compress');
+    },
     /**
      * 选择图片
      */

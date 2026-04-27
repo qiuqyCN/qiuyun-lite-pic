@@ -18,6 +18,7 @@ import { showLoading } from '../../utils/ui';
 import { debounce } from '../../utils/debounce';
 import { ALL_PRESETS } from '../../constants/presets';
 import type { PresetSize } from '../../types/index';
+import { onShareAppMessage, onShareTimeline } from '../../utils/share';
 
 /** 页面数据接口 */
 interface ResizeData {
@@ -80,6 +81,19 @@ Component({
   } as ResizeData,
 
   methods: {
+    /**
+     * 分享到聊天
+     */
+    onShareAppMessage() {
+      return onShareAppMessage('resize');
+    },
+
+    /**
+     * 分享到朋友圈
+     */
+    onShareTimeline() {
+      return onShareTimeline('resize');
+    },
     /**
      * 选择图片
      * 从相册或相机选择图片并获取图片信息

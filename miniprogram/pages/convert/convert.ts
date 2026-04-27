@@ -8,6 +8,7 @@ import { saveToHistory } from '../../utils/history';
 import { handleError } from '../../utils/error';
 import { showLoading } from '../../utils/ui';
 import { debounce } from '../../utils/debounce';
+import { onShareAppMessage, onShareTimeline } from '../../utils/share';
 
 /** 页面数据 */
 interface ConvertData {
@@ -54,6 +55,19 @@ Component({
   } as ConvertData,
 
   methods: {
+    /**
+     * 分享到聊天
+     */
+    onShareAppMessage() {
+      return onShareAppMessage('convert');
+    },
+
+    /**
+     * 分享到朋友圈
+     */
+    onShareTimeline() {
+      return onShareTimeline('convert');
+    },
     /**
      * 选择图片
      */

@@ -7,6 +7,7 @@ import { saveImageToAlbumWithUI } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
 import { handleError } from '../../utils/error';
 import { debounce } from '../../utils/debounce';
+import { onShareAppMessage, onShareTimeline } from '../../utils/share';
 
 interface CropData {
   // 图片信息
@@ -84,6 +85,19 @@ Component({
   } as CropData & { aspectRatios: typeof ASPECT_RATIOS },
 
   methods: {
+    /**
+     * 分享到聊天
+     */
+    onShareAppMessage() {
+      return onShareAppMessage('crop');
+    },
+
+    /**
+     * 分享到朋友圈
+     */
+    onShareTimeline() {
+      return onShareTimeline('crop');
+    },
     /**
      * 选择图片
      */

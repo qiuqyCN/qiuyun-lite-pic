@@ -9,6 +9,7 @@ import { handleError } from '../../utils/error';
 import { showLoading } from '../../utils/ui';
 import { ALL_FILTERS } from '../../constants/filters';
 import type { ImageInfo, FilterParams } from '../../types/index';
+import { onShareAppMessage, onShareTimeline } from '../../utils/share';
 
 /** 滤镜页面数据接口 */
 interface FilterData {
@@ -60,6 +61,19 @@ Component({
   } as FilterData,
 
   methods: {
+    /**
+     * 分享到聊天
+     */
+    onShareAppMessage() {
+      return onShareAppMessage('filter');
+    },
+
+    /**
+     * 分享到朋友圈
+     */
+    onShareTimeline() {
+      return onShareTimeline('filter');
+    },
     /**
      * 选择图片
      * 使用 chooseImage 工具函数替代 wx.chooseMedia

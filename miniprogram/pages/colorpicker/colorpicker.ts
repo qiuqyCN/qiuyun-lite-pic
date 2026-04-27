@@ -6,6 +6,7 @@ import { handleError } from '../../utils/error';
 import { showSuccess } from '../../utils/ui';
 import { saveToHistory } from '../../utils/history';
 import { STORAGE_KEYS } from '../../constants/storage-keys';
+import { onShareAppMessage, onShareTimeline } from '../../utils/share';
 
 interface ColorPickerData {
   // 图片信息
@@ -77,6 +78,19 @@ Component({
   },
 
   methods: {
+    /**
+     * 分享到聊天
+     */
+    onShareAppMessage() {
+      return onShareAppMessage('colorpicker');
+    },
+
+    /**
+     * 分享到朋友圈
+     */
+    onShareTimeline() {
+      return onShareTimeline('colorpicker');
+    },
     /**
      * 选择图片
      */

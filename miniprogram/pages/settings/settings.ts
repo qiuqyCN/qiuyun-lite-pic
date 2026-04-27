@@ -5,6 +5,7 @@ import { calculateCacheSize, clearCache } from '../../utils/file';
 import { handleError } from '../../utils/error';
 import { showSuccess } from '../../utils/ui';
 import { formatFileSize } from '../../utils/format';
+import { onShareAppMessage, onShareTimeline } from '../../utils/share';
 
 /** 设置页面数据接口 */
 interface SettingsData {
@@ -39,23 +40,23 @@ Component({
     show() {
       // 刷新缓存大小
       this.loadCacheSize();
-
-      // 设置页面分享配置
-      const pages = getCurrentPages();
-      const currentPage = pages[pages.length - 1];
-      if (currentPage) {
-        currentPage.onShareAppMessage = () => {
-          return {
-            title: '秋云轻图 - 极简高效的图片处理工具',
-            path: '/pages/index/index',
-            imageUrl: '/images/logo.png'
-          };
-        };
-      }
     }
   },
 
   methods: {
+    /**
+     * 分享到聊天
+     */
+    onShareAppMessage() {
+      return onShareAppMessage('settings');
+    },
+
+    /**
+     * 分享到朋友圈
+     */
+    onShareTimeline() {
+      return onShareTimeline('settings');
+    },
     /**
      * 加载缓存大小
      * 使用 calculateCacheSize 工具函数获取缓存大小，并使用 formatFileSize 格式化显示

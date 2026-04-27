@@ -2,6 +2,7 @@
 // 历史记录页面
 
 import { getHistory, clearHistory, removeHistoryItem } from '../../utils/history';
+import { onShareAppMessage, onShareTimeline } from '../../utils/share';
 
 Component({
   data: {
@@ -26,6 +27,20 @@ Component({
   },
 
   methods: {
+    /**
+     * 分享到聊天
+     */
+    onShareAppMessage() {
+      return onShareAppMessage('history');
+    },
+
+    /**
+     * 分享到朋友圈
+     */
+    onShareTimeline() {
+      return onShareTimeline('history');
+    },
+
     // 格式化相对时间
     formatRelativeTime(timestamp: number): string {
       const now = Date.now();

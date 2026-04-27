@@ -5,6 +5,7 @@ import { chooseImage, getImageInfo } from '../../utils/image';
 import { saveImageToAlbumWithUI } from '../../utils/file';
 import { handleError } from '../../utils/error';
 import { saveToHistory } from '../../utils/history';
+import { onShareAppMessage, onShareTimeline } from '../../utils/share';
 
 interface AnnotateData {
   // 图片信息
@@ -83,6 +84,19 @@ Component({
   } as AnnotateData & { presetColors: typeof PRESET_COLORS },
 
   methods: {
+    /**
+     * 分享到聊天
+     */
+    onShareAppMessage() {
+      return onShareAppMessage('annotate');
+    },
+
+    /**
+     * 分享到朋友圈
+     */
+    onShareTimeline() {
+      return onShareTimeline('annotate');
+    },
     /**
      * 选择图片
      */
