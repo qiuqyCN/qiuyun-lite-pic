@@ -25,4 +25,9 @@
       <text class="tip-text">{{item.text}}</text>
     </view>
   </view>
+
+  <!-- 广告位 -->
+  <view class="ad-container" wx:if="{{showAd}}">
+    <ad-custom class="ad-card" unit-id="{{adUnitId}}" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+  </view>
 </view>

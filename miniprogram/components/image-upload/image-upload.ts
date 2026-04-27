@@ -40,6 +40,16 @@ Component({
     tips: {
       type: Array,
       value: []
+    },
+    /** 是否显示广告 */
+    showAd: {
+      type: Boolean,
+      value: true
+    },
+    /** 广告单元ID */
+    adUnitId: {
+      type: String,
+      value: 'adunit-ce1dec1c9c3ce688'
     }
   },
 
@@ -53,6 +63,27 @@ Component({
     onTap() {
       if (this.data.disabled) return;
       this.triggerEvent('upload');
+    },
+
+    /**
+     * 广告加载成功
+     */
+    adLoad() {
+      console.log('广告加载成功');
+    },
+
+    /**
+     * 广告加载失败
+     */
+    adError(err: any) {
+      console.error('广告加载失败', err);
+    },
+
+    /**
+     * 广告关闭
+     */
+    adClose() {
+      console.log('广告关闭');
     }
   }
 });
