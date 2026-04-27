@@ -143,6 +143,22 @@ Component({
     },
 
     /**
+     * 分享小程序
+     * 调用微信分享菜单
+     */
+    onShareApp() {
+      wx.showShareMenu({
+        withShareTicket: true,
+        menus: ['shareAppMessage', 'shareTimeline']
+      });
+      wx.showToast({
+        title: '请点击右上角分享',
+        icon: 'none',
+        duration: 2000
+      });
+    },
+
+    /**
      * 预览小程序码
      */
     onShareWeappCode() {
