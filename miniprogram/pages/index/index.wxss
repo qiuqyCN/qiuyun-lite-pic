@@ -30,6 +30,32 @@
   display: block;
 }
 
+/* 广告位 */
+.ad-section {
+  background: #ffffff;
+  border-radius: 16px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.ad-section ad-custom {
+  width: 100%;
+  display: block;
+}
+
+/* 底部广告位 */
+.ad-section-bottom {
+  background: #ffffff;
+  border-radius: 16px;
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+.ad-section-bottom ad-custom {
+  width: 100%;
+  display: block;
+}
+
 /* Categories Section */
 .categories-section {
   flex: 1;

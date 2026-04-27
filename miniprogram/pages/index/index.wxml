@@ -6,6 +6,11 @@
     <text class="header-subtitle">轻量级图片处理工具</text>
   </view>
 
+  <!-- 广告位 -->
+  <view class="ad-section">
+    <ad-custom unit-id="adunit-259eb26874a3e595" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+  </view>
+
   <!-- 工具分类列表 -->
   <view class="categories-section">
     <view 
@@ -62,6 +67,11 @@
   <!-- Footer -->
   <view class="minimal-footer">
     <text class="footer-text">本地处理 · 隐私安全 · 完全免费</text>
+  </view>
+
+  <!-- 底部广告位 -->
+  <view class="ad-section-bottom">
+    <ad-custom unit-id="adunit-b97d96b4236f4bd6" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
   </view>
 
   <view class="safe-area-bottom"></view>

@@ -242,6 +242,21 @@ Component({
     // 阻止事件冒泡
     preventBubble() {
       // 什么都不做，只是阻止冒泡
+    },
+
+    // 广告加载成功
+    adLoad() {
+      console.log('首页广告加载成功');
+    },
+
+    // 广告加载失败
+    adError(err: any) {
+      console.error('首页广告加载失败', err);
+    },
+
+    // 广告关闭
+    adClose() {
+      console.log('首页广告关闭');
     }
   }
 });

@@ -105,6 +105,11 @@
     </view>
   </view>
 
+  <!-- 广告位 -->
+  <view class="ad-section">
+    <ad-custom unit-id="adunit-c30a5edfeb2c052b" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+  </view>
+
   <!-- Footer -->
   <view class="page-footer">
     <view class="logo-section">

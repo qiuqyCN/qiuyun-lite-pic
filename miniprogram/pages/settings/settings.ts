@@ -149,6 +149,27 @@ Component({
         urls: ['/images/weappcode.png'],
         current: '/images/weappcode.png'
       });
+    },
+
+    /**
+     * 广告加载成功
+     */
+    adLoad() {
+      console.log('设置页广告加载成功');
+    },
+
+    /**
+     * 广告加载失败
+     */
+    adError(err: any) {
+      console.error('设置页广告加载失败', err);
+    },
+
+    /**
+     * 广告关闭
+     */
+    adClose() {
+      console.log('设置页广告关闭');
     }
   }
 });
