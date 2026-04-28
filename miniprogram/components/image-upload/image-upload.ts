@@ -1,6 +1,8 @@
 // components/image-upload/image-upload.ts
 // 图片上传卡片组件
 
+import { AD_CONFIG } from '../../constants/ad-config';
+
 Component({
   /**
    * 组件属性
@@ -41,15 +43,15 @@ Component({
       type: Array,
       value: []
     },
-    /** 是否显示广告 */
+    /** 是否显示广告（默认使用全局配置） */
     showAd: {
       type: Boolean,
-      value: true
+      value: AD_CONFIG.enabled
     },
-    /** 广告单元ID */
+    /** 广告单元ID（默认使用全局配置） */
     adUnitId: {
       type: String,
-      value: 'adunit-ce1dec1c9c3ce688'
+      value: AD_CONFIG.units.upload
     }
   },
 

@@ -6,6 +6,7 @@ import { handleError } from '../../utils/error';
 import { showSuccess } from '../../utils/ui';
 import { formatFileSize } from '../../utils/format';
 import { onShareAppMessage, onShareTimeline } from '../../utils/share';
+import { AD_CONFIG } from '../../constants/ad-config';
 
 /** 设置页面数据接口 */
 interface SettingsData {
@@ -21,7 +22,8 @@ Component({
   data: {
     cacheSize: '0 B',
     version: '1.0.0',
-    envVersion: ''
+    envVersion: '',
+    AD_CONFIG
   } as SettingsData,
 
   options: {

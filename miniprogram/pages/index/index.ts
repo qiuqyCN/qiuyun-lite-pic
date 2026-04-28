@@ -2,6 +2,7 @@
 // 首页逻辑 - 分类+列表式工具展示
 
 import { onShareAppMessage, onShareTimeline } from '../../utils/share';
+import { AD_CONFIG } from '../../constants/ad-config';
 
 interface ToolItem {
   id: string;
@@ -149,7 +150,8 @@ Component({
     // 是否显示 Tooltip 引导
     showAddGuideTooltip: false,
     // Tooltip 位置
-    tooltipTop: 80
+    tooltipTop: 80,
+    AD_CONFIG
   },
 
   lifetimes: {

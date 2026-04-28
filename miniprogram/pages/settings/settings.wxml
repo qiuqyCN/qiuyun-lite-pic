@@ -125,8 +125,8 @@
   </view>
 
   <!-- 广告位 -->
-  <view class="ad-section">
-    <ad-custom unit-id="adunit-c30a5edfeb2c052b" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+  <view class="ad-section" wx:if="{{AD_CONFIG.enabled}}">
+    <ad-custom unit-id="{{AD_CONFIG.units.settings}}" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
   </view>
 
   <!-- Footer -->
