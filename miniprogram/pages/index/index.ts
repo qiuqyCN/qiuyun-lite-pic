@@ -143,6 +143,15 @@ Component({
             iconBg: '#e8f0ff',
             path: '/pages/qrcode/qrcode',
             isNew: true
+          },
+          {
+            id: 'signature',
+            name: '电子签名',
+            description: '手写签名，透明背景导出',
+            icon: '✍️',
+            iconBg: '#e8fff0',
+            path: '/pages/signature/signature',
+            isNew: true
           }
         ]
       }

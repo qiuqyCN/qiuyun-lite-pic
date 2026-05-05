@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "电子签名",
+  "navigationBarBackgroundColor": "#41bc3f",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "format-selector": "../../components/format-selector/format-selector"
+  }
+}

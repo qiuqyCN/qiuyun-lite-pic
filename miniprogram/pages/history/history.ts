@@ -326,7 +326,9 @@ Component({
         'crop': '/pages/crop/crop',
         'rotate': '/pages/rotate/rotate',
         'annotate': '/pages/annotate/annotate',
-        'colorpicker': '/pages/colorpicker/colorpicker'
+        'colorpicker': '/pages/colorpicker/colorpicker',
+        'qrcode': '/pages/qrcode/qrcode',
+        'signature': '/pages/signature/signature'
       };
 
       const path = toolPaths[item.type];

@@ -1,0 +1,99 @@
+<!--pages/signature/signature.wxml-->
+<view class="page-container">
+  <!-- 签名画布 -->
+  <view class="section">
+    <view class="section-card canvas-card">
+      <view class="canvas-container" catchtouchstart="onTouchStart" catchtouchmove="onTouchMove" catchtouchend="onTouchEnd">
+        <canvas type="2d" id="signatureCanvas" class="signature-canvas"></canvas>
+        <view class="canvas-placeholder" wx:if="{{!hasSignature}}">
+          <text class="placeholder-text">请在此处签名</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="section">
+    <view class="section-card action-card">
+      <view class="action-row">
+        <view class="action-btn" bindtap="undo">
+          <text class="action-icon">↩</text>
+          <text class="action-label">撤销</text>
+        </view>
+        <view class="action-btn" bindtap="clearCanvas">
+          <text class="action-icon">🗑</text>
+          <text class="action-label">清空</text>
+        </view>
+        <view class="action-btn" bindtap="redo">
+          <text class="action-icon">↪</text>
+          <text class="action-label">重做</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 颜色设置 -->
+  <view class="section">
+    <view class="section-card">
+      <view class="setting-row">
+        <text class="setting-label">笔触颜色</text>
+      </view>
+      <scroll-view scroll-x class="color-scroll">
+        <view class="color-list">
+          <view
+            wx:for="{{presetColors}}"
+            wx:key="*this"
+            class="color-item {{penColor === item ? 'active' : ''}}"
+            style="background-color: {{item}};"
+            data-color="{{item}}"
+            bindtap="onColorSelect"
+          >
+            <text wx:if="{{penColor === item}}" class="color-check">✓</text>
+          </view>
+        </view>
+      </scroll-view>
+
+      <view class="divider"></view>
+
+      <!-- 粗细设置 -->
+      <view class="size-section">
+        <view class="size-header">
+          <text class="setting-label">笔触粗细</text>
+          <text class="size-value">{{lineWidth}}px</text>
+        </view>
+        <slider
+          class="size-slider"
+          min="1"
+          max="20"
+          value="{{lineWidth}}"
+          block-size="24"
+          activeColor="#41bc3f"
+          backgroundColor="#e8e8ed"
+          bindchange="onLineWidthChange"
+        />
+      </view>
+    </view>
+  </view>
+
+  <!-- 输出格式 -->
+  <view class="section">
+    <format-selector
+      value="{{fileType}}"
+      showDesc="{{false}}"
+      disabledFormats="{{['jpg']}}"
+      bind:change="onFormatChange"
+    ></format-selector>
+  </view>
+
+  <!-- 保存按钮 -->
+  <view class="section">
+    <view class="btn-row">
+      <view class="btn btn-reset" bindtap="resetSignature">重置</view>
+      <view class="btn btn-save {{isSaving ? 'btn-disabled' : ''}}" bindtap="saveToAlbum">
+        <text>{{isSaving ? '保存中...' : '保存到相册'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="safe-area-bottom"></view>
+</view>

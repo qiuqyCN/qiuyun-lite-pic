@@ -73,6 +73,11 @@ const shareConfigMap: Record<string, ShareConfig> = {
     path: '/pages/qrcode/qrcode',
     imageUrl: '/images/weappcode.png'
   },
+  signature: {
+    title: '电子签名生成器，手写签名一键导出',
+    path: '/pages/signature/signature',
+    imageUrl: '/images/weappcode.png'
+  },
   settings: {
     title: '秋云轻图 - 本地处理，保护隐私',
     path: '/pages/index/index',

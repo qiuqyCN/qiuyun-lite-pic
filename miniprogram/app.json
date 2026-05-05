@@ -12,6 +12,7 @@
     "pages/collage/collage",
     "pages/cutout/cutout",
     "pages/colorpicker/colorpicker",
+    "pages/signature/signature",
     "pages/qrcode/qrcode",
     "pages/history/history",
     "pages/settings/settings"
