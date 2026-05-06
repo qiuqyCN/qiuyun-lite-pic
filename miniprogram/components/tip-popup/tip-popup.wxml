@@ -1,0 +1,20 @@
+<!--components/tip-popup/tip-popup.wxml-->
+<view class="tip-popup-mask" wx:if="{{show}}" bindtap="onConfirm">
+  <view class="tip-popup" catchtap="stopPropagation">
+    <!-- 箭头 -->
+    <view class="popup-arrow"></view>
+    
+    <!-- 内容 -->
+    <view class="popup-content">
+      <view class="popup-icon">{{icon}}</view>
+      <text class="popup-title" wx:if="{{title}}">{{title}}</text>
+      <text class="popup-desc" wx:if="{{desc}}">{{desc}}</text>
+    </view>
+    
+    <!-- 按钮区域 -->
+    <view class="popup-actions">
+      <view class="action-btn confirm-btn" catchtap="onConfirm">知道了</view>
+      <view class="action-btn never-show-btn" wx:if="{{showNeverShow}}" catchtap="onNeverShow">不再显示</view>
+    </view>
+  </view>
+</view>

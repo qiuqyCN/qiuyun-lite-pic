@@ -1,0 +1,41 @@
+<!--components/guide-popup/guide-popup.wxml-->
+<view class="guide-popup-mask" wx:if="{{show}}" bindtap="onConfirm">
+  <view class="guide-popup" catchtap="stopPropagation">
+    <!-- 箭头 -->
+    <view class="popup-arrow"></view>
+    
+    <!-- 标题 -->
+    <text class="popup-title">{{title}}</text>
+    
+    <!-- 步骤列表 -->
+    <view class="step-list">
+      <view class="step-item">
+        <text class="step-number">1.</text>
+        <text class="step-text">点击右上角</text>
+        <view class="step-tag">···</view>
+      </view>
+      
+      <view class="step-item">
+        <text class="step-number">2.</text>
+        <text class="step-text">点击</text>
+        <text class="step-highlight">「添加到我的小程序」</text>
+      </view>
+
+      <!-- 引导图片 -->
+      <view class="tip-image-wrapper">
+        <image class="tip-image" src="/images/tip.png" mode="widthFix"></image>
+      </view>
+      
+      <view class="step-item">
+        <text class="step-number">3.</text>
+        <text class="step-text">微信首页下拉，「我的小程序」中找到「秋云轻图」，即可快速进入</text>
+      </view>
+    </view>
+    
+    <!-- 按钮区域 -->
+    <view class="popup-actions">
+      <view class="confirm-btn" catchtap="onConfirm">我知道了</view>
+      <view class="never-show-btn" catchtap="onNeverShow">不再显示</view>
+    </view>
+  </view>
+</view>

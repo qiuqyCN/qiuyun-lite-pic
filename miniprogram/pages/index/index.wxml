@@ -77,21 +77,18 @@
   <view class="safe-area-bottom"></view>
 
   <!-- Tooltip 引导 - 添加到我的小程序 -->
-  <view wx:if="{{showAddGuideTooltip}}" class="tooltip-mask" bindtap="closeAddGuide">
-    <!-- Tooltip 气泡 -->
-    <view class="tooltip-container" style="top: {{tooltipTop}}px; right: 25px;">
-      <view class="tooltip-arrow"></view>
-      <view class="tooltip-content" catchtap="preventBubble">
-        <view class="tooltip-header">
-          <text class="tooltip-icon">👆</text>
-          <text class="tooltip-title">点击右上角"⋯"</text>
-        </view>
-        <text class="tooltip-text">添加到我的小程序，下次使用更方便</text>
-        <view class="tooltip-actions">
-          <text class="tooltip-close" bindtap="closeAddGuide">知道了</text>
-          <text class="tooltip-never" bindtap="neverShowAddGuide">不再提示</text>
-        </view>
-      </view>
-    </view>
-  </view>
+  <!-- <tip-popup
+    icon="👆"
+    title="点击右上角..."
+    desc="添加到我的小程序，下次使用更方便"
+    duration="{{20}}"
+    storageKey="addGuide"
+    showOnLaunches="{{[1, 5, 10]}}"
+  ></tip-popup> -->
+
+  <!-- 引导弹窗 - 下次可以这样找到我 -->
+  <guide-popup
+    storageKey="addGuideDetail"
+    showOnLaunches="{{[1, 2, 4, 8, 16, 32, 64, 128, 512, 1024]}}"
+  ></guide-popup>
 </view>
