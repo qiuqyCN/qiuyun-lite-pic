@@ -189,6 +189,30 @@ Component({
      */
     adClose() {
       console.log('设置页广告关闭');
+    },
+
+    onOpenToolbox() {
+      wx.navigateToMiniProgram({
+        appId: 'wx8f22a4c93bed3d01',
+        path: '',
+        envVersion: 'release'
+      });
+    },
+
+    onOpenDoc() {
+      wx.navigateToMiniProgram({
+        appId: 'wx0133fb911f0e7232',
+        path: '',
+        envVersion: 'release'
+      });
+    },
+
+    onOpenPoetry() {
+      wx.navigateToMiniProgram({
+        appId: 'wx1ee54f15721ada62',
+        path: '',
+        envVersion: 'release'
+      });
     }
   }
 });
