@@ -1,6 +1,8 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "more-apps": "../../components/more-apps/more-apps"
+  },
   "navigationBarTitleText": "设置",
-   "navigationBarBackgroundColor": "#41bc3f",
+  "navigationBarBackgroundColor": "#41bc3f",
   "navigationBarTextStyle": "white"
 }

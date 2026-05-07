@@ -1,0 +1,18 @@
+<!--components/more-apps/more-apps.wxml-->
+<view class="more-apps-section" wx:if="{{apps.length > 0}}">
+  <view class="section-title" wx:if="{{showTitle}}">{{title}}</view>
+  <view class="apps-card">
+    <view
+      class="app-item"
+      wx:for="{{apps}}"
+      wx:key="appid"
+      data-appid="{{item.appid}}"
+      data-path="{{item.path}}"
+      bindtap="onOpenApp"
+    >
+      <image class="app-logo" src="{{item.logo}}" mode="aspectFit"/>
+      <text class="app-name">{{item.name}}</text>
+      <text class="app-desc">{{item.desc}}</text>
+    </view>
+  </view>
+</view>
