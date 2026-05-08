@@ -108,8 +108,7 @@ Component({
             description: '自由涂鸦标注，支持多种颜色',
             icon: '✏️',
             iconBg: '#fff0e8',
-            path: '/pages/annotate/annotate',
-            isNew: true
+            path: '/pages/annotate/annotate'
           }
         ]
       },
@@ -132,8 +131,7 @@ Component({
             description: '点击图片获取任意位置颜色值',
             icon: '🎨',
             iconBg: '#f8e8ff',
-            path: '/pages/colorpicker/colorpicker',
-            isNew: true
+            path: '/pages/colorpicker/colorpicker'
           },
           {
             id: 'qrcode',

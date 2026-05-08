@@ -28,7 +28,7 @@
       
       <view class="step-item">
         <text class="step-number">3.</text>
-        <text class="step-text">微信首页下拉，「我的小程序」中找到「秋云轻图」，即可快速进入</text>
+        <text class="step-text">微信首页下拉，「<text class="step-highlight">我的小程序</text>」中找到「<text class="step-highlight">秋云轻图</text>」，即可快速进入</text>
       </view>
     </view>
     

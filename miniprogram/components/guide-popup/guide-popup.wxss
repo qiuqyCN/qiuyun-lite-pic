@@ -113,14 +113,14 @@
 .confirm-btn {
   flex: 1;
   height: 88rpx;
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
   border-radius: 44rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 30rpx;
   font-weight: 600;
-  color: #c94b00;
+  background: #41bc3f;
+  color: #ffffff;
   transition: opacity 0.2s ease;
 }
 

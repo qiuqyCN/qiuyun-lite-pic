@@ -4,7 +4,7 @@
 /** 广告配置 */
 export const AD_CONFIG = {
   /** 是否启用广告 */
-  enabled: false,
+  enabled: true,
 
   /** 广告单元ID配置 */
   units: {
