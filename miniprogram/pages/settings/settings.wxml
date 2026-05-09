@@ -12,7 +12,7 @@
       <view class="setting-item" bindtap="onClearCache">
         <view class="setting-left">
           <view class="icon-wrapper cache-icon">
-            <text class="icon">🗑️</text>
+            <image class="setting-icon-img" src="/images/setting/clear.png" mode="aspectFit"/>
           </view>
           <view class="setting-info">
             <text class="setting-name">清除缓存</text>
@@ -35,7 +35,7 @@
         <button class="share-btn-inner" open-type="share">
           <view class="setting-left">
             <view class="icon-wrapper share-icon">
-              <text class="icon">🔗</text>
+              <image class="setting-icon-img" src="/images/setting/share.png" mode="aspectFit"/>
             </view>
             <view class="setting-info">
               <text class="setting-name">分享小程序</text>
@@ -53,7 +53,7 @@
       <view class="setting-item weapp-code-item" bindtap="onShareWeappCode">
         <view class="setting-left">
           <view class="icon-wrapper code-icon">
-            <text class="icon">📱</text>
+            <image class="setting-icon-img" src="/images/setting/qrcode.png" mode="aspectFit"/>
           </view>
           <view class="setting-info">
             <text class="setting-name">小程序码</text>
@@ -75,8 +75,8 @@
       <view class="setting-item">
         <button class="contact-btn-inner" open-type="contact">
           <view class="setting-left">
-            <view class="icon-wrapper feedback-icon">
-              <text class="icon">💬</text>
+            <view class="icon-wrapper contact-icon">
+              <image class="setting-icon-img" src="/images/setting/contact.png" mode="aspectFit"/>
             </view>
             <view class="setting-info">
               <text class="setting-name">联系客服</text>
@@ -94,7 +94,7 @@
         <button class="contact-btn-inner" open-type="feedback">
           <view class="setting-left">
             <view class="icon-wrapper feedback-icon">
-              <text class="icon">📝</text>
+              <image class="setting-icon-img" src="/images/setting/feedback.png" mode="aspectFit"/>
             </view>
             <view class="setting-info">
               <text class="setting-name">意见反馈</text>
@@ -111,7 +111,7 @@
       <view class="setting-item" bindtap="onAbout">
         <view class="setting-left">
           <view class="icon-wrapper about-icon">
-            <text class="icon">ℹ️</text>
+            <image class="setting-icon-img" src="/images/setting/about.png" mode="aspectFit"/>
           </view>
           <view class="setting-info">
             <text class="setting-name">关于我们</text>

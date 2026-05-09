@@ -74,6 +74,10 @@
   background: #fff2f0;
 }
 
+.contact-icon {
+  background: #e8f0ff;
+}
+
 .feedback-icon {
   background: #e6f7ff;
 }
@@ -92,6 +96,11 @@
 
 .icon {
   font-size: 36rpx;
+}
+
+.setting-icon-img {
+  width: 44rpx;
+  height: 44rpx;
 }
 
 .setting-info {
