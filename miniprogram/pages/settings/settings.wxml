@@ -125,7 +125,7 @@
   </view>
 
   <!-- 更多应用 -->
-  <more-apps apps="{{moreApps}}"></more-apps>
+  <more-apps></more-apps>
 
   <!-- 广告位 -->
   <view class="ad-section" wx:if="{{AD_CONFIG.enabled}}">
