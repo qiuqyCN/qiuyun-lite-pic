@@ -112,10 +112,11 @@
 
     <!-- 操作按钮 -->
     <action-buttons
-      isLoading="{{isProcessing}}"
-      bind:reset="resetCrop"
-      bind:save="saveToAlbum"
-    />
+  isLoading="{{isProcessing}}"
+  filePath="{{croppedPath}}"
+  bind:reset="resetCrop"
+  bind:aftersave="onAfterSave"
+/>
 
     <!-- 隐藏Canvas -->
     <canvas type="2d" id="cropCanvas" class="hidden-canvas"></canvas>

@@ -216,9 +216,9 @@
 
   <!-- 操作按钮 -->
   <action-buttons
-    isLoading="{{isSaving}}"
-    disabled="{{!hasGenerated}}"
-    bind:reset="onReset"
-    bind:save="onSave"
-  />
+  filePath="{{qrImagePath}}"
+  disabled="{{!hasGenerated}}"
+  bind:reset="onReset"
+  bind:aftersave="onAfterSave"
+/>
 </view>

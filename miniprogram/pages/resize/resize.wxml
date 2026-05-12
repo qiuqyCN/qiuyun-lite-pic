@@ -125,10 +125,11 @@
 
     <!-- 操作按钮：始终显示重置+保存 -->
     <action-buttons
-      isLoading="{{isProcessing}}"
-      bind:reset="resetResize"
-      bind:save="saveToAlbum"
-    />
+  isLoading="{{isProcessing}}"
+  bind:reset="resetResize"
+  bind:save="saveToAlbum"
+  bind:sharechat="onShareChat"
+/>
   </view>
 
   <!-- Canvas -->

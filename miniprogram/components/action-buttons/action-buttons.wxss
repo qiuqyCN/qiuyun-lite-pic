@@ -25,6 +25,7 @@
   border: none;
 }
 
+/* 主按钮 - 保存到相册 */
 .btn-primary {
   background: linear-gradient(135deg, #41bc3f 0%, #34a853 100%);
   color: #ffffff;
@@ -36,6 +37,7 @@
   box-shadow: 0 2px 6px rgba(65, 188, 63, 0.2);
 }
 
+/* 次要按钮 - 重置 */
 .btn-secondary {
   background: #f5f5f7;
   color: #1d1d1f;
@@ -43,6 +45,18 @@
 
 .btn-secondary:active {
   background: #e8e8ed;
+}
+
+/* 描边按钮 - 发送到聊天 */
+.btn-outline {
+  background: #fff;
+  color: #41bc3f;
+  border: 2rpx solid #41bc3f;
+  box-sizing: border-box;
+}
+
+.btn-outline:active {
+  background: rgba(65, 188, 63, 0.06);
 }
 
 /* 禁用状态 */

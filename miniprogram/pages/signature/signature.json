@@ -3,6 +3,7 @@
   "navigationBarBackgroundColor": "#41bc3f",
   "navigationBarTextStyle": "white",
   "usingComponents": {
-    "format-selector": "../../components/format-selector/format-selector"
+    "format-selector": "../../components/format-selector/format-selector",
+    "action-buttons": "../../components/action-buttons/action-buttons"
   }
 }

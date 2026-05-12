@@ -1,19 +1,33 @@
-<!--components/action-buttons/action-buttons.wxml-->
+<!--操作按钮组件 - 重置 + 发送到聊天 + 保存到相册-->
+<!--使用方式：-->
+<!--1. filePath模式（推荐）：传入filePath，组件内部处理保存和分享，通过aftersave事件通知页面写历史记录-->
+<!--   适用页面：compress/convert/filter/watermark/collage/crop/rotate/qrcode-->
+<!--2. 事件模式：不传filePath，通过save/sharechat事件由页面自行处理-->
+<!--   适用页面：resize（懒生成图片）、annotate/signature（Canvas实时导出）-->
 <view class="action-buttons">
   <view class="action-row">
     <button 
-      class="btn btn-secondary {{isLoading ? 'btn-disabled' : ''}}"
+      class="btn btn-secondary {{isLoading || _saving ? 'btn-disabled' : ''}}"
       bindtap="onResetTap"
-      disabled="{{isLoading}}"
+      disabled="{{isLoading || _saving}}"
     >
       {{resetText}}
     </button>
     <button 
-      class="btn btn-primary {{isLoading || disabled ? 'btn-disabled' : ''}}"
+      wx:if="{{showShareChat}}"
+      class="btn btn-outline {{isLoading || _saving || disabled ? 'btn-disabled' : ''}}"
+      bindtap="onShareChatTap"
+      disabled="{{isLoading || _saving || disabled}}"
+    >
+      发送到聊天
+    </button>
+    <button 
+      class="btn btn-primary {{isLoading || _saving || disabled ? 'btn-disabled' : ''}}"
       bindtap="onSaveTap"
-      disabled="{{isLoading || disabled}}"
+      disabled="{{isLoading || _saving || disabled}}"
     >
       <text wx:if="{{isLoading}}">{{loadingText}}</text>
+      <text wx:elif="{{_saving}}">保存中...</text>
       <text wx:else>{{saveText}}</text>
     </button>
   </view>

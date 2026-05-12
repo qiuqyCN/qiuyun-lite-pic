@@ -3,7 +3,6 @@
 
 import { chooseImage, getImageInfo } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
-import { saveImageToAlbumWithUI } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
 import { handleError } from '../../utils/error';
 import { showLoading } from '../../utils/ui';
@@ -250,9 +249,6 @@ Component({
           isProcessing: false
         });
 
-        // 保存到历史记录
-        this.saveToHistory();
-
       } catch (err) {
         handleError(err, '转换失败');
         this.setData({ isProcessing: false });
@@ -275,9 +271,6 @@ Component({
       });
     },
 
-    /**
-     * 保存到历史记录
-     */
     saveToHistory() {
       saveToHistory({
         type: 'convert',
@@ -294,13 +287,8 @@ Component({
       });
     },
 
-    /**
-     * 保存到相册
-     */
-    async saveToAlbum() {
-      if (!this.data.convertedPath) return;
-
-      await saveImageToAlbumWithUI(this.data.convertedPath);
-    }
+    onAfterSave() {
+      this.saveToHistory();
+    },
   }
 });

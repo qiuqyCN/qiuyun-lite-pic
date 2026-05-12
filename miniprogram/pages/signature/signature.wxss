@@ -164,47 +164,37 @@
   margin: 0;
 }
 
-/* 按钮区域 */
-.btn-row {
-  display: flex;
-  gap: 24rpx;
-  padding: 0 4rpx;
-}
-
-.btn {
-  flex: 1;
-  height: 88rpx;
-  border-radius: 16rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 30rpx;
-  font-weight: 500;
-  transition: opacity 0.2s ease;
-}
-
-.btn:active {
-  opacity: 0.8;
-}
-
-.btn-reset {
-  background: #fff;
-  color: #86868b;
-  border: 2rpx solid #e5e5e5;
-}
-
-.btn-save {
-  background: #41bc3f;
-  color: #fff;
-}
-
-.btn-disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
 /* Safe Area */
 .safe-area-bottom {
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 提示信息 */
+.tips-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+}
+
+.tips-card .tip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.tips-card .tip-item:last-child {
+  margin-bottom: 0;
+}
+
+.tips-card .tip-icon {
+  font-size: 32rpx;
+  flex-shrink: 0;
+}
+
+.tips-card .tip-text {
+  font-size: 28rpx;
+  color: #666666;
+  line-height: 1.5;
 }

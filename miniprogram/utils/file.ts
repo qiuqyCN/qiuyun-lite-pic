@@ -76,10 +76,19 @@ export const saveImageToAlbumWithUI = async (
  * @param filePath 文件路径
  * @returns Promise
  */
-export const shareImage = async (filePath: string): Promise<void> => {
-  await (wx as any).shareFileMessage({
+export const shareImageToChat = (filePath: string, fileName?: string): void => {
+  const ext = filePath.match(/\.(jpg|jpeg|png|gif|webp|bmp)$/i)?.[0] || '.png';
+  const name = fileName ? (fileName.endsWith(ext.slice(1)) ? fileName : fileName + ext) : '秋云轻图_' + Date.now() + ext;
+  (wx as any).shareFileMessage({
     filePath,
-    fileName: '处理后的图片'
+    fileName: name,
+    success: () => {
+      showSuccess('发送成功');
+    },
+    fail: (err: any) => {
+      if (err.errMsg && err.errMsg.includes('cancel')) return;
+      handleError(err, '发送失败');
+    }
   });
 };
 

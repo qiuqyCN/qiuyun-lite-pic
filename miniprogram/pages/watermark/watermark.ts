@@ -3,7 +3,6 @@
 
 import { chooseImage } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
-import { saveImageToAlbumWithUI } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
 import { handleError } from '../../utils/error';
 import { onShareAppMessage, onShareTimeline } from '../../utils/share';
@@ -448,22 +447,6 @@ Component({
       });
     },
 
-    /**
-     * 保存到相册
-     * 将带水印的图片保存到系统相册
-     */
-    async saveToAlbum() {
-      if (!this.data.watermarkedPath) return;
-
-      await saveImageToAlbumWithUI(this.data.watermarkedPath, {
-        onSuccess: () => this.saveToHistory()
-      });
-    },
-
-    /**
-     * 保存到历史记录
-     * 将处理记录保存到本地存储
-     */
     saveToHistory() {
       saveToHistory({
         type: 'watermark',
@@ -477,10 +460,10 @@ Component({
       });
     },
 
-    /**
-     * 重置水印设置
-     * 将所有水印设置恢复到默认值
-     */
+    onAfterSave() {
+      this.saveToHistory();
+    },
+
     resetWatermark() {
       this.setData({
         watermarkType: 'text',

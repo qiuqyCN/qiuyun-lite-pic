@@ -1,44 +1,74 @@
-// components/action-buttons/action-buttons.ts
-// 操作按钮组件 - 重置 + 保存到相册
+import { saveImageToAlbumWithUI, shareImageToChat } from '../../utils/file';
 
 Component({
   properties: {
-    /** 是否处理中 */
     isLoading: {
       type: Boolean,
       value: false
     },
-    /** 重置按钮文字 */
     resetText: {
       type: String,
       value: '重置'
     },
-    /** 保存按钮文字 */
     saveText: {
       type: String,
       value: '保存到相册'
     },
-    /** 加载文字 */
     loadingText: {
       type: String,
       value: '处理中...'
     },
-    /** 是否禁用保存按钮 */
     disabled: {
       type: Boolean,
       value: false
+    },
+    showShareChat: {
+      type: Boolean,
+      value: true
+    },
+    filePath: {
+      type: String,
+      value: ''
     }
+  },
+
+  data: {
+    _saving: false
   },
 
   methods: {
     onResetTap() {
-      if (this.data.isLoading) return;
+      if (this.data.isLoading || this.data._saving) return;
       this.triggerEvent('reset');
     },
 
-    onSaveTap() {
-      if (this.data.isLoading) return;
-      this.triggerEvent('save');
+    async onSaveTap() {
+      if (this.data.isLoading || this.data.disabled || this.data._saving) return;
+
+      if (this.data.filePath) {
+        this.setData({ _saving: true });
+        try {
+          const success = await saveImageToAlbumWithUI(this.data.filePath);
+          if (success) {
+            this.triggerEvent('aftersave', { filePath: this.data.filePath });
+          }
+        } finally {
+          this.setData({ _saving: false });
+        }
+      } else {
+        this.triggerEvent('save');
+      }
+    },
+
+    onShareChatTap() {
+      if (this.data.isLoading || this.data.disabled || this.data._saving) return;
+
+      if (this.data.filePath) {
+        shareImageToChat(this.data.filePath);
+        this.triggerEvent('aftersave', { filePath: this.data.filePath });
+      } else {
+        this.triggerEvent('sharechat');
+      }
     }
   }
 });

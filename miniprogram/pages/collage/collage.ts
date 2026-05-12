@@ -3,7 +3,6 @@
 
 import { chooseImage, chooseMultipleImages, getImageInfo } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
-import { saveImageToAlbumWithUI } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
 import { handleError } from '../../utils/error';
 import { debounce } from '../../utils/debounce';
@@ -602,20 +601,6 @@ Component({
       });
     },
 
-    /**
-     * 保存到相册
-     */
-    async saveToAlbum() {
-      if (!this.data.resultPath) return;
-
-      await saveImageToAlbumWithUI(this.data.resultPath, {
-        onSuccess: () => this.saveToHistory()
-      });
-    },
-
-    /**
-     * 保存到历史记录
-     */
     saveToHistory() {
       saveToHistory({
         type: 'collage',
@@ -628,6 +613,10 @@ Component({
           spacing: this.data.spacing
         }
       });
+    },
+
+    onAfterSave() {
+      this.saveToHistory();
     }
   }
 });

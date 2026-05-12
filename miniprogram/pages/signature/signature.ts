@@ -1,7 +1,7 @@
 // signature.ts
 // 电子签名生成器
 
-import { saveImageToAlbumWithUI } from '../../utils/file';
+import { saveImageToAlbumWithUI, shareImageToChat } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
 import { handleError } from '../../utils/error';
 import { onShareAppMessage, onShareTimeline } from '../../utils/share';
@@ -307,6 +307,33 @@ Component({
         lineWidth: 6,
         fileType: 'png',
       });
+    },
+
+    async onShareChat() {
+      const canvasContext = (this as any)._canvasContext;
+      if (!canvasContext || !this.data.hasSignature) {
+        wx.showToast({ title: '请先签名', icon: 'none' });
+        return;
+      }
+
+      try {
+        const { canvas } = canvasContext;
+        const { fileType } = this.data;
+
+        const res = await new Promise<any>((resolve, reject) => {
+          wx.canvasToTempFilePath({
+            canvas,
+            fileType,
+            quality: 1,
+            success: resolve,
+            fail: reject
+          });
+        });
+
+        shareImageToChat(res.tempFilePath);
+      } catch (err) {
+        handleError(err, '发送失败');
+      }
     }
   }
 });

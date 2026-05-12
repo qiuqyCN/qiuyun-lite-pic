@@ -3,7 +3,6 @@
 
 import { chooseImage } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
-import { saveImageToAlbumWithUI } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
 import { handleError } from '../../utils/error';
 import { showLoading } from '../../utils/ui';
@@ -343,43 +342,6 @@ Component({
       });
     },
 
-    /**
-     * 保存到相册
-     * 使用 saveImageToAlbum 工具函数替代 wx.saveImageToPhotosAlbum
-     */
-    async saveToAlbum() {
-      if (!this.data.filteredPath) return;
-
-      // 原图不需要保存，直接提示用户
-      if (this.data.currentFilter === 'original') {
-        wx.showToast({
-          title: '原图无需保存',
-          icon: 'none',
-          duration: 2000
-        });
-        return;
-      }
-
-      // 保存时禁用按钮
-      console.log('保存开始，设置 isProcessing: true');
-      this.setData({ isProcessing: true });
-
-      try {
-        await saveImageToAlbumWithUI(this.data.filteredPath, {
-          onSuccess: () => this.saveToHistory()
-        });
-      } catch (err) {
-        console.log('保存失败:', err);
-      } finally {
-        // 无论成功失败，都恢复按钮状态
-        console.log('保存结束，设置 isProcessing: false');
-        this.setData({ isProcessing: false });
-      }
-    },
-
-    /**
-     * 保存到历史记录
-     */
     saveToHistory() {
       saveToHistory({
         type: 'filter',
@@ -393,15 +355,16 @@ Component({
       });
     },
 
-    /**
-     * 重置滤镜
-     */
     resetFilter() {
       this.setData({
         currentFilter: 'original',
         filterIntensity: 100,
         filteredPath: this.data.imagePath
       });
+    },
+
+    onAfterSave() {
+      this.saveToHistory();
     }
   }
 });

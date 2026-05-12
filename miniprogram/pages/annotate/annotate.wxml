@@ -155,9 +155,10 @@
 
     <!-- 操作按钮 -->
     <action-buttons
-      isLoading="{{isProcessing}}"
-      bind:reset="resetCanvas"
-      bind:save="saveToAlbum"
-    />
+  isLoading="{{isProcessing}}"
+  bind:reset="resetCanvas"
+  bind:save="saveToAlbum"
+  bind:sharechat="onShareChat"
+/>
   </block>
 </view>

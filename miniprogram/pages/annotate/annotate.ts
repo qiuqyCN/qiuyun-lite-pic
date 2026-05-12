@@ -2,7 +2,7 @@
 // 图片标注/涂鸦页面
 
 import { chooseImage, getImageInfo } from '../../utils/image';
-import { saveImageToAlbumWithUI } from '../../utils/file';
+import { saveImageToAlbumWithUI, shareImageToChat } from '../../utils/file';
 import { handleError } from '../../utils/error';
 import { saveToHistory } from '../../utils/history';
 import { onShareAppMessage, onShareTimeline } from '../../utils/share';
@@ -427,6 +427,30 @@ Component({
           isEraser
         }
       });
+    },
+
+    async onShareChat() {
+      const canvasContext = (this as any)._canvasContext;
+      if (!canvasContext) return;
+
+      try {
+        const { canvas } = canvasContext;
+        const { fileType } = this.data;
+
+        const res = await new Promise<any>((resolve, reject) => {
+          wx.canvasToTempFilePath({
+            canvas,
+            fileType,
+            quality: 0.95,
+            success: resolve,
+            fail: reject
+          });
+        });
+
+        shareImageToChat(res.tempFilePath);
+      } catch (err) {
+        handleError(err, '发送失败');
+      }
     },
   },
 });

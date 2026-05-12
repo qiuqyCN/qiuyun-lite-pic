@@ -3,7 +3,6 @@
 
 import { chooseImage, getImageInfo } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
-import { saveImageToAlbumWithUI } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
 import { handleError } from '../../utils/error';
 import { debounce } from '../../utils/debounce';
@@ -450,29 +449,10 @@ Component({
       });
     },
 
-    /**
-     * 保存到相册
-     */
-    async saveToAlbum() {
-      if (!this.data.croppedPath) {
-        await this.cropImage();
-      }
-
-      if (!this.data.croppedPath) return;
-
-      await saveImageToAlbumWithUI(this.data.croppedPath, {
-        onSuccess: () => this.saveHistory()
-      });
-    },
-
-    /**
-     * 保存到历史记录
-     */
     saveHistory() {
       const { imagePath, croppedPath, originalWidth, originalHeight, cropWidth, cropHeight, aspectRatio } = this.data;
       if (!croppedPath) return;
 
-      // 查找比例对应的标签
       const ratioItem = ASPECT_RATIOS.find(r => r.value === aspectRatio);
       const aspectRatioLabel = ratioItem ? ratioItem.label : (aspectRatio === 0 ? '自由裁剪' : '自定义');
 
@@ -489,6 +469,10 @@ Component({
           aspectRatio: aspectRatioLabel
         }
       });
+    },
+
+    onAfterSave() {
+      this.saveHistory();
     },
   },
 });

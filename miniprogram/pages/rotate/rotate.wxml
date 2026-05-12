@@ -77,10 +77,11 @@
 
     <!-- 操作按钮 -->
     <action-buttons
-      isLoading="{{isProcessing}}"
-      bind:reset="resetTransform"
-      bind:save="saveToAlbum"
-    />
+  isLoading="{{isProcessing}}"
+  filePath="{{resultPath}}"
+  bind:reset="resetTransform"
+  bind:aftersave="onAfterSave"
+/>
 
     <!-- 隐藏Canvas -->
     <canvas type="2d" id="rotateCanvas" class="hidden-canvas"></canvas>

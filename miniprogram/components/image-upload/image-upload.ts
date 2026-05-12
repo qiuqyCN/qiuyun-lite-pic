@@ -31,7 +31,7 @@ Component({
     /** 提示文字 */
     hint: {
       type: String,
-      value: '点击从相册选择或拍照'
+      value: '点击选择图片（支持相册/聊天记录/拍照）'
     },
     /** 是否禁用 */
     disabled: {

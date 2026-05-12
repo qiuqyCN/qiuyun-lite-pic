@@ -3,7 +3,7 @@
 
 import { chooseImage, calculateSavedPercent } from '../../utils/image';
 import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
-import { saveImageToAlbumWithUI, getFileSize } from '../../utils/file';
+import { getFileSize } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
 import { handleError } from '../../utils/error';
 import { showLoading } from '../../utils/ui';
@@ -211,10 +211,6 @@ Component({
             confirmText: '知道了'
           });
         }
-
-        // 保存到历史记录
-        this.saveToHistory();
-
       } catch (err) {
         hideLoading();
         handleError(err, '压缩失败');
@@ -255,13 +251,8 @@ Component({
       });
     },
 
-    /**
-     * 保存到相册
-     */
-    async saveToAlbum() {
-      if (!this.data.compressedPath) return;
-
-      await saveImageToAlbumWithUI(this.data.compressedPath);
-    }
+    onAfterSave() {
+      this.saveToHistory();
+    },
   }
 });

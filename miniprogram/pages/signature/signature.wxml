@@ -85,14 +85,29 @@
     ></format-selector>
   </view>
 
-  <!-- 保存按钮 -->
+  <!-- 提示信息 -->
   <view class="section">
-    <view class="btn-row">
-      <view class="btn btn-reset" bindtap="resetSignature">重置</view>
-      <view class="btn btn-save {{isSaving ? 'btn-disabled' : ''}}" bindtap="saveToAlbum">
-        <text>{{isSaving ? '保存中...' : '保存到相册'}}</text>
+    <view class="tips-card">
+      <view class="tip-item">
+        <text class="tip-icon">✅</text>
+        <text class="tip-text">仅支持导出为 PNG 格式（透明背景）</text>
+      </view>
+      <view class="tip-item">
+        <text class="tip-icon">🚫</text>
+        <text class="tip-text">不支持导出 JPG 格式</text>
       </view>
     </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="section">
+    <action-buttons
+  isLoading="{{isSaving}}"
+  disabled="{{!hasSignature}}"
+  bind:reset="resetSignature"
+  bind:save="saveToAlbum"
+  bind:sharechat="onShareChat"
+/>
   </view>
 
   <view class="safe-area-bottom"></view>

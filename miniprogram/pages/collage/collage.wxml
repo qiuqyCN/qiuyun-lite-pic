@@ -138,11 +138,12 @@
 
   <!-- 操作按钮 -->
   <action-buttons
-    isLoading="{{isProcessing}}"
-    disabled="{{!hasImages}}"
-    bind:reset="resetCollage"
-    bind:save="saveToAlbum"
-  />
+  isLoading="{{isProcessing}}"
+  filePath="{{resultPath}}"
+  disabled="{{!hasImages}}"
+  bind:reset="resetCollage"
+  bind:aftersave="onAfterSave"
+/>
 
   <!-- 底部占位 -->
   <view class="bottom-space"></view>

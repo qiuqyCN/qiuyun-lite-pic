@@ -11,7 +11,7 @@ import {
   canvasToTempFile,
   fillBackground
 } from '../../utils/canvas';
-import { saveImageToAlbumWithUI } from '../../utils/file';
+import { saveImageToAlbumWithUI, shareImageToChat } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
 import { handleError } from '../../utils/error';
 import { showLoading } from '../../utils/ui';
@@ -453,6 +453,12 @@ Component({
           targetHeight: this.data.targetHeight,
         }
       });
+    },
+
+    onShareChat() {
+      if (this.data.resultPath) {
+        shareImageToChat(this.data.resultPath);
+      }
     },
   }
 });

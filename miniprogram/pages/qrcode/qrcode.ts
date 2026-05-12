@@ -24,7 +24,6 @@ interface QRCodeData {
   hasGenerated: boolean;
   qrImagePath: string;
   fileType: string;
-  isSaving: boolean;
   colorOptions: Array<{ id: string; name: string; color: string }>;
 }
 
@@ -61,7 +60,6 @@ Page({
     hasGenerated: false,
     qrImagePath: '',
     fileType: 'jpg',
-    isSaving: false,
     colorOptions: [
       { id: 'black', name: '黑色', color: '#000000' },
       { id: 'green', name: '绿色', color: '#41bc3f' },
@@ -286,43 +284,8 @@ Page({
     }
   },
 
-  onSave() {
-    if (!this.data.qrImagePath) {
-      wx.showToast({ title: '请先生成二维码', icon: 'none' });
-      return;
-    }
-
-    this.setData({ isSaving: true });
-
-    wx.saveImageToPhotosAlbum({
-      filePath: this.data.qrImagePath,
-      success: () => {
-        wx.showToast({ title: '保存成功', icon: 'success' });
-        this.saveToHistory();
-      },
-      fail: (err) => {
-        if (err.errMsg.includes('auth deny')) {
-          wx.showModal({
-            title: '需要权限',
-            content: '请允许保存图片到相册',
-            success: (res) => {
-              if (res.confirm) {
-                wx.openSetting();
-              }
-            }
-          });
-        } else {
-          wx.showToast({ title: '保存失败', icon: 'none' });
-        }
-      },
-      complete: () => {
-        this.setData({ isSaving: false });
-      }
-    });
-  },
-
-  saveToHistory() {
-    const { currentType, qrImagePath, textContent, urlContent, wifiSsid, cardName } = this.data;
+  onAfterSave(e: any) {
+    const { currentType, textContent, urlContent, wifiSsid, cardName } = this.data;
     const typeMap: Record<string, string> = {
       text: '文本',
       url: '网址',
@@ -334,7 +297,7 @@ Page({
       type: 'qrcode',
       typeName: `二维码生成 - ${typeMap[currentType]}`,
       originalPath: '',
-      resultPath: qrImagePath,
+      resultPath: e.detail.filePath,
       params: {
         qrcodeType: currentType,
         content: currentType === 'text' ? textContent :
@@ -344,7 +307,6 @@ Page({
       }
     });
   },
-  
 
   onReset() {
     this.setData({

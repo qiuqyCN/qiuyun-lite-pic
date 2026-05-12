@@ -187,11 +187,12 @@
 
     <!-- 操作按钮 -->
     <action-buttons
-      isLoading="{{isProcessing}}"
-      disabled="{{!hasImage}}"
-      bind:reset="resetWatermark"
-      bind:save="saveToAlbum"
-    />
+  isLoading="{{isProcessing}}"
+  filePath="{{watermarkedPath}}"
+  disabled="{{!hasImage}}"
+  bind:reset="resetWatermark"
+  bind:aftersave="onAfterSave"
+/>
   </view>
 
   <!-- 隐藏Canvas -->
