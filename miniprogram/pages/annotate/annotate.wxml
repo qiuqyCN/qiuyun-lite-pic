@@ -38,9 +38,9 @@
           id="annotateCanvas"
           class="annotate-canvas"
           style="width: {{canvasWidth}}px; height: {{canvasHeight}}px;"
-          bindtouchstart="onTouchStart"
-          bindtouchmove="onTouchMove"
-          bindtouchend="onTouchEnd"
+          catchtouchstart="onTouchStart"
+          catchtouchmove="onTouchMove"
+          catchtouchend="onTouchEnd"
         ></canvas>
       </view>
       <view class="canvas-hint">在图片上涂鸦标注</view>
