@@ -10,7 +10,7 @@
       class="clear-btn {{historyList.length === 0 ? 'disabled' : ''}}"
       bindtap="onClearHistory"
     >
-      <text class="clear-icon">🗑</text>
+      <image class="clear-icon-img" src="/images/setting/clear.png" mode="aspectFit" />
       <text class="clear-text">清空</text>
     </view>
   </view>
@@ -134,7 +134,7 @@
           
           <!-- 箭头 -->
           <view class="arrow">
-            <text class="arrow-icon">›</text>
+            <view class="arrow-line"></view>
           </view>
         </view>
       </view>
@@ -159,7 +159,7 @@
     <text class="empty-desc">开始处理图片，记录将显示在这里</text>
     <view class="empty-action" bindtap="goToHome">
       <text class="action-text">去处理图片</text>
-      <text class="action-arrow">→</text>
+      <view class="action-arrow-icon"></view>
     </view>
   </view>
 

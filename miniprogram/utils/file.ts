@@ -79,6 +79,7 @@ export const saveImageToAlbumWithUI = async (
 export const shareImageToChat = (filePath: string, fileName?: string): void => {
   const ext = filePath.match(/\.(jpg|jpeg|png|gif|webp|bmp)$/i)?.[0] || '.png';
   const name = fileName ? (fileName.endsWith(ext.slice(1)) ? fileName : fileName + ext) : '秋云轻图_' + Date.now() + ext;
+
   (wx as any).shareFileMessage({
     filePath,
     fileName: name,
@@ -87,8 +88,24 @@ export const shareImageToChat = (filePath: string, fileName?: string): void => {
     },
     fail: (err: any) => {
       if (err.errMsg && err.errMsg.includes('cancel')) return;
+      if (err.errMsg && err.errMsg.includes('not support')) {
+        wx.showToast({ title: '请在真机上使用此功能', icon: 'none' });
+        return;
+      }
       handleError(err, '发送失败');
     }
+  });
+};
+
+export const exportCanvasImage = (canvas: any, fileType: 'jpg' | 'png' = 'png', quality: number = 1): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    wx.canvasToTempFilePath({
+      canvas,
+      fileType,
+      quality,
+      success: (res: any) => resolve(res.tempFilePath),
+      fail: (err: any) => reject(err)
+    });
   });
 };
 

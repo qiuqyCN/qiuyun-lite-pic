@@ -59,6 +59,11 @@
   font-size: 16px;
 }
 
+.clear-icon-img {
+  width: 32rpx;
+  height: 32rpx;
+}
+
 .clear-text {
   font-size: 14px;
   color: #ff4d4f;
@@ -251,10 +256,12 @@
   margin-left: 8px;
 }
 
-.arrow-icon {
-  font-size: 20px;
-  color: #c7c7cc;
-  font-weight: 300;
+.arrow-line {
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #c7c7cc;
+  border-right: 2px solid #c7c7cc;
+  transform: rotate(45deg);
 }
 
 /* List Footer */
@@ -374,6 +381,14 @@
 .action-arrow {
   font-size: 16px;
   color: #ffffff;
+}
+
+.action-arrow-icon {
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+  transform: rotate(45deg);
 }
 
 /* Safe Area */

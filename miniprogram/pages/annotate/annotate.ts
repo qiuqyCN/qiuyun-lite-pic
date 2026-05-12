@@ -2,7 +2,7 @@
 // 图片标注/涂鸦页面
 
 import { chooseImage, getImageInfo } from '../../utils/image';
-import { saveImageToAlbumWithUI, shareImageToChat } from '../../utils/file';
+import { saveImageToAlbumWithUI, exportCanvasImage } from '../../utils/file';
 import { handleError } from '../../utils/error';
 import { saveToHistory } from '../../utils/history';
 import { onShareAppMessage, onShareTimeline } from '../../utils/share';
@@ -32,6 +32,7 @@ interface AnnotateData {
   isProcessing: boolean;
   hasImage: boolean;
   isDrawing: boolean;
+  _cachedExportPath: string;
 }
 
 // 预设颜色（更多颜色选择）
@@ -79,6 +80,7 @@ Component({
     isProcessing: false,
     hasImage: false,
     isDrawing: false,
+    _cachedExportPath: '',
 
     presetColors: PRESET_COLORS,
   } as AnnotateData & { presetColors: typeof PRESET_COLORS },
@@ -386,32 +388,17 @@ Component({
       if (!canvasContext) return;
 
       try {
-        const { canvas } = canvasContext;
-        const { fileType } = this.data;
-
-        // 导出canvas为图片
-        const res = await new Promise<any>((resolve, reject) => {
-          wx.canvasToTempFilePath({
-            canvas,
-            fileType,
-            quality: 0.95,
-            success: resolve,
-            fail: reject
-          });
-        });
-
-        await saveImageToAlbumWithUI(res.tempFilePath, {
+        const tempFilePath = await exportCanvasImage(canvasContext.canvas, this.data.fileType, 0.95);
+        this.setData({ _cachedExportPath: tempFilePath });
+        await saveImageToAlbumWithUI(tempFilePath, {
           loadingText: '导出并保存中...',
-          onSuccess: () => this.saveHistory(res.tempFilePath)
+          onSuccess: () => this.saveHistory(tempFilePath)
         });
       } catch (err) {
         handleError(err, '保存失败');
       }
     },
 
-    /**
-     * 保存到历史记录
-     */
     saveHistory(resultPath: string) {
       const { imagePath, brushColor, brushSize, brushType, isEraser } = this.data;
 
@@ -429,27 +416,9 @@ Component({
       });
     },
 
-    async onShareChat() {
-      const canvasContext = (this as any)._canvasContext;
-      if (!canvasContext) return;
-
-      try {
-        const { canvas } = canvasContext;
-        const { fileType } = this.data;
-
-        const res = await new Promise<any>((resolve, reject) => {
-          wx.canvasToTempFilePath({
-            canvas,
-            fileType,
-            quality: 0.95,
-            success: resolve,
-            fail: reject
-          });
-        });
-
-        shareImageToChat(res.tempFilePath);
-      } catch (err) {
-        handleError(err, '发送失败');
+    onAfterSave() {
+      if (this.data._cachedExportPath) {
+        this.saveHistory(this.data._cachedExportPath);
       }
     },
   },

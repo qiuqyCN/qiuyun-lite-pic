@@ -1,9 +1,9 @@
 <!--操作按钮组件 - 重置 + 发送到聊天 + 保存到相册-->
 <!--使用方式：-->
-<!--1. filePath模式（推荐）：传入filePath，组件内部处理保存和分享，通过aftersave事件通知页面写历史记录-->
-<!--   适用页面：compress/convert/filter/watermark/collage/crop/rotate/qrcode-->
-<!--2. 事件模式：不传filePath，通过save/sharechat事件由页面自行处理-->
-<!--   适用页面：resize（懒生成图片）、annotate/signature（Canvas实时导出）-->
+<!--1. filePath模式：传入filePath，组件内部处理保存和分享，通过aftersave事件通知页面写历史记录-->
+<!--   适用页面：compress/convert/filter/watermark/collage/crop/rotate/qrcode/resize/annotate/signature-->
+<!--2. 事件模式：不传filePath，通过save事件由页面自行处理保存（分享按钮不显示）-->
+<!--   适用页面：colorpicker（复制颜色，不涉及图片）-->
 <view class="action-buttons">
   <view class="action-row">
     <button 
@@ -15,9 +15,9 @@
     </button>
     <button 
       wx:if="{{showShareChat}}"
-      class="btn btn-outline {{isLoading || _saving || disabled ? 'btn-disabled' : ''}}"
+      class="btn btn-outline {{isLoading || _saving || disabled || !filePath ? 'btn-disabled' : ''}}"
       bindtap="onShareChatTap"
-      disabled="{{isLoading || _saving || disabled}}"
+      disabled="{{isLoading || _saving || disabled || !filePath}}"
     >
       发送到聊天
     </button>

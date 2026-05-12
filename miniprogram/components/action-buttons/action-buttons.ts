@@ -62,13 +62,10 @@ Component({
 
     onShareChatTap() {
       if (this.data.isLoading || this.data.disabled || this.data._saving) return;
+      if (!this.data.filePath) return;
 
-      if (this.data.filePath) {
-        shareImageToChat(this.data.filePath);
-        this.triggerEvent('aftersave', { filePath: this.data.filePath });
-      } else {
-        this.triggerEvent('sharechat');
-      }
+      shareImageToChat(this.data.filePath);
+      this.triggerEvent('aftersave', { filePath: this.data.filePath });
     }
   }
 });

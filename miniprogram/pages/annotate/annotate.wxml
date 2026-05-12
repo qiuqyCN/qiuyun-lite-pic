@@ -156,9 +156,10 @@
     <!-- 操作按钮 -->
     <action-buttons
   isLoading="{{isProcessing}}"
+  filePath="{{_cachedExportPath}}"
   bind:reset="resetCanvas"
   bind:save="saveToAlbum"
-  bind:sharechat="onShareChat"
+  bind:aftersave="onAfterSave"
 />
   </block>
 </view>

@@ -1,7 +1,7 @@
 // signature.ts
 // 电子签名生成器
 
-import { saveImageToAlbumWithUI, shareImageToChat } from '../../utils/file';
+import { saveImageToAlbumWithUI, exportCanvasImage } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
 import { handleError } from '../../utils/error';
 import { onShareAppMessage, onShareTimeline } from '../../utils/share';
@@ -35,6 +35,7 @@ Component({
     lineWidth: 6,
     hasSignature: false,
     isSaving: false,
+    _cachedExportPath: '',
     presetColors: PRESET_COLORS,
     fileType: 'png',
     isDrawing: false,
@@ -264,21 +265,10 @@ Component({
       this.setData({ isSaving: true });
 
       try {
-        const { canvas } = canvasContext;
-        const { fileType } = this.data;
-
-        const res = await new Promise<any>((resolve, reject) => {
-          wx.canvasToTempFilePath({
-            canvas,
-            fileType,
-            quality: 1,
-            success: resolve,
-            fail: reject
-          });
-        });
-
-        await saveImageToAlbumWithUI(res.tempFilePath, {
-          onSuccess: () => this.saveHistory(res.tempFilePath)
+        const tempFilePath = await exportCanvasImage(canvasContext.canvas, this.data.fileType, 1);
+        this.setData({ _cachedExportPath: tempFilePath });
+        await saveImageToAlbumWithUI(tempFilePath, {
+          onSuccess: () => this.saveHistory(tempFilePath)
         });
       } catch (err) {
         handleError(err, '保存失败');
@@ -300,40 +290,20 @@ Component({
       });
     },
 
+    onAfterSave() {
+      if (this.data._cachedExportPath) {
+        this.saveHistory(this.data._cachedExportPath);
+      }
+    },
+
     resetSignature() {
       this.clearCanvas();
       this.setData({
         penColor: '#000000',
         lineWidth: 6,
         fileType: 'png',
+        _cachedExportPath: '',
       });
-    },
-
-    async onShareChat() {
-      const canvasContext = (this as any)._canvasContext;
-      if (!canvasContext || !this.data.hasSignature) {
-        wx.showToast({ title: '请先签名', icon: 'none' });
-        return;
-      }
-
-      try {
-        const { canvas } = canvasContext;
-        const { fileType } = this.data;
-
-        const res = await new Promise<any>((resolve, reject) => {
-          wx.canvasToTempFilePath({
-            canvas,
-            fileType,
-            quality: 1,
-            success: resolve,
-            fail: reject
-          });
-        });
-
-        shareImageToChat(res.tempFilePath);
-      } catch (err) {
-        handleError(err, '发送失败');
-      }
     }
   }
 });

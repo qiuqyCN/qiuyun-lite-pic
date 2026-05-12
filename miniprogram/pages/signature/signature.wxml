@@ -103,10 +103,11 @@
   <view class="section">
     <action-buttons
   isLoading="{{isSaving}}"
+  filePath="{{_cachedExportPath}}"
   disabled="{{!hasSignature}}"
   bind:reset="resetSignature"
   bind:save="saveToAlbum"
-  bind:sharechat="onShareChat"
+  bind:aftersave="onAfterSave"
 />
   </view>
 

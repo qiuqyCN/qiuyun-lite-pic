@@ -11,10 +11,8 @@ import {
   canvasToTempFile,
   fillBackground
 } from '../../utils/canvas';
-import { saveImageToAlbumWithUI, shareImageToChat } from '../../utils/file';
+import { saveImageToAlbumWithUI } from '../../utils/file';
 import { saveToHistory } from '../../utils/history';
-import { handleError } from '../../utils/error';
-import { showLoading } from '../../utils/ui';
 import { debounce } from '../../utils/debounce';
 import { ALL_PRESETS } from '../../constants/presets';
 import type { PresetSize } from '../../types/index';
@@ -267,13 +265,9 @@ Component({
     async generatePreview() {
       if (!this.data.hasImage) return;
 
-      // 清空结果路径，强制保存时重新生成
-      this.setData({ resultPath: '' });
-
       const { imagePath, originalWidth, originalHeight, targetWidth, targetHeight } = this.data;
 
       try {
-        // 计算预览容器尺寸（限制最大显示尺寸）
         const maxContainerSize = 280;
         let containerWidth = targetWidth;
         let containerHeight = targetHeight;
@@ -290,7 +284,6 @@ Component({
           }
         }
 
-        // 计算图片在容器中 aspectFit 后的实际显示尺寸
         const displaySize = calculateDisplaySize(
           originalWidth,
           originalHeight,
@@ -301,14 +294,11 @@ Component({
         const imageDisplayWidth = displaySize.width;
         const imageDisplayHeight = displaySize.height;
 
-        // 获取 Canvas 上下文
         const { canvas, ctx } = await createCanvasContext('previewCanvas', this);
 
-        // Canvas 尺寸与图片显示尺寸一致，不要有灰色背景
         canvas.width = imageDisplayWidth;
         canvas.height = imageDisplayHeight;
 
-        // 创建图片对象
         const image = canvas.createImage();
         await new Promise<void>((resolve, reject) => {
           image.onload = () => resolve();
@@ -316,10 +306,8 @@ Component({
           image.src = imagePath;
         });
 
-        // 直接绘制图片，填满整个 Canvas，不要有背景
         ctx.drawImage(image, 0, 0, imageDisplayWidth, imageDisplayHeight);
 
-        // 导出预览图
         const tempFilePath = await canvasToTempFile(canvas, {
           quality: 0.8,
           fileType: 'jpg',
@@ -330,6 +318,10 @@ Component({
           previewDisplayWidth: Math.round(imageDisplayWidth),
           previewDisplayHeight: Math.round(imageDisplayHeight),
         });
+
+        this.generateResultImage().then(resultPath => {
+          this.setData({ resultPath });
+        }).catch(() => {});
       } catch (err) {
         console.error('预览生成失败:', err);
       }
@@ -399,31 +391,22 @@ Component({
      * 将处理后的图片保存到系统相册
      */
     async saveToAlbum() {
-      let resultPath = this.data.resultPath;
-
-      // 如果没有结果路径，先生成
-      if (!resultPath) {
-        const hideLoading = showLoading('生成中...');
-        try {
-          resultPath = await this.generateResultImage();
-          this.setData({ resultPath });
-          hideLoading();
-        } catch (err) {
-          hideLoading();
-          handleError(err, '生成失败');
-          return;
-        }
+      if (!this.data.resultPath) {
+        const resultPath = await this.generateResultImage();
+        this.setData({ resultPath });
       }
 
-      await saveImageToAlbumWithUI(resultPath, {
+      if (!this.data.resultPath) return;
+
+      await saveImageToAlbumWithUI(this.data.resultPath, {
         onSuccess: () => this.saveToHistory()
       });
     },
 
-    /**
-     * 重置
-     * 清除结果，恢复到原始尺寸
-     */
+    onAfterSave() {
+      this.saveToHistory();
+    },
+
     resetResize() {
       const { originalWidth, originalHeight } = this.data;
       this.setData({
@@ -436,10 +419,6 @@ Component({
       this.generatePreview();
     },
 
-    /**
-     * 保存到历史记录
-     * 将处理记录保存到本地存储
-     */
     saveToHistory() {
       saveToHistory({
         type: 'resize',
@@ -453,12 +432,6 @@ Component({
           targetHeight: this.data.targetHeight,
         }
       });
-    },
-
-    onShareChat() {
-      if (this.data.resultPath) {
-        shareImageToChat(this.data.resultPath);
-      }
     },
   }
 });
