@@ -11,6 +11,68 @@
     <text class="header-subtitle">轻量级图片处理工具</text>
   </view>
 
+  <!-- 快捷入口 -->
+  <view class="quick-entry-section">
+    <view class="quick-entry-container">
+      <!-- 左侧大卡片 - 电子签名（垂直布局） -->
+      <view
+        class="quick-card quick-card-large"
+        style="background: {{quickEntries[0].bg}};"
+        data-path="{{quickEntries[0].path}}"
+        bindtap="navigateToTool"
+      >
+        <view class="quick-card-content-vertical">
+          <text class="quick-card-name">{{quickEntries[0].name}}</text>
+          <text class="quick-card-desc">{{quickEntries[0].description}}</text>
+        </view>
+        <image
+          class="quick-card-img-large"
+          src="{{quickEntries[0].imageUrl}}"
+          mode="aspectFit"
+        ></image>
+      </view>
+
+      <!-- 右侧上下两个小卡片（水平布局） -->
+      <view class="quick-card-right">
+        <!-- 图片压缩 -->
+        <view
+          class="quick-card quick-card-small"
+          style="background: {{quickEntries[1].bg}};"
+          data-path="{{quickEntries[1].path}}"
+          bindtap="navigateToTool"
+        >
+          <view class="quick-card-content">
+            <text class="quick-card-name-small">{{quickEntries[1].name}}</text>
+            <text class="quick-card-desc-small">{{quickEntries[1].description}}</text>
+          </view>
+          <image
+            class="quick-card-img-small"
+            src="{{quickEntries[1].imageUrl}}"
+            mode="aspectFit"
+          ></image>
+        </view>
+
+        <!-- 格式转换 -->
+        <view
+          class="quick-card quick-card-small"
+          style="background: {{quickEntries[2].bg}};"
+          data-path="{{quickEntries[2].path}}"
+          bindtap="navigateToTool"
+        >
+          <view class="quick-card-content">
+            <text class="quick-card-name-small">{{quickEntries[2].name}}</text>
+            <text class="quick-card-desc-small">{{quickEntries[2].description}}</text>
+          </view>
+          <image
+            class="quick-card-img-small"
+            src="{{quickEntries[2].imageUrl}}"
+            mode="aspectFit"
+          ></image>
+        </view>
+      </view>
+    </view>
+  </view>
+
   <!-- 工具分类列表 -->
   <view class="categories-section">
     <view 

@@ -24,6 +24,35 @@ interface ToolCategory {
 
 Component({
   data: {
+    quickEntries: [
+      {
+        id: 'signature',
+        name: '电子签名',
+        description: '手写签名，透明背景导出',
+        path: '/pages/signature/signature',
+        bg: '#F0ECFF',
+        themeColor: '#7C6AE0',
+        imageUrl: '/images/homepage/book-writer.svg'
+      },
+      {
+        id: 'compress',
+        name: '图片压缩',
+        description: '智能压缩，节省存储空间',
+        path: '/pages/compress/compress',
+        bg: '#E8F4FC',
+        themeColor: '#3BA5E5',
+        imageUrl: '/images/homepage/folder-files.svg'
+      },
+      {
+        id: 'convert',
+        name: '格式转换',
+        description: '图片格式转换为JPG/PNG',
+        path: '/pages/convert/convert',
+        bg: '#FFECEF',
+        themeColor: '#E85CA0',
+        imageUrl: '/images/homepage/asset-selection.svg'
+      }
+    ],
     // 工具分类
     categories: [
       {
@@ -45,7 +74,8 @@ Component({
             description: '多格式导入，转为 JPG/PNG',
             icon: '🔄',
             iconBg: '#fff0f0',
-            path: '/pages/convert/convert'
+            path: '/pages/convert/convert',
+            isHot: true
           },
           {
             id: 'resize',
@@ -53,8 +83,7 @@ Component({
             description: '裁剪、缩放，适配各种平台尺寸',
             icon: '📐',
             iconBg: '#f0f0ff',
-            path: '/pages/resize/resize',
-            isHot: true
+            path: '/pages/resize/resize'
           },
           {
             id: 'crop',
@@ -75,9 +104,60 @@ Component({
         ]
       },
       {
+        id: 'advanced',
+        name: '高级功能',
+        tools: [
+          // {
+          //   id: 'cutout',
+          //   name: '智能抠图',
+          //   description: 'AI 自动识别，一键更换背景',
+          //   icon: '✂️',
+          //   iconBg: '#ffe8f0',
+          //   path: '/pages/cutout/cutout',
+          //   isDeveloping: true
+          // },
+          {
+            id: 'signature',
+            name: '电子签名',
+            description: '手写签名，透明背景导出',
+            icon: '✍️',
+            iconBg: '#e8fff0',
+            path: '/pages/signature/signature',
+            isHot: true,
+            isNew: true
+          },
+            {
+            id: 'qrcode',
+            name: '二维码生成',
+            description: '文本、网址、WiFi、名片二维码',
+            icon: '🔲',
+            iconBg: '#e8f0ff',
+            path: '/pages/qrcode/qrcode',
+            isHot: true
+          },
+          {
+            id: 'colorpicker',
+            name: '图片取色',
+            description: '点击图片获取任意位置颜色值',
+            icon: '🎨',
+            iconBg: '#f8e8ff',
+            path: '/pages/colorpicker/colorpicker'
+          }
+        ]
+      },
+      {
         id: 'enhance',
         name: '美化编辑',
         tools: [
+           {
+            id: 'watermark',
+            name: '添加水印',
+            description: '文字或图片水印，保护作品版权',
+            icon: '💧',
+            iconBg: '#e8f8ff',
+            path: '/pages/watermark/watermark',
+            isHot: true
+          },
           {
             id: 'filter',
             name: '滤镜美化',
@@ -85,14 +165,6 @@ Component({
             icon: '✨',
             iconBg: '#fff8e8',
             path: '/pages/filter/filter'
-          },
-          {
-            id: 'watermark',
-            name: '添加水印',
-            description: '文字或图片水印，保护作品版权',
-            icon: '💧',
-            iconBg: '#e8f8ff',
-            path: '/pages/watermark/watermark'
           },
           {
             id: 'collage',
@@ -109,47 +181,6 @@ Component({
             icon: '✏️',
             iconBg: '#fff0e8',
             path: '/pages/annotate/annotate'
-          }
-        ]
-      },
-      {
-        id: 'advanced',
-        name: '高级功能',
-        tools: [
-          // {
-          //   id: 'cutout',
-          //   name: '智能抠图',
-          //   description: 'AI 自动识别，一键更换背景',
-          //   icon: '✂️',
-          //   iconBg: '#ffe8f0',
-          //   path: '/pages/cutout/cutout',
-          //   isDeveloping: true
-          // },
-          {
-            id: 'colorpicker',
-            name: '图片取色',
-            description: '点击图片获取任意位置颜色值',
-            icon: '🎨',
-            iconBg: '#f8e8ff',
-            path: '/pages/colorpicker/colorpicker'
-          },
-          {
-            id: 'qrcode',
-            name: '二维码生成',
-            description: '文本、网址、WiFi、名片二维码',
-            icon: '🔲',
-            iconBg: '#e8f0ff',
-            path: '/pages/qrcode/qrcode',
-            isNew: true
-          },
-          {
-            id: 'signature',
-            name: '电子签名',
-            description: '手写签名，透明背景导出',
-            icon: '✍️',
-            iconBg: '#e8fff0',
-            path: '/pages/signature/signature',
-            isNew: true
           }
         ]
       }

@@ -12,7 +12,7 @@
 
 /* Header */
 .minimal-header {
-  padding: 32px 0 24px;
+  padding: 0px 0 24px;
 }
 
 .header-title {
@@ -28,6 +28,140 @@
   color: #86868b;
   margin-top: 6px;
   display: block;
+}
+
+/* 快捷入口 */
+.quick-entry-section {
+  margin-bottom: 28px;
+}
+
+.quick-entry-container {
+  display: flex;
+  gap: 16rpx;
+  height: 320rpx;
+  align-items: stretch;
+}
+
+/* 左侧大卡片 - 垂直布局 */
+.quick-card-large {
+  width: calc(50% - 8rpx);
+  height: 100%;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 16rpx 20rpx;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* 右侧卡片容器 */
+.quick-card-right {
+  width: calc(50% - 8rpx);
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  height: 100%;
+}
+
+/* 小卡片 - 水平布局 */
+.quick-card-small {
+  flex: 1;
+}
+
+.quick-card {
+  border-radius: 20rpx;
+  padding: 16rpx 20rpx;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  position: relative;
+}
+
+.quick-card:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+/* 卡片内容 - 水平布局（小卡片用） */
+.quick-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  flex: 1;
+  min-width: 0;
+  z-index: 1;
+}
+
+/* 卡片内容 - 垂直布局（大卡片用） */
+.quick-card-content-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  flex-shrink: 0;
+  z-index: 1;
+  margin-bottom: 12rpx;
+}
+
+/* 描述+箭头同行 */
+.quick-card-desc-row {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.quick-card-name {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1d1d1f;
+  letter-spacing: -0.01em;
+}
+
+.quick-card-desc {
+  font-size: 20rpx;
+  color: #86868b;
+  line-height: 1.4;
+}
+
+.quick-card-arrow {
+  font-size: 24rpx;
+  font-weight: 300;
+  flex-shrink: 0;
+}
+
+/* 大卡片图片 - 填充剩余空间 */
+.quick-card-img-large {
+  width: 100%;
+  height: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  align-self: center;
+}
+
+/* 小卡片文字样式 */
+.quick-card-name-small {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.quick-card-desc-small {
+  font-size: 20rpx;
+  color: #86868b;
+  line-height: 1.3;
+}
+
+.quick-card-arrow-small {
+  font-size: 24rpx;
+  font-weight: 300;
+  flex-shrink: 0;
+}
+
+/* 小卡片图片 - 占50%空间 */
+.quick-card-img-small {
+  width: 45%;
+  height: 80%;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 /* 广告位 */
