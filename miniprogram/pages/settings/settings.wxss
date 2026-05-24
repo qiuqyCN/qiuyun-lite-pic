@@ -70,29 +70,7 @@
   margin-right: 24rpx;
 }
 
-.cache-icon {
-  background: #fff2f0;
-}
 
-.contact-icon {
-  background: #e8f0ff;
-}
-
-.feedback-icon {
-  background: #e6f7ff;
-}
-
-.about-icon {
-  background: #f6ffed;
-}
-
-.share-icon {
-  background: #e6fffb;
-}
-
-.code-icon {
-  background: #f0f5ff;
-}
 
 .icon {
   font-size: 36rpx;

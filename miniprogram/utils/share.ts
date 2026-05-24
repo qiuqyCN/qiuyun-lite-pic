@@ -16,72 +16,72 @@ const shareConfigMap: Record<string, ShareConfig> = {
   index: {
     title: '秋云轻图 - 极简高效的图片处理工具',
     path: '/pages/index/index',
-    imageUrl: '/images/weappcode.png'
+    imageUrl: '/images/wxaqrcode.png'
   },
   compress: {
     title: '图片压缩神器，一键节省90%空间',
     path: '/pages/index/index',
-    imageUrl: '/images/weappcode.png'
+    imageUrl: '/images/wxaqrcode.png'
   },
   resize: {
     title: '图片尺寸调整，适配各种平台',
     path: '/pages/index/index',
-    imageUrl: '/images/weappcode.png'
+    imageUrl: '/images/wxaqrcode.png'
   },
   convert: {
     title: '图片格式转换，支持多种格式互转',
     path: '/pages/index/index',
-    imageUrl: '/images/weappcode.png'
+    imageUrl: '/images/wxaqrcode.png'
   },
   filter: {
     title: '20+滤镜效果，让照片更出彩',
     path: '/pages/index/index',
-    imageUrl: '/images/weappcode.png'
+    imageUrl: '/images/wxaqrcode.png'
   },
   watermark: {
     title: '添加个性水印，保护作品版权',
     path: '/pages/index/index',
-    imageUrl: '/images/weappcode.png'
+    imageUrl: '/images/wxaqrcode.png'
   },
   crop: {
     title: '智能图片裁剪，自由调整尺寸',
     path: '/pages/index/index',
-    imageUrl: '/images/weappcode.png'
+    imageUrl: '/images/wxaqrcode.png'
   },
   rotate: {
     title: '图片旋转翻转，任意角度调整',
     path: '/pages/index/index',
-    imageUrl: '/images/weappcode.png'
+    imageUrl: '/images/wxaqrcode.png'
   },
   annotate: {
     title: '图片标注涂鸦，自由创作',
     path: '/pages/index/index',
-    imageUrl: '/images/weappcode.png'
+    imageUrl: '/images/wxaqrcode.png'
   },
   collage: {
     title: '多图拼接，多种布局可选',
     path: '/pages/index/index',
-    imageUrl: '/images/weappcode.png'
+    imageUrl: '/images/wxaqrcode.png'
   },
   colorpicker: {
     title: '图片取色器，精准识别颜色',
     path: '/pages/index/index',
-    imageUrl: '/images/weappcode.png'
+    imageUrl: '/images/wxaqrcode.png'
   },
   qrcode: {
     title: '免费二维码生成，支持多种格式',
     path: '/pages/qrcode/qrcode',
-    imageUrl: '/images/weappcode.png'
+    imageUrl: '/images/wxaqrcode.png'
   },
   signature: {
     title: '电子签名生成器，手写签名一键导出',
     path: '/pages/signature/signature',
-    imageUrl: '/images/weappcode.png'
+    imageUrl: '/images/wxaqrcode.png'
   },
   settings: {
     title: '秋云轻图 - 本地处理，保护隐私',
     path: '/pages/index/index',
-    imageUrl: '/images/weappcode.png'
+    imageUrl: '/images/wxaqrcode.png'
   }
 };
 

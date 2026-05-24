@@ -61,7 +61,7 @@
           </view>
         </view>
         <view class="setting-right">
-          <image class="weapp-code-img" src="/images/weappcode.png" mode="aspectFit"/>
+          <image class="weapp-code-img" src="/images/wxaqrcode.png" mode="aspectFit"/>
           <text class="arrow">›</text>
         </view>
       </view>

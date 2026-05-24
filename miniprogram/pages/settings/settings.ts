@@ -165,8 +165,8 @@ Component({
      */
     onShareWeappCode() {
       wx.previewImage({
-        urls: ['/images/weappcode.png'],
-        current: '/images/weappcode.png'
+        urls: ['/images/wxaqrcode.png'],
+        current: '/images/wxaqrcode.png'
       });
     },
 
