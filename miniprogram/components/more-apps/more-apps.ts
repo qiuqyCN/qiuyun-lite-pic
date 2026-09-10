@@ -17,18 +17,18 @@ Component({
 
   data: {
     apps: [
-      {
-        appid: 'wx8f22a4c93bed3d01',
-        name: '秋云工具大全',
-        desc: '实用工具集合',
-        logo: '/images/logo/toolbox-logo.png'
-      },
-      {
-        appid: 'wx0133fb911f0e7232',
-        name: '办公文档助手',
-        desc: '文档处理工具',
-        logo: '/images/logo/doc-logo.png'
-      },
+      // {
+      //   appid: 'wx8f22a4c93bed3d01',
+      //   name: '秋云工具大全',
+      //   desc: '实用工具集合',
+      //   logo: '/images/logo/toolbox-logo.png'
+      // },
+      // {
+      //   appid: 'wx0133fb911f0e7232',
+      //   name: '办公文档助手',
+      //   desc: '文档处理工具',
+      //   logo: '/images/logo/doc-logo.png'
+      // },
       // {
       //   appid: 'wx1ee54f15721ada62',
       //   name: '秋云古诗词',
