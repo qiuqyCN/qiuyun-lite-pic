@@ -3,6 +3,7 @@
 
 import type { ImageInfo } from '../types/index';
 import { getFileSize } from './file';
+import { checkImage } from './security';
 
 /**
  * 显示选择图片菜单
@@ -99,6 +100,16 @@ export const chooseImage = async (): Promise<ImageInfo> => {
     tempFilePaths = await chooseImageFromMessage(1);
   }
 
+  // 内容安全检测
+  wx.showLoading({ title: '检测中...' });
+  const safe = await checkImage(tempFilePaths[0]);
+  wx.hideLoading();
+
+  if (!safe) {
+    wx.showToast({ title: '图片内容违规', icon: 'none' });
+    throw new Error('图片内容违规');
+  }
+
   const images = await processImageInfos(tempFilePaths);
   return images[0];
 };
@@ -129,6 +140,18 @@ export const chooseMultipleImages = async (count: number = 9): Promise<ImageInfo
     // 聊天记录
     tempFilePaths = await chooseImageFromMessage(count);
   }
+
+  // 内容安全检测（逐张检测）
+  wx.showLoading({ title: '检测中...' });
+  for (const path of tempFilePaths) {
+    const safe = await checkImage(path);
+    if (!safe) {
+      wx.hideLoading();
+      wx.showToast({ title: '图片内容违规', icon: 'none' });
+      throw new Error('图片内容违规');
+    }
+  }
+  wx.hideLoading();
 
   return await processImageInfos(tempFilePaths);
 };

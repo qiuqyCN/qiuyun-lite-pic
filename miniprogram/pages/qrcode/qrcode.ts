@@ -1,6 +1,7 @@
 import drawQrcode from '../../miniprogram_npm/weapp-qrcode-canvas-2d/index';
 import { saveToHistory } from '../../utils/history';
 import { onShareAppMessage, onShareTimeline } from '../../utils/share';
+import { checkImage, checkText } from '../../utils/security';
 
 interface QRCodeData {
   currentType: string;
@@ -163,6 +164,16 @@ Page({
       }
 
       if (tempFilePath) {
+        // 图片安全检测
+        wx.showLoading({ title: '检测中...' });
+        const safe = await checkImage(tempFilePath);
+        wx.hideLoading();
+
+        if (!safe) {
+          wx.showToast({ title: '图片内容违规', icon: 'none' });
+          return;
+        }
+
         this.setData({ logoPath: tempFilePath });
         this.debounceGenerate();
       }
@@ -205,9 +216,17 @@ Page({
     }, 300);
   },
 
-  generateQRCode() {
+  async generateQRCode() {
     const content = this.getQRContent();
     if (!content.trim()) {
+      this.setData({ hasGenerated: false, qrImagePath: '' });
+      return;
+    }
+
+    // 文本安全检测
+    const safe = await checkText(content);
+    if (!safe) {
+      wx.showToast({ title: '内容违规', icon: 'none' });
       this.setData({ hasGenerated: false, qrImagePath: '' });
       return;
     }

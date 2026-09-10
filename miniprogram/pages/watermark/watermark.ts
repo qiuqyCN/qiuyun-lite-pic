@@ -6,6 +6,7 @@ import { createCanvasContext, canvasToTempFile } from '../../utils/canvas';
 import { saveToHistory } from '../../utils/history';
 import { handleError } from '../../utils/error';
 import { onShareAppMessage, onShareTimeline } from '../../utils/share';
+import { checkText } from '../../utils/security';
 
 /** 水印位置类型 */
 type WatermarkPosition = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight' | 'center' | 'tile';
@@ -229,9 +230,19 @@ Component({
       if (!this.data.hasImage) return;
 
       // 文字水印检查
-      if (this.data.watermarkType === 'text' && !this.data.watermarkText) {
-        this.setData({ watermarkedPath: this.data.imagePath });
-        return;
+      if (this.data.watermarkType === 'text') {
+        if (!this.data.watermarkText) {
+          this.setData({ watermarkedPath: this.data.imagePath });
+          return;
+        }
+
+        // 文本安全检测
+        const safe = await checkText(this.data.watermarkText);
+        if (!safe) {
+          wx.showToast({ title: '内容违规', icon: 'none' });
+          this.setData({ watermarkedPath: this.data.imagePath });
+          return;
+        }
       }
 
       // 图片水印检查
