@@ -237,9 +237,8 @@ Component({
         }
 
         // 文本安全检测
-        const safe = await checkText(this.data.watermarkText);
-        if (!safe) {
-          wx.showToast({ title: '内容违规', icon: 'none' });
+        const checkRes = await checkText(this.data.watermarkText);
+        if (!checkRes.pass) {
           this.setData({ watermarkedPath: this.data.imagePath });
           return;
         }

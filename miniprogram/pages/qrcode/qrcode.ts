@@ -165,7 +165,7 @@ Page({
 
       if (tempFilePath) {
         // 图片安全检测
-        wx.showLoading({ title: '检测中...' });
+        wx.showLoading({ title: '安全检测中，请稍候' });
         const safe = await checkImage(tempFilePath);
         wx.hideLoading();
 
@@ -224,9 +224,8 @@ Page({
     }
 
     // 文本安全检测
-    const safe = await checkText(content);
-    if (!safe) {
-      wx.showToast({ title: '内容违规', icon: 'none' });
+    const checkRes = await checkText(content);
+    if (!checkRes.pass) {
       this.setData({ hasGenerated: false, qrImagePath: '' });
       return;
     }

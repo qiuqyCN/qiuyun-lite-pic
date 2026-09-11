@@ -101,13 +101,12 @@ export const chooseImage = async (): Promise<ImageInfo> => {
   }
 
   // 内容安全检测
-  wx.showLoading({ title: '检测中...' });
-  const safe = await checkImage(tempFilePaths[0]);
+  wx.showLoading({ title: '安全检测中，请稍候' });
+  const res = await checkImage(tempFilePaths[0]);
   wx.hideLoading();
 
-  if (!safe) {
-    wx.showToast({ title: '图片内容违规', icon: 'none' });
-    throw new Error('图片内容违规');
+  if (!res.pass) {
+    throw new Error(res.reason || '图片内容违规');
   }
 
   const images = await processImageInfos(tempFilePaths);
@@ -142,13 +141,12 @@ export const chooseMultipleImages = async (count: number = 9): Promise<ImageInfo
   }
 
   // 内容安全检测（逐张检测）
-  wx.showLoading({ title: '检测中...' });
+  wx.showLoading({ title: '安全检测中，请稍候' });
   for (const path of tempFilePaths) {
-    const safe = await checkImage(path);
-    if (!safe) {
+    const res = await checkImage(path);
+    if (!res.pass) {
       wx.hideLoading();
-      wx.showToast({ title: '图片内容违规', icon: 'none' });
-      throw new Error('图片内容违规');
+      throw new Error(res.reason || '图片内容违规');
     }
   }
   wx.hideLoading();
