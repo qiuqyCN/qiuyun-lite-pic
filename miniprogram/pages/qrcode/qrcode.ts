@@ -165,7 +165,7 @@ Page({
 
       if (tempFilePath) {
         // 图片安全检测
-        wx.showLoading({ title: '安全检测中，请稍候' });
+        wx.showLoading({ title: '安全检测中...' });
         const safe = await checkImage(tempFilePath);
         wx.hideLoading();
 

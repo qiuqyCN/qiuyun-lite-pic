@@ -101,7 +101,7 @@ export const chooseImage = async (): Promise<ImageInfo> => {
   }
 
   // 内容安全检测
-  wx.showLoading({ title: '安全检测中，请稍候' });
+  wx.showLoading({ title: '安全检测中...' });
   const res = await checkImage(tempFilePaths[0]);
   wx.hideLoading();
 
@@ -141,7 +141,7 @@ export const chooseMultipleImages = async (count: number = 9): Promise<ImageInfo
   }
 
   // 内容安全检测（逐张检测）
-  wx.showLoading({ title: '安全检测中，请稍候' });
+  wx.showLoading({ title: '安全检测中...' });
   for (const path of tempFilePaths) {
     const res = await checkImage(path);
     if (!res.pass) {

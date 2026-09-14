@@ -3,8 +3,8 @@
 // - 图片: mediaCheckAsync (异步, 前端轮询)
 // - 文本: msgSecCheck (同步)
 
-const POLL_INTERVAL = 2000   // 轮询间隔 2秒
-const POLL_MAX = 20          // 最多轮询 20 次 = 40秒
+const POLL_INTERVAL = 1200   // 轮询间隔 1 秒
+const POLL_MAX = 25          // 最多轮询 10 次 = 10秒
 
 /**
  * 图片安全检测（异步轮询）
@@ -45,7 +45,7 @@ export async function checkImage(filePath: string): Promise<{ pass: boolean; rea
 
     // 轮询等待结果
     for (let i = 0; i < POLL_MAX; i++) {
-      await new Promise(r => setTimeout(r, POLL_INTERVAL))
+      await new Promise(r => setTimeout(r, i === 0 ? POLL_INTERVAL : POLL_INTERVAL - 100))
 
       const pollRes = await wx.cloud.callFunction({
         name: 'checkResult',
@@ -66,7 +66,8 @@ export async function checkImage(filePath: string): Promise<{ pass: boolean; rea
         if (!filePath.startsWith('cloud://')) {
           wx.cloud.deleteFile({ fileList: [fileID] }).catch(() => {})
         }
-
+        console.log('[Security] 图片检测结果:', result)
+        
         if (!result.pass) {
           const detail = result.labelName ? `（${result.labelName}）` : ''
           wx.showModal({
