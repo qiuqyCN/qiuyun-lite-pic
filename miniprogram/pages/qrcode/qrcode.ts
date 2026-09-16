@@ -2,6 +2,7 @@ import drawQrcode from '../../miniprogram_npm/weapp-qrcode-canvas-2d/index';
 import { saveToHistory } from '../../utils/history';
 import { onShareAppMessage, onShareTimeline } from '../../utils/share';
 import { checkImage, checkText } from '../../utils/security';
+import { showChecking, hideChecking } from '../../utils/checking';
 
 interface QRCodeData {
   currentType: string;
@@ -30,6 +31,7 @@ interface QRCodeData {
 
 Page({
   data: {
+    checkingVisible: false,
     currentType: 'text',
     typeList: [
       { id: 'text', name: '文本', icon: '📝' },
@@ -165,9 +167,9 @@ Page({
 
       if (tempFilePath) {
         // 图片安全检测
-        wx.showLoading({ title: '安全检测中...' });
+        showChecking();
         const safe = await checkImage(tempFilePath);
-        wx.hideLoading();
+        hideChecking();
 
         if (!safe) {
           wx.showToast({ title: '图片内容违规', icon: 'none' });

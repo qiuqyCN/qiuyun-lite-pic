@@ -2,6 +2,7 @@
 <!-- 图片取色页面 - 增强版 -->
 
 <view class="container">
+  <checking-modal visible="{{checkingVisible}}" />
   <!-- 未选择图片状态 -->
   <image-upload
     wx:if="{{!hasImage}}"

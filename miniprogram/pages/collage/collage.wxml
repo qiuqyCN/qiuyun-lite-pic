@@ -1,5 +1,6 @@
 <!--collage.wxml-->
 <view class="container">
+  <checking-modal visible="{{checkingVisible}}" />
   <!-- 图片选择区域 -->
   <view class="section">
     <view class="section-title">选择图片</view>

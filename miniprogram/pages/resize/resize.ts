@@ -50,6 +50,7 @@ interface ResizeData {
 
 Component({
   data: {
+    checkingVisible: false,
     // 图片信息
     imagePath: '',
     originalWidth: 0,

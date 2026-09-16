@@ -1,0 +1,18 @@
+<view wx:if="{{visible}}" class="checking-mask">
+  <view class="checking-box">
+    <!-- loading 动画 -->
+    <view class="checking-loading">
+      <view class="loading-spinner"></view>
+      <text class="checking-text">安全检测中，请稍候</text>
+    </view>
+
+    <!-- Banner 广告 -->
+    <view class="checking-ad" wx:if="{{showAd}}">
+      <ad-custom
+        unit-id="{{adUnitId}}"
+        bindload="onAdLoad"
+        binderror="onAdError"
+      ></ad-custom>
+    </view>
+  </view>
+</view>

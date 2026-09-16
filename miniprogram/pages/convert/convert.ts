@@ -33,6 +33,7 @@ interface ConvertData {
 
 Component({
   data: {
+    checkingVisible: false,
     // 图片信息
     imagePath: '',
     originalSize: 0,

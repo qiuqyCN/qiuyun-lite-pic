@@ -61,6 +61,7 @@ const PRESET_COLORS = [
 
 Component({
   data: {
+    checkingVisible: false,
     imagePath: '',
     originalWidth: 0,
     originalHeight: 0,

@@ -3,6 +3,7 @@
   "navigationBarBackgroundColor": "#41bc3f",
   "navigationBarTextStyle": "white",
   "usingComponents": {
+    "checking-modal": "/components/checking-modal/checking-modal",
     "image-upload": "/components/image-upload/image-upload",
     "image-preview": "/components/image-preview/image-preview",
     "scroll-selector": "/components/scroll-selector/scroll-selector",

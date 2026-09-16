@@ -52,6 +52,7 @@ interface WatermarkData {
 
 Component({
   data: {
+    checkingVisible: false,
     // 图片信息
     imagePath: '',
     watermarkedPath: '',

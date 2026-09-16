@@ -1,4 +1,5 @@
 <view class="qrcode-container">
+  <checking-modal visible="{{checkingVisible}}" />
   <!-- 类型选择 -->
   <view class="section">
     <scroll-selector

@@ -1,5 +1,6 @@
 {
   "usingComponents": {
+    "checking-modal": "/components/checking-modal/checking-modal",
     "image-upload": "/components/image-upload/image-upload",
     "image-preview": "/components/image-preview/image-preview",
     "format-selector": "/components/format-selector/format-selector",

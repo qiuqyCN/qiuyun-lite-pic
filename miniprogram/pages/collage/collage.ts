@@ -61,6 +61,7 @@ interface CollageData {
 
 Component({
   data: {
+    checkingVisible: false,
     // 图片列表
     images: [] as string[],
     imageInfos: [] as ImageSizeInfo[],

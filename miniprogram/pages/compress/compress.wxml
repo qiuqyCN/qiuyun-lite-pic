@@ -1,5 +1,6 @@
 <!--compress.wxml-->
 <view class="compress-container">
+  <checking-modal visible="{{checkingVisible}}" />
   <!-- 未选择图片状态 -->
   <image-upload
     wx:if="{{!hasImage}}"

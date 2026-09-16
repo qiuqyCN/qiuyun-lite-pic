@@ -4,6 +4,7 @@
 import type { ImageInfo } from '../types/index';
 import { getFileSize } from './file';
 import { checkImage } from './security';
+import { showChecking, hideChecking } from './checking';
 
 /**
  * 显示选择图片菜单
@@ -101,9 +102,9 @@ export const chooseImage = async (): Promise<ImageInfo> => {
   }
 
   // 内容安全检测
-  wx.showLoading({ title: '安全检测中...' });
+  showChecking();
   const res = await checkImage(tempFilePaths[0]);
-  wx.hideLoading();
+  hideChecking();
 
   if (!res.pass) {
     throw new Error(res.reason || '图片内容违规');
@@ -141,15 +142,15 @@ export const chooseMultipleImages = async (count: number = 9): Promise<ImageInfo
   }
 
   // 内容安全检测（逐张检测）
-  wx.showLoading({ title: '安全检测中...' });
+  showChecking();
   for (const path of tempFilePaths) {
     const res = await checkImage(path);
     if (!res.pass) {
-      wx.hideLoading();
+      hideChecking();
       throw new Error(res.reason || '图片内容违规');
     }
   }
-  wx.hideLoading();
+  hideChecking();
 
   return await processImageInfos(tempFilePaths);
 };

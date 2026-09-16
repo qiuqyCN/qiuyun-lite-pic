@@ -1,5 +1,6 @@
 <!--watermark.wxml-->
 <view class="watermark-container">
+  <checking-modal visible="{{checkingVisible}}" />
   <!-- 未选择图片状态 -->
   <image-upload
     wx:if="{{!hasImage}}"

@@ -36,6 +36,7 @@ interface FilterData {
 
 Component({
   data: {
+    checkingVisible: false,
     // 图片信息
     imagePath: '',
     filteredPath: '',

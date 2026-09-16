@@ -33,6 +33,7 @@ interface CompressData {
 
 Component({
   data: {
+    checkingVisible: false,
     imagePath: '',
     originalSize: 0,
     originalWidth: 0,

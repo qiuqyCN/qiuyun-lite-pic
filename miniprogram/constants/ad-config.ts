@@ -16,5 +16,7 @@ export const AD_CONFIG = {
     settings: 'adunit-c30a5edfeb2c052b',
     /** 文件上传组件 */
     upload: 'adunit-ce1dec1c9c3ce688',
+    /** Loading组件 */
+    loading: 'adunit-055625f19f782347',
   }
 };
